@@ -12,6 +12,11 @@
 		var/mob/L = loc
 		L.update_inv_cloak()
 
+/datum/controller/subsystem/vote/result()
+	. = ..()
+	if(mode == "norulervote")
+		SSticker.voting = FALSE
+
 // UPSTREAM BUG (remove this override once fixed upstream): /obj/structure/vine/Crossed types the crosser as /mob and reads crosser.m_intent, but non-mob movers (e.g. the wandering /obj/item/reagent_containers/food/snacks/smallrat) cross vines and runtime on the undefined var. Reimplemented with an ismob() guard; replicates /atom/movable/Crossed (COMSIG_MOVABLE_CROSSED) and /obj/structure/Crossed (climb offset) because the same-type redefinition bypasses the upstream ..() chain.
 /obj/structure/vine/Crossed(atom/movable/crosser, oldloc)
 	SEND_SIGNAL(src, COMSIG_MOVABLE_CROSSED, crosser)

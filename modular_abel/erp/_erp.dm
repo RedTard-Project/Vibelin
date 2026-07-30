@@ -116,6 +116,7 @@
 #include "code\modules\erp_system\actions\masturbation\tail\oral.dm"
 #include "code\modules\erp_system\actions\masturbation\tail\penis.dm"
 #include "code\modules\erp_system\actions\masturbation\tail\vaginal.dm"
+#include "code\modules\erp_system\additionals\erp_items.dm"
 #include "code\modules\erp_system\actor\erp_actor.dm"
 #include "code\modules\erp_system\actor\erp_actor_custom_actions_service.dm"
 #include "code\modules\erp_system\actor\erp_actor_ui_helpers.dm"

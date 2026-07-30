@@ -21,12 +21,29 @@
 
 	return get_location_accessible(H, zone)
 
+/datum/erp_organ_spill_policy/proc/stain_covering_clothing(mob/living/carbon/wearer, zone, datum/reagents/R)
+	if(!istype(wearer) || !R || R.total_volume <= 0)
+		return FALSE
+
+	for(var/obj/item/equipped_item in wearer.get_equipped_items())
+		if(!zone2covered(zone, equipped_item.body_parts_covered) || !equipped_item.surgery_cover)
+			continue
+		if(!equipped_item.reagents)
+			equipped_item.create_reagents(30)
+		R.trans_to(equipped_item, R.total_volume, 1, TRUE, TRUE)
+		return TRUE
+
+	return FALSE
+
 /datum/erp_organ_spill_policy/proc/drop_to_ground(datum/erp_sex_organ/O, datum/reagents/R)
 	if(!R || R.total_volume <= 0)
 		return
 
 	if(!can_spill_to_ground(O))
-		R.clear_reagents()
+		var/mob/living/carbon/H = O.get_owner()
+		var/zone = _organ_type_to_zone(O)
+		if(!zone || !stain_covering_clothing(H, zone, R))
+			R.clear_reagents()
 		return
 
 	var/turf/T = get_turf(O.get_owner() || O.host)

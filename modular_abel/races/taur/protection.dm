@@ -9,10 +9,10 @@
 	name = "iron horseshoes"
 	desc = "A pair of sturdy iron horseshoes fixed to leather straps for taur hooves."
 	gender = PLURAL
-	icon = 'modular_abel/races/icons/clothing/onmob/saiga.dmi'
+	icon = 'icons/roguetown/clothing/feet.dmi'
 	mob_overlay_icon = 'modular_abel/races/icons/clothing/onmob/saiga.dmi'
 	sleeved = null
-	icon_state = "iron_horseshoes"
+	icon_state = "iplateboots"
 	item_state = "iron_horseshoes"
 	body_parts_covered = FEET
 	armor_type = /datum/armor/boots/plate/bad
@@ -23,8 +23,11 @@
 	resistance_flags = FIRE_PROOF
 	sellprice = VALUE_IRON_ARMOR
 	item_weight = 1.4 KILOGRAMS
+	var/onmob_state = "iron_horseshoes"
 
 /obj/item/clothing/shoes/taur_horseshoes/build_worn_icon(age = AGE_ADULT, default_layer = 0, default_icon_file = null, isinhands = FALSE, femaleuniform = NO_FEMALE_UNIFORM, override_state = null, coom = FALSE, customi = null, sleeveindex, force_child = FALSE)
+	if(!isinhands && !override_state)
+		override_state = onmob_state
 	var/mutable_appearance/image = ..()
 	if(!isinhands && istype(image, /mutable_appearance))
 		image.pixel_x = -16
@@ -42,8 +45,9 @@
 /obj/item/clothing/shoes/taur_horseshoes/steel
 	name = "steel horseshoes"
 	desc = "Well-forged steel horseshoes on thick leather straps. Heavier than iron, but they protect a taur's hooves far better."
-	icon_state = "steel_horseshoes"
+	icon_state = "armorboots"
 	item_state = "steel_horseshoes"
+	onmob_state = "steel_horseshoes"
 	armor_type = /datum/armor/boots/plate/good
 	max_integrity = ARMOR_INT_LEG_STEEL_PLATE
 	armor_class = AC_HEAVY
@@ -54,7 +58,7 @@
 /obj/item/clothing/shoes/taur_horseshoes/leather
 	name = "leather hoofguards"
 	desc = "Layered leather wraps and pads strapped over a taur's hooves. Light and quiet, but they offer only modest protection."
-	icon_state = "iron_horseshoes"
+	icon_state = "leatherboots"
 	item_state = "iron_horseshoes"
 	color = "#8a5a2b"
 	armor_type = /datum/armor/boots/leather

@@ -56,6 +56,8 @@
 	return FALSE
 
 /obj/item/clothing/proc/get_propagade_kinks()
+	if(islist(propagade_kink) && propagade_kink.len)
+		return propagade_kink
 	return null
 
 /mob/living/carbon/human/proc/get_worn_kink_tags()

@@ -392,7 +392,9 @@
 	if(bodyzone && !get_location_accessible(coat_mob, bodyzone))
 		var/datum/reagents/Rwaste = source_organ.extract_reagents(amount * 2)
 		if(Rwaste)
-			Rwaste.clear_reagents()
+			var/datum/erp_organ_spill_policy/SP = SSerp.organ_spill_policy
+			if(!SP || !SP.stain_covering_clothing(coat_mob, bodyzone, Rwaste))
+				Rwaste.clear_reagents()
 			qdel(Rwaste)
 		return TRUE
 
