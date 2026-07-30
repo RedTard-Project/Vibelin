@@ -1,0 +1,10 @@
+author: "trueroguan"
+delete-after: True
+changes:
+  - bugfix: "fixed compile errors from upstream's armor rework"
+  - bugfix: "fixed rounds getting stuck forever with no Ruler readied"
+  - bugfix: "fixed taur horseshoes overflowing their inventory slot"
+  - bugfix: "fixed ERP fluid vanishing instead of staining clothing"
+  - bugfix: "fixed home doors never closing on their own"
+  - rscadd: "added pony-themed ERP attire (corset, boots, hooves, harness gag, blindfold)"
+  - code_imp: "fixed resident quirk not calling parent procs"
