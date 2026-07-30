@@ -8851,7 +8851,7 @@
 /area/rogue/outdoors/woods/vampire_lair)
 "JJ" = (
 /obj/structure/closet/crate/crafted_closet,
-/obj/item/clothing/gloves/leather/otavan,
+/obj/item/clothing/gloves/leather/grenzel,
 /obj/item/clothing/gloves,
 /obj/item/clothing/gloves/leather/black,
 /obj/item/clothing/gloves/angle,
@@ -11730,9 +11730,9 @@
 "Vy" = (
 /obj/structure/closet/crate/chest,
 /obj/machinery/light/fueled/wallfire/candle/r/dun_world,
-/obj/item/clothing/head,
-/obj/item/clothing/head,
-/obj/item/clothing/head,
+/obj/item/clothing/head/menacing,
+/obj/item/clothing/head/menacing,
+/obj/item/clothing/head/menacing,
 /obj/effect/decal/cobbleedge/dun_world{
 	dir = 10;
 	icon_state = "cobbleedge-w"
