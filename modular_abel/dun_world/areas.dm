@@ -267,6 +267,14 @@
 /area/rogue/outdoors/woods/wretch_lair
 	name = "Twilight Axis - Outdoors / Woods / Wretch Lair"
 
+/area/rogue/under/cave/abyssor
+	name = "Twilight Axis - Under / Cave / Abyssal Grotto"
+	icon_state = "caves"
+
+/area/rogue/under/cave/abyssor/inner
+	name = "Twilight Axis - Under / Cave / Abyssal Grotto / Inner"
+	first_time_text = "THE ABYSSAL GROTTO"
+
 /area/rogue/under/cave/dragonden
 	name = "Twilight Axis - Under / Cave / Dragon Den"
 

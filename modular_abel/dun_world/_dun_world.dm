@@ -1,6 +1,7 @@
 #include "_defines.dm"
 #include "areas.dm"
 #include "compat.dm"
+#include "abyssor/_abyssor.dm"
 #include "furniture.dm"
 #include "items.dm"
 #include "jobs.dm"

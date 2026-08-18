@@ -16,6 +16,7 @@
 	"other_z": [
 		"map_files/otherz/wretch_coast"
 	],
+	"abyssor_cult": true,
 	"minetype": null,
 	"space_empty_levels": 0,
 	"space_ruin_levels": 0

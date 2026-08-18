@@ -23,6 +23,8 @@
 		/datum/job/archivist/dun_world_clerk = 1,
 		/datum/job/minor_noble/dun_world_suitor = 0,
 		/datum/job/servant/dun_world_bathhouse_attendant = 5,
+		// Abyssor dream cult - only Twilight Axis opts in, see abyssor/map_config.dm.
+		/datum/job/painter = 1,
 	)
 
 /datum/map_adjustment/dun_world/job_change()
@@ -34,6 +36,6 @@
 	GLOB.serf_positions.Add("Guildmaster", "Guildsman", "Bathmaster")
 	GLOB.noble_positions.Add("Seneschal", "Councillor", "Clerk", "Suitor")
 	GLOB.noble_courthand_positions.Add("Seneschal", "Councillor", "Clerk", "Suitor")
-	GLOB.church_positions.Add("Druid", "Martyr")
+	GLOB.church_positions.Add("Druid", "Martyr", "Painter")
 	GLOB.garrison_positions.Add("Warden")
 	GLOB.allmig_positions.Add("Keeper", "Trader", "Lunatic", "Vagabond", "Veteran", ROLE_WRETCH)
