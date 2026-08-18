@@ -12,6 +12,8 @@
 	shared_occurence_type = SHARED_MINOR_THREAT
 	minor_roleset = TRUE
 
+	can_call_midround = TRUE
+
 	restricted_roles = list(
 		/datum/job/lord,
 		/datum/job/consort,
@@ -32,6 +34,7 @@
 		/datum/job/forestpreacher,
 		/datum/job/bogwitch,
 		/datum/job/bog_apprentice,
+		/datum/job/admin,
 	)
 
 
