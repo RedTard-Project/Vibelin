@@ -32,6 +32,8 @@ Layout:
   sewing recipes, ported from Azure-Peak after PR #5 (batch 3). See `garments/README.md`.
 - `snouted_helms/` — snouted helmet variants of existing Vanderlin helmets, sprites from
   Azure-Peak after PR #5. See `snouted_helms/README.md`.
+- `sundries/` — the traditional Psydonian tabard and flavoured zigs, ported from
+  Azure-Peak after PR #5. See `sundries/README.md`.
 - `tools/` — map generation and QA scripts.
 
 - Source map: `Azure-Peak/Azure-Peak:_maps/map_files/dun_world/dun_world.dmm`

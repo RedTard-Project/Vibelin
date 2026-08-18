@@ -15,6 +15,7 @@
 #include "facemasks/_facemasks.dm"
 #include "garments/_garments.dm"
 #include "snouted_helms/_snouted_helms.dm"
+#include "sundries/_sundries.dm"
 #include "job_starting_coins.dm"
 #include "map_advclass_blacklist.dm"
 #include "cyrillic_say_fix.dm"
