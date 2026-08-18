@@ -20,6 +20,8 @@ Layout:
   include list), `erp/code/` (the ERP/sexcon/organ/sprite-accessory sources),
   `erp/icons/` and `erp/sound/` (ERP assets), and `erp/_parked_twilight/`
   (unported Twilight reference material).
+- `woodcarving/` — carved wooden trinkets and their recipes, ported from Azure-Peak
+  after PR #5. See `woodcarving/README.md`.
 - `tools/` — map generation and QA scripts.
 
 - Source map: `Azure-Peak/Azure-Peak:_maps/map_files/dun_world/dun_world.dmm`

@@ -9,6 +9,7 @@
 #include "loadout_panel/_loadout_panel.dm"
 #include "automapper/_automapper.dm"
 #include "ratwood/_ratwood.dm"
+#include "woodcarving/_woodcarving.dm"
 #include "job_starting_coins.dm"
 #include "map_advclass_blacklist.dm"
 #include "cyrillic_say_fix.dm"
