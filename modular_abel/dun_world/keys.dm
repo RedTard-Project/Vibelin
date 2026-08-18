@@ -1,3 +1,9 @@
+/obj/item/key/walls
+	name = "wall key"
+	desc = "This key opens the gates and wall posterns of the town."
+	icon_state = "spikekey"
+	lockids = list("walls")
+
 /obj/item/key/dun_world
 	name = "iron key"
 	desc = "A heavy iron key, its bow stamped with a worn local seal."

@@ -10,15 +10,30 @@ Layout:
 - `_module.dm` — single entry point: includes `erp/_erp.dm` (ERP system),
   `dun_world/_dun_world.dm` (the Twilight Axis map import), and `upstream_fixes.dm`.
 - `dun_world/` — everything for the Twilight Axis import in one place: the support
-  `.dm` files (`areas`, `compat`, `furniture`, `items`, `jobs`, `mapgen`,
+  `.dm` files (`areas`, `compat`, `furniture`, `items`, `jobs`, `keys`, `mapgen`,
   `mobs`, `structures`, `map_adjustment`), plus
-  `dun_world/config/` (`map.json` replacement table, `maps_fragment.txt`) and
-  `dun_world/icons/` (ported Azure sprites). `dun_world/_dun_world.dm` is the
-  sub-include list.
+  `dun_world/config/` (`map.json` replacement table, `maps_fragment.txt`),
+  `dun_world/icons/` (ported Azure sprites) and `dun_world/abyssor/` (the Abyssor
+  dream-cult content pack — see `dun_world/abyssor/README.md`).
+  `dun_world/_dun_world.dm` is the sub-include list.
 - `erp/` — everything for the ERP system in one place: `erp/_erp.dm` (the
   include list), `erp/code/` (the ERP/sexcon/organ/sprite-accessory sources),
   `erp/icons/` and `erp/sound/` (ERP assets), and `erp/_parked_twilight/`
   (unported Twilight reference material).
+- `woodcarving/` — carved wooden trinkets and their recipes, ported from Azure-Peak
+  after PR #5. See `woodcarving/README.md`.
+- `ceramics/` — fired clay vessels and their pottery-wheel recipes, ported from
+  Azure-Peak after PR #5. See `ceramics/README.md`.
+- `neck_amulets/` — gold and silver carved gem amulets, ported from Azure-Peak after
+  PR #5 (batch 1 of the clothing port). See `neck_amulets/README.md`.
+- `facemasks/` — padded, leather and chainmaille face masks, ported from Azure-Peak
+  after PR #5 (batch 2 of the clothing port). See `facemasks/README.md`.
+- `garments/` — dresses, robes, a winter coat, a toga and a formal skirt with their
+  sewing recipes, ported from Azure-Peak after PR #5 (batch 3). See `garments/README.md`.
+- `snouted_helms/` — snouted helmet variants of existing Vanderlin helmets, sprites from
+  Azure-Peak after PR #5. See `snouted_helms/README.md`.
+- `sundries/` — the traditional Psydonian tabard and flavoured zigs, ported from
+  Azure-Peak after PR #5. See `sundries/README.md`.
 - `tools/` — map generation and QA scripts.
 
 - Source map: `Azure-Peak/Azure-Peak:_maps/map_files/dun_world/dun_world.dmm`
@@ -54,6 +69,12 @@ DME injection.
 `_maps/dun_world.json` is the downstream map config for the generated map. It is
 now part of the upstream CI map matrix (no `exclude_from_ci`), so Integration
 Tests boot the Twilight Axis map on every push.
+
+The Abyssor dream-cult content (`dun_world/abyssor/`) is gated per map by the
+`abyssor_cult` key in the map's `_maps/*.json`. It defaults to `FALSE`, so the stock maps
+are unaffected; only `_maps/dun_world.json` sets `"abyssor_cult": true`. See
+`modular_abel/dun_world/abyssor/README.md` for what is ported, what was adapted, and the
+two subsystems still outstanding.
 
 Twilight Axis (`dun_world`) is hardcoded as the boot map by the modular
 `dun_world/force_load.dm` mapping override. It remains listed as a votable map

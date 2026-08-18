@@ -108,7 +108,7 @@
 /datum/erp_action_prefs_codec/proc/export_for_prefs(datum/erp_action/A)
 	var/list/out = list()
 
-	for(var/field in ERP_ACTION_PREF_FIELDS)
+	for(var/field in GLOB.ERP_ACTION_PREF_FIELDS)
 		if(!(field in A.vars))
 			continue
 
@@ -128,7 +128,7 @@
 	if(!islist(data))
 		return FALSE
 
-	for(var/field in ERP_ACTION_PREF_FIELDS)
+	for(var/field in GLOB.ERP_ACTION_PREF_FIELDS)
 		if(!(field in data) || !(field in A.vars))
 			continue
 

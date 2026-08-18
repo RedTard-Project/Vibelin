@@ -1125,8 +1125,8 @@
 		return 0
 
 	if(owner.used_intent)
-		var/intent_name = lowertext("[owner.used_intent.name]")
-		var/intent_type = lowertext("[owner.used_intent.type]")
+		var/intent_name = LOWER_TEXT("[owner.used_intent.name]")
+		var/intent_type = LOWER_TEXT("[owner.used_intent.type]")
 
 		if(findtext(intent_name, "grab") || findtext(intent_type, "grab"))
 			return MARTIAL_MASTER_INPUT_GRAB
@@ -1172,7 +1172,7 @@
 	return FALSE
 
 /datum/component/combo_core/martial_master/proc/IsMouthZone(zone)
-	var/zone_text = lowertext("[zone]")
+	var/zone_text = LOWER_TEXT("[zone]")
 	return (findtext(zone_text, "mouth") || findtext(zone_text, "face_mouth") || findtext(zone_text, "precise_mouth"))
 
 /datum/component/combo_core/martial_master/proc/_balloon(message)
@@ -1409,7 +1409,7 @@ GLOBAL_LIST_INIT(temptress_combat_skills, list(
 
 	var/action_type = A.type
 
-	for(var/skill_type as anything in GLOB.temptress_erp_training_map)
+	for(var/skill_type in GLOB.temptress_erp_training_map)
 		var/list/entry = GLOB.temptress_erp_training_map[skill_type]
 		if(!islist(entry))
 			continue
@@ -1696,7 +1696,7 @@ GLOBAL_LIST_INIT(temptress_combat_skills, list(
 		return
 
 	if(C.temptress_awakened)
-		L.balloon_alert(L, "Already awakened.")
+		L.balloon_alert(L, "already awakened.")
 		return
 
 	C.UnlockTemptressArts()

@@ -128,6 +128,9 @@
 		/turf/closed/dungeon_void,
 		/turf/closed/sea_fog,
 		/turf/template_noop,
+		// Abyssor grotto undercurrent - placed by the Twilight Axis .dmm around the dream
+		// pool, never buildable. See modular_abel/dun_world/abyssor/turfs.dm.
+		/turf/open/rebound,
 		/turf/closed/wall/mineral/underbrick/fake_world,
 		/turf/closed/wall/mineral,
 		/turf/closed/wall/mineral/stonebrick/reddish,
@@ -236,6 +239,15 @@
 		/obj/item/clothing/head/sultana,
 		/obj/item/clothing/face/spectacles/fancy,
 		/obj/item/clothing/face/spectacles/fancy_dark,
+		// Plain cloth strip with no pattern behind it; nothing to sew it from.
+		/obj/item/clothing/face/blindfold,
+		// Abyssor painter vestments. In Azure these come out of the abyssal robe rituals,
+		// which are not ported yet - see modular_abel/dun_world/abyssor/README.md. They are
+		// deliberately not tailorable, so they have no recipe to find.
+		/obj/item/clothing/head/roguehood/abyssor_painter,
+		/obj/item/clothing/shirt/robe/abyssor_painter,
+		/obj/item/clothing/shirt/robe/abyssor_painter_sea,
+		/obj/item/clothing/shirt/robe/abyssor_leader,
 		/obj/item/clothing/shirt/robe/undivided,
 		/obj/item/clothing/shirt/robe/undividedcleric,
 		/obj/item/clothing/shirt/robe/ravox,
@@ -273,3 +285,29 @@
 	)
 	return ..()
 #endif
+
+// UPSTREAM BUG (remove these overrides once fixed upstream): four outfits hand out abstract
+// clothing types, so every mob wearing them throws "Abstract type (...) initialised!" on
+// spawn. /obj/item/clothing/head/helmet and /obj/item/clothing/shoes/boots both declare
+// themselves abstract_type. Repointed at concrete subtypes that match what each outfit is
+// already wearing; the fencer's own boots already exist, its assignment just never got
+// updated past the "placeholder until i can fix the boots" comment.
+/datum/outfit/mercenary/fencer
+	shoes = /obj/item/clothing/shoes/boots/fencer
+
+/datum/outfit/adventurer/heartfeltlord
+	head = /obj/item/clothing/head/helmet/bascinet
+
+/datum/outfit/heartfelt_lord
+	head = /obj/item/clothing/head/helmet/bascinet
+
+/datum/outfit/rockhill/mayor
+	head = /obj/item/clothing/head/helmet/bascinet
+
+// Same bug in a runtime roll rather than a static var: /datum/outfit/skeleton/pre_equip's
+// headgear switch has the bare abstract helmet on roll 9 of 9. Patched after the parent
+// runs so the switch itself is left alone.
+/datum/outfit/skeleton/pre_equip(mob/living/carbon/human/equipped_human)
+	. = ..()
+	if(head == /obj/item/clothing/head/helmet)
+		head = /obj/item/clothing/head/helmet/nasal

@@ -96,7 +96,7 @@
 	department_flag = OUTSIDERS
 	job_flags = (JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE | JOB_SHOW_IN_CREDITS)
 	display_order = JDO_WRETCH
-	faction = FACTION_NEUTRAL
+	factions = list(FACTION_NEUTRAL)
 	total_positions = 0
 	spawn_positions = 0
 	antag_job = TRUE

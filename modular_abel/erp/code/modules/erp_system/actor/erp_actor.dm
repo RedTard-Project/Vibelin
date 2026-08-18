@@ -361,7 +361,7 @@
 	var/list/ordered = list()
 	var/list/used = list()
 
-	for(var/t in ERP_ORGAN_ORDER)
+	for(var/t in GLOB.ERP_ORGAN_ORDER)
 		for(var/datum/erp_sex_organ/O in organs)
 			if(!O || QDELETED(O) || used[O])
 				continue
@@ -377,5 +377,5 @@
 
 	organs = ordered
 
-/datum/erp_actor/proc/get_strength(var/stat)
+/datum/erp_actor/proc/get_strength(stat)
 	return 10

@@ -87,15 +87,16 @@
 /datum/customizer_choice/organ/penis/generate_pref_choices(list/dat, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
 	var/datum/customizer_entry/organ/penis/penis_entry = entry
-	dat += "<br>Penis size: <a href='?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=penis_size'>[find_key_by_value(PENIS_SIZES_BY_NAME, penis_entry.penis_size)]</a>"
-	dat += "<br>Functional: <a href='?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=functional'>[penis_entry.functional ? "YES" : "NO"]</a>"
+	dat += "<br>Penis size: <a href='byond://?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=penis_size'>[find_key_by_value(PENIS_SIZES_BY_NAME, penis_entry.penis_size)]</a>"
+	dat += "<br>Functional: <a href='byond://?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=functional'>[penis_entry.functional ? "YES" : "NO"]</a>"
 
 /datum/customizer_choice/organ/penis/handle_topic(mob/user, list/href_list, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
 	var/datum/customizer_entry/organ/penis/penis_entry = entry
 	switch(href_list["customizer_task"])
 		if("penis_size")
-			var/named_size = input(user, "Choose your penis size:", "Character Preference", find_key_by_value(PENIS_SIZES_BY_NAME, penis_entry.penis_size)) as anything in PENIS_SIZES_BY_NAME
+			var/named_size
+			named_size = input(user, "Choose your penis size:", "Character Preference", find_key_by_value(PENIS_SIZES_BY_NAME, penis_entry.penis_size)) as anything in PENIS_SIZES_BY_NAME
 			if(isnull(named_size))
 				return
 			penis_entry.penis_size = sanitize_integer(PENIS_SIZES_BY_NAME[named_size], MIN_PENIS_SIZE, MAX_PENIS_SIZE, DEFAULT_PENIS_SIZE)
@@ -201,15 +202,16 @@
 /datum/customizer_choice/organ/testicles/generate_pref_choices(list/dat, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
 	var/datum/customizer_entry/organ/testicles/testicles_entry = entry
-	dat += "<br>Ball size: <a href='?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=ball_size'>[find_key_by_value(TESTICLE_SIZES_BY_NAME, testicles_entry.ball_size)]</a>"
-	dat += "<br>Virile: <a href='?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=virile'>[testicles_entry.virility ? "Virile" : "Sterile"]</a>"
+	dat += "<br>Ball size: <a href='byond://?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=ball_size'>[find_key_by_value(TESTICLE_SIZES_BY_NAME, testicles_entry.ball_size)]</a>"
+	dat += "<br>Virile: <a href='byond://?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=virile'>[testicles_entry.virility ? "Virile" : "Sterile"]</a>"
 
 /datum/customizer_choice/organ/testicles/handle_topic(mob/user, list/href_list, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
 	var/datum/customizer_entry/organ/testicles/testicles_entry = entry
 	switch(href_list["customizer_task"])
 		if("ball_size")
-			var/named_size = input(user, "Choose your ball size:", "Character Preference", find_key_by_value(TESTICLE_SIZES_BY_NAME, testicles_entry.ball_size)) as anything in TESTICLE_SIZES_BY_NAME
+			var/named_size
+			named_size = input(user, "Choose your ball size:", "Character Preference", find_key_by_value(TESTICLE_SIZES_BY_NAME, testicles_entry.ball_size)) as anything in TESTICLE_SIZES_BY_NAME
 			if(isnull(named_size))
 				return
 			testicles_entry.ball_size = sanitize_integer(TESTICLE_SIZES_BY_NAME[named_size], MIN_TESTICLES_SIZE, MAX_TESTICLES_SIZE, DEFAULT_TESTICLES_SIZE)
@@ -262,15 +264,16 @@
 /datum/customizer_choice/organ/breasts/generate_pref_choices(list/dat, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
 	var/datum/customizer_entry/organ/breasts/breasts_entry = entry
-	dat += "<br>Breast size: <a href='?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=breast_size'>[find_key_by_value(BREAST_SIZES_BY_NAME, breasts_entry.breast_size)]</a>"
-	dat += "<br>Lactation: <a href='?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=lactating'>[breasts_entry.lactating ? "Enabled" : "Disabled"]</a>"
+	dat += "<br>Breast size: <a href='byond://?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=breast_size'>[find_key_by_value(BREAST_SIZES_BY_NAME, breasts_entry.breast_size)]</a>"
+	dat += "<br>Lactation: <a href='byond://?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=lactating'>[breasts_entry.lactating ? "Enabled" : "Disabled"]</a>"
 
 /datum/customizer_choice/organ/breasts/handle_topic(mob/user, list/href_list, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
 	var/datum/customizer_entry/organ/breasts/breasts_entry = entry
 	switch(href_list["customizer_task"])
 		if("breast_size")
-			var/named_size = input(user, "Choose your breast size:", "Character Preference", find_key_by_value(BREAST_SIZES_BY_NAME, breasts_entry.breast_size)) as anything in BREAST_SIZES_BY_NAME
+			var/named_size
+			named_size = input(user, "Choose your breast size:", "Character Preference", find_key_by_value(BREAST_SIZES_BY_NAME, breasts_entry.breast_size)) as anything in BREAST_SIZES_BY_NAME
 			if(isnull(named_size))
 				return
 			breasts_entry.breast_size = sanitize_integer(BREAST_SIZES_BY_NAME[named_size], MIN_BREASTS_SIZE, MAX_BREASTS_SIZE, DEFAULT_BREASTS_SIZE)
@@ -315,7 +318,7 @@
 /datum/customizer_choice/organ/vagina/generate_pref_choices(list/dat, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
 	var/datum/customizer_entry/organ/vagina/vagina_entry = entry
-	dat += "<br>Fertile: <a href='?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=fertile'>[vagina_entry.fertility ? "Fertile" : "Sterile"]</a>"
+	dat += "<br>Fertile: <a href='byond://?_src_=prefs;task=change_customizer;customizer=[customizer_type];customizer_task=fertile'>[vagina_entry.fertility ? "Fertile" : "Sterile"]</a>"
 
 /datum/customizer_choice/organ/vagina/handle_topic(mob/user, list/href_list, datum/preferences/prefs, datum/customizer_entry/entry, customizer_type)
 	..()
