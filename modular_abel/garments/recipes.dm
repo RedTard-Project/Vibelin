@@ -8,12 +8,6 @@
 // Cloth costs follow Azure's reqs where it declares them and the surrounding Vanderlin
 // sewing recipes otherwise. craftdiff uses Vanderlin's 0-6 scale, not Azure's SKILL_LEVEL_*.
 
-/datum/repeatable_crafting_recipe/sewing/nightgown
-	name = "nightgown"
-	output = /obj/item/clothing/shirt/dress/nightgown
-	requirements = list(/obj/item/natural/cloth = 2)
-	craftdiff = 1
-
 /datum/repeatable_crafting_recipe/sewing/taverndress
 	name = "tavern dress"
 	output = /obj/item/clothing/shirt/dress/tavern
@@ -38,7 +32,7 @@
 	requirements = list(/obj/item/natural/cloth = 2)
 	craftdiff = 2
 
-/datum/repeatable_crafting_recipe/sewing/toga
+/datum/repeatable_crafting_recipe/sewing/toga_dress
 	name = "toga"
 	output = /obj/item/clothing/cloak/tabard/toga/dress
 	requirements = list(/obj/item/natural/cloth = 3)

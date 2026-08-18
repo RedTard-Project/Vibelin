@@ -39,14 +39,6 @@
 	icon_state = "taverndress"
 	sellprice = 20
 
-/obj/item/clothing/shirt/dress/nightgown
-	name = "nightgown"
-	desc = "A thin, loose gown meant for sleeping and little else."
-	icon = 'modular_abel/garments/icons/garments_world.dmi'
-	mob_overlay_icon = 'modular_abel/garments/icons/garments_onmob.dmi'
-	icon_state = "nightgown"
-	sellprice = 12
-
 // ---------------------------------------------------------------------------
 // Robes.
 // ---------------------------------------------------------------------------

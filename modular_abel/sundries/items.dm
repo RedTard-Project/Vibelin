@@ -21,6 +21,10 @@
 	mob_overlay_icon = 'modular_abel/sundries/icons/sundries_onmob.dmi'
 	icon_state = "whitepsydontabard"
 	item_state = "whitepsydontabard"
+	// The parent tabard carries detail_tag = "_spl" for its heraldic split. This one is a
+	// fixed white design (Azure marks it custom_design), so it has no _spl state and must
+	// clear the tag or item_detail_sanity fails on the missing icon.
+	detail_tag = null
 	slot_flags = ITEM_SLOT_SHIRT|ITEM_SLOT_ARMOR|ITEM_SLOT_CLOAK
 	sellprice = 30
 

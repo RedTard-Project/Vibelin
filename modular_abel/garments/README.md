@@ -9,9 +9,9 @@ exist to make exactly these garments.
 
 ## What is ported
 
-11 garments and a sewing recipe for each: blue / green / tavern dresses, a nightgown, the
-leopard bathrobe and its open variant, lunar and magician's robes, a winter coat, a toga and
-a formal skirt.
+10 garments and a sewing recipe for each: blue / green / tavern dresses, the leopard
+bathrobe and its open variant, lunar and magician's robes, a winter coat, a toga and a
+formal skirt.
 
 ## Adaptations made during the port
 
@@ -36,7 +36,9 @@ a formal skirt.
 
 ## Not ported from this batch, and why
 
-- **Courtesan dress and blouse** — Vanderlin already has both.
+- **Courtesan dress, blouse and nightgown** — Vanderlin already has all three; the
+  nightgown lives at `/obj/item/clothing/shirt/dress/gen/nightgown` in `modular_abel/gear`
+  with its own recipe, so the Azure one would have been a duplicate.
 - **`cloak/tabard/psydontabard/white` and its alt** — `/obj/item/clothing/cloak/tabard/psydontabard`
   does not exist here, so they have no parent. Same blocker as the batch-2 helmets.
 
