@@ -128,6 +128,9 @@
 		/turf/closed/dungeon_void,
 		/turf/closed/sea_fog,
 		/turf/template_noop,
+		// Abyssor grotto undercurrent - placed by the Twilight Axis .dmm around the dream
+		// pool, never buildable. See modular_abel/dun_world/abyssor/turfs.dm.
+		/turf/open/rebound,
 		/turf/closed/wall/mineral/underbrick/fake_world,
 		/turf/closed/wall/mineral,
 		/turf/closed/wall/mineral/stonebrick/reddish,
@@ -236,6 +239,15 @@
 		/obj/item/clothing/head/sultana,
 		/obj/item/clothing/face/spectacles/fancy,
 		/obj/item/clothing/face/spectacles/fancy_dark,
+		// Plain cloth strip with no pattern behind it; nothing to sew it from.
+		/obj/item/clothing/face/blindfold,
+		// Abyssor painter vestments. In Azure these come out of the abyssal robe rituals,
+		// which are not ported yet - see modular_abel/dun_world/abyssor/README.md. They are
+		// deliberately not tailorable, so they have no recipe to find.
+		/obj/item/clothing/head/roguehood/abyssor_painter,
+		/obj/item/clothing/shirt/robe/abyssor_painter,
+		/obj/item/clothing/shirt/robe/abyssor_painter_sea,
+		/obj/item/clothing/shirt/robe/abyssor_leader,
 		/obj/item/clothing/shirt/robe/undivided,
 		/obj/item/clothing/shirt/robe/undividedcleric,
 		/obj/item/clothing/shirt/robe/ravox,
