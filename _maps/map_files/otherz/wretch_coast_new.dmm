@@ -1039,9 +1039,9 @@
 /obj/effect/decal/cleanable/dirt/cobweb{
 	icon_state = "cobweb2"
 	},
-/obj/item/clothing/head,
-/obj/item/clothing/head,
-/obj/item/clothing/head,
+/obj/item/clothing/head/brimmed,
+/obj/item/clothing/head/brimmed,
+/obj/item/clothing/head/brimmed,
 /obj/item/clothing/shirt/undershirt/formal,
 /obj/item/clothing/shirt/undershirt/formal,
 /obj/item/clothing/shirt/undershirt/formal,
@@ -1196,7 +1196,7 @@
 /turf/open/floor/naturalstone,
 /area/rogue/outdoors/banditcamp)
 "eP" = (
-/obj/item/weapon,
+/obj/item/weapon/axe/iron,
 /turf/open/floor/grass,
 /area/rogue/outdoors/woods/wretch_lair)
 "eS" = (
@@ -1308,7 +1308,7 @@
 /area/rogue/under/cave/inhumen)
 "fn" = (
 /obj/structure/table/church,
-/obj/item/weapon,
+/obj/item/weapon/knife/dagger,
 /turf/open/floor/naturalstone,
 /area/rogue/under/cave/inhumen)
 "fo" = (
@@ -1388,7 +1388,7 @@
 /area/rogue/under/cave/inhumen)
 "fD" = (
 /obj/machinery/light/fueled/wallfire/candle/l/dun_world,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/nobleboot,
 /obj/structure/closet/crate/crafted_closet,
 /obj/item/clothing/shirt/dress/silkydress,
 /obj/item/clothing/shirt/tunic/noblecoat,
@@ -1730,7 +1730,7 @@
 /area/rogue/indoors/vampire_manor)
 "gR" = (
 /obj/structure/table/wood/plain,
-/obj/item/weapon{
+/obj/item/weapon/knife/cleaver{
 	pixel_x = -4;
 	pixel_y = 4
 	},
@@ -2002,7 +2002,7 @@
 /area/rogue/outdoors/woods/vampire_lair)
 "ik" = (
 /obj/structure/table/wood/plain,
-/obj/item/weapon,
+/obj/item/weapon/knife/cleaver,
 /obj/machinery/light/fueled/torchholder/r,
 /turf/open/floor/ruinedwood,
 /area/rogue/indoors/banditcamp)
@@ -2102,7 +2102,7 @@
 /area/rogue/indoors/vampire_manor)
 "iK" = (
 /obj/structure/flora/tree/stump,
-/obj/item/weapon,
+/obj/item/weapon/pick,
 /turf/open/floor/grass/cold,
 /area/rogue/outdoors/banditcamp)
 "iL" = (
@@ -2269,7 +2269,7 @@
 "jq" = (
 /obj/machinery/light/fueled/wallfire/candle/r/dun_world,
 /obj/structure/closet/crate/crafted_closet,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/nobleboot,
 /obj/item/clothing/shirt/dress/silkydress,
 /obj/item/clothing/shirt/tunic/noblecoat,
 /turf/open/floor/ruinedwood/spiral,
@@ -3047,7 +3047,7 @@
 /obj/structure/closet/crate/crafted_closet,
 /obj/item/soap/bath,
 /obj/item/soap/bath,
-/obj/item/weapon{
+/obj/item/weapon/knife/scissors{
 	pixel_y = -5;
 	sellprice = 8
 	},
@@ -3646,7 +3646,7 @@
 "oJ" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/pants/platelegs,
@@ -3759,9 +3759,9 @@
 /obj/item/clothing/head/maidband,
 /obj/item/clothing/head/maidband,
 /obj/item/clothing/head/maidband,
-/obj/item/clothing/head,
-/obj/item/clothing/head,
-/obj/item/clothing/head,
+/obj/item/clothing/head/headband,
+/obj/item/clothing/head/headband,
+/obj/item/clothing/head/headband,
 /obj/item/storage/belt/leather,
 /obj/item/storage/belt/leather,
 /obj/item/storage/belt/leather,
@@ -3818,9 +3818,9 @@
 "pr" = (
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/armor/plate,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/boots/armor,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/item/clothing/pants/platelegs,
 /turf/open/floor/tile/bfloorz,
@@ -3854,8 +3854,8 @@
 /area/rogue/indoors/vampire_manor)
 "px" = (
 /obj/structure/closet/crate/crafted_closet,
-/obj/item/weapon,
-/obj/item/weapon,
+/obj/item/weapon/knife/cleaver,
+/obj/item/weapon/knife/cleaver,
 /obj/item/clothing/head/cookhat/chef,
 /obj/item/kitchen/spoon/iron,
 /obj/item/kitchen/spoon/iron,
@@ -3954,7 +3954,7 @@
 "pK" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/pants/platelegs,
@@ -4395,7 +4395,7 @@
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/item/clothing/pants/platelegs,
 /turf/open/floor/tile/bfloorz,
@@ -4580,7 +4580,7 @@
 	pixel_x = -5;
 	pixel_y = 2
 	},
-/obj/item/weapon{
+/obj/item/weapon/knife/cleaver{
 	pixel_x = 5;
 	pixel_y = 1
 	},
@@ -5045,7 +5045,7 @@
 /area/rogue/outdoors/banditcamp)
 "tG" = (
 /obj/item/clothing/gloves/plate,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
 /obj/effect/decal/cleanable/dirt/cobweb,
@@ -5398,7 +5398,7 @@
 /area/rogue/indoors/vampire_manor)
 "vn" = (
 /obj/structure/table/church,
-/obj/item/weapon,
+/obj/item/weapon/knife/dagger/steel,
 /turf/open/floor/naturalstone,
 /area/rogue/under/cave/inhumen)
 "vo" = (
@@ -5438,7 +5438,7 @@
 "vw" = (
 /obj/structure/table/wood/plain,
 /obj/structure/fluff/railing/border,
-/obj/item/weapon{
+/obj/item/weapon/knife/cleaver{
 	pixel_x = -6;
 	pixel_y = 8
 	},
@@ -5770,7 +5770,7 @@
 	},
 /obj/item/clothing/shirt/tunic/noblecoat,
 /obj/item/clothing/shirt/dress/silkydress,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/nobleboot,
 /turf/open/floor/ruinedwood/spiral,
 /area/rogue/indoors/vampire_manor)
 "wQ" = (
@@ -6242,7 +6242,7 @@
 /obj/structure/closet/crate/crafted_closet,
 /obj/item/clothing/shirt/tunic/noblecoat,
 /obj/item/clothing/shirt/dress/silkydress,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/nobleboot,
 /obj/item/clothing/shirt/dress/royal/princess,
 /obj/item/clothing/shirt/dress/royal/prince,
 /obj/item/storage/belt/leather/steel,
@@ -6250,9 +6250,9 @@
 /obj/machinery/light/fueled/wallfire/candle/blue/r/dun_world,
 /obj/item/clothing/pants/trou/leather,
 /obj/item/clothing/pants/trou/shadowpants,
-/obj/item/clothing/pants,
+/obj/item/clothing/pants/trou,
 /obj/item/clothing/pants/tights,
-/obj/item/clothing/cloak,
+/obj/item/clothing/cloak/black_cloak,
 /obj/item/storage/belt/leather/black,
 /turf/open/floor/churchbrick,
 /area/rogue/indoors/vampire_manor)
@@ -6318,7 +6318,7 @@
 /turf/open/floor/naturalstone,
 /area/rogue/indoors/vampire_manor)
 "zm" = (
-/obj/item/weapon,
+/obj/item/weapon/axe/steel,
 /turf/open/floor/grass,
 /area/rogue/outdoors/woods/vampire_lair)
 "zn" = (
@@ -6697,8 +6697,8 @@
 /area/rogue/indoors/vampire_manor)
 "AF" = (
 /obj/structure/closet/crate/crafted_closet,
-/obj/item/weapon,
-/obj/item/weapon,
+/obj/item/weapon/knife/cleaver,
+/obj/item/weapon/knife/cleaver,
 /obj/item/clothing/head/cookhat/chef,
 /obj/item/kitchen/spoon/iron,
 /obj/item/kitchen/spoon/iron,
@@ -6736,7 +6736,7 @@
 /area/rogue/outdoors/banditcamp)
 "AL" = (
 /obj/item/clothing/gloves/plate,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
 /obj/effect/decal/cleanable/dirt/cobweb,
@@ -7799,7 +7799,7 @@
 /area/rogue/outdoors/woods/wretch_lair)
 "Fd" = (
 /obj/structure/closet/crate/crafted_closet,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/nobleboot,
 /obj/item/clothing/shirt/dress/silkydress,
 /obj/item/clothing/shirt/tunic/noblecoat,
 /turf/open/floor/ruinedwood/spiral,
@@ -7921,7 +7921,7 @@
 "FD" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/pants/platelegs,
@@ -8193,7 +8193,7 @@
 	pixel_x = -13;
 	pixel_y = 4
 	},
-/obj/item/weapon{
+/obj/item/weapon/knife/cleaver{
 	pixel_x = -3;
 	pixel_y = 8
 	},
@@ -8226,7 +8226,7 @@
 /turf/open/floor/churchbrick,
 /area/rogue/outdoors/banditcamp)
 "GX" = (
-/obj/item/weapon,
+/obj/item/weapon/knife/scissors,
 /obj/structure/table/wood/fancy/purple,
 /turf/open/floor/tile,
 /area/rogue/indoors/vampire_manor)
@@ -8234,7 +8234,7 @@
 /obj/structure/closet/crate/crafted_closet,
 /obj/machinery/light/fueled/wallfire/candle/r/dun_world,
 /obj/item/clothing/shirt/tunic/noblecoat,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/nobleboot,
 /obj/item/clothing/shirt/dress/silkydress,
 /turf/open/floor/ruinedwood/spiral,
 /area/rogue/indoors/vampire_manor)
@@ -8700,7 +8700,7 @@
 "Jg" = (
 /obj/structure/closet/crate/crafted_closet,
 /obj/item/clothing/shirt/dress/silkydress,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/nobleboot,
 /obj/item/clothing/shirt/tunic/noblecoat,
 /turf/open/floor/ruinedwood/spiral,
 /area/rogue/indoors/vampire_manor)
@@ -8852,7 +8852,7 @@
 "JJ" = (
 /obj/structure/closet/crate/crafted_closet,
 /obj/item/clothing/gloves/leather/grenzel,
-/obj/item/clothing/gloves,
+/obj/item/clothing/gloves/leather,
 /obj/item/clothing/gloves/leather/black,
 /obj/item/clothing/gloves/angle,
 /obj/item/clothing/pants/skirt,
@@ -8863,21 +8863,21 @@
 /obj/item/clothing/armor/leather,
 /obj/item/clothing/armor/gambeson/heavy,
 /obj/item/clothing/shoes/shalal,
-/obj/item/clothing/shoes,
+/obj/item/clothing/shoes/boots/armor/gold,
 /obj/item/clothing/cloak/cape/crusader,
 /obj/item/clothing/cloak/cape/blkknight,
-/obj/item/clothing/armor,
+/obj/item/clothing/armor/gambeson,
 /obj/item/clothing/head/hatblu,
 /obj/item/clothing/head/fancyhat,
 /obj/item/clothing/shoes/rare/grenzelhoft,
-/obj/item/clothing/head,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/head/brimmed,
 /obj/item/clothing/shoes/boots/leather,
-/obj/item/clothing/shoes/boots,
+/obj/item/clothing/shoes/boots/leather,
+/obj/item/clothing/shoes/boots/leather,
 /obj/item/clothing/head/bardhat,
 /obj/item/clothing/head/hatfur,
 /obj/item/clothing/gloves/eastgloves1,
-/obj/item/clothing/head,
+/obj/item/clothing/head/chaperon,
 /obj/item/clothing,
 /obj/item/clothing/gloves/angle,
 /turf/open/floor/churchbrick,
@@ -8923,7 +8923,7 @@
 "JS" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/pants/platelegs,
@@ -9282,7 +9282,7 @@
 "Lg" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/structure/fluff/walldeco/maidendrape,
@@ -9639,7 +9639,7 @@
 /area/rogue/indoors/vampire_manor)
 "Mm" = (
 /obj/structure/fluff/psycross/zizocross,
-/obj/item/weapon,
+/obj/item/weapon/axe/boneaxe,
 /turf/open/floor/cobble/dun_world,
 /area/rogue/under/cave/inhumen)
 "Mn" = (
@@ -9747,7 +9747,7 @@
 /area/rogue/indoors/banditcamp)
 "MQ" = (
 /obj/item/clothing/gloves/plate,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
 /obj/effect/decal/cleanable/dirt/cobweb,
@@ -10267,7 +10267,7 @@
 "OS" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/pants/platelegs,
@@ -10822,7 +10822,7 @@
 /area/rogue/outdoors/woods/vampire_lair)
 "RD" = (
 /obj/item/clothing/gloves/plate,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
 /obj/structure/mannequin/male/decorative,
@@ -10832,7 +10832,7 @@
 "RF" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/item/clothing/pants/platelegs,
@@ -11277,7 +11277,7 @@
 /obj/machinery/light/fueled/wallfire/candle/l/dun_world,
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle,
 /obj/effect/decal/cleanable/dirt/cobweb,
-/obj/item/weapon,
+/obj/item/weapon/surgery/saw,
 /turf/open/floor/naturalstone,
 /area/rogue/under/cave/inhumen)
 "TH" = (
@@ -12798,7 +12798,7 @@
 "Zy" = (
 /obj/item/clothing/armor/plate,
 /obj/item/clothing/neck/gorget,
-/obj/item/clothing/head/helmet/heavy,
+/obj/item/clothing/head/helmet/heavy/aalloy,
 /obj/item/clothing/gloves/plate,
 /obj/structure/mannequin/male/decorative,
 /obj/structure/fluff/walldeco/maidendrape,
