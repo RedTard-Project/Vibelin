@@ -202,7 +202,7 @@
 /datum/erp_actor/human/can_register_signals()
 	return TRUE
 
-/datum/erp_actor/get_strength(var/stat)
+/datum/erp_actor/get_strength(stat)
 	var/mob/living/M = get_effect_mob()
 	if(!M)
 		return 10

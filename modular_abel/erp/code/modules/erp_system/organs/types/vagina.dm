@@ -40,7 +40,7 @@
 		pregnant = TRUE
 		to_chat(mother, span_love("Я чувствую тепло в животе… кажется, я беременна."))
 
-/obj/item/organ/vagina/Insert(mob/living/carbon/M, special = 0, drop_if_replaced = TRUE, new_zone = null)
+/obj/item/organ/vagina/Insert(mob/living/carbon/M, special = FALSE, movement_flags = NONE, new_zone = null)
 	. = ..()
 	if(!sex_organ)
 		sex_organ = new /datum/erp_sex_organ/vagina(src)

@@ -36,11 +36,11 @@
 		var/obj/item/organ/penis/penis = getorganslot(ORGAN_SLOT_PENIS)
 		if(penis?.visible_organ && penis.accessory_type)
 			var/size_name = find_key_by_value(PENIS_SIZES_BY_NAME, penis.penis_size)
-			features += "a[size_name ? " [lowertext(size_name)]" : ""] penis"
+			features += "a[size_name ? " [LOWER_TEXT(size_name)]" : ""] penis"
 		var/obj/item/organ/testicles/balls = getorganslot(ORGAN_SLOT_TESTICLES)
 		if(balls?.visible_organ && balls.accessory_type)
 			var/size_name = find_key_by_value(TESTICLE_SIZES_BY_NAME, balls.ball_size)
-			features += "[size_name ? "[lowertext(size_name)] " : ""]testicles"
+			features += "[size_name ? "[LOWER_TEXT(size_name)] " : ""]testicles"
 		var/obj/item/organ/vagina/cunt = getorganslot(ORGAN_SLOT_VAGINA)
 		if(cunt?.visible_organ && cunt.accessory_type)
 			features += "a vagina"
@@ -49,7 +49,7 @@
 		var/obj/item/organ/breasts/breasts = getorganslot(ORGAN_SLOT_BREASTS)
 		if(breasts?.visible_organ && breasts.accessory_type)
 			var/size_name = find_key_by_value(BREAST_SIZES_BY_NAME, breasts.breast_size)
-			features += "[size_name ? "[lowertext(size_name)] " : ""]breasts[breasts.lactating ? ", lactating" : ""]"
+			features += "[size_name ? "[LOWER_TEXT(size_name)] " : ""]breasts[breasts.lactating ? ", lactating" : ""]"
 
 	if(length(features))
 		. += "<span style='color: #6e3aa8'>[capitalize(english_list(features))].</span>"

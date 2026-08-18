@@ -27,7 +27,7 @@
 #define ERP_ACTION_LEGACY_AROUSAL	"arousal"
 #define ERP_ACTION_LEGACY_PAIN		"pain"
 
-var/global/list/ERP_ACTION_PREF_FIELDS = list(
+GLOBAL_LIST_INIT(ERP_ACTION_PREF_FIELDS, list(
 	"name",
 	"required_init_organ",
 	"required_target_organ",
@@ -51,9 +51,9 @@ var/global/list/ERP_ACTION_PREF_FIELDS = list(
 	"message_climax_active",
 	"message_climax_passive",
 	"action_scope"
-)
+))
 
-var/global/list/ERP_ACTION_EDITOR_FIELDS = list(
+GLOBAL_LIST_INIT(ERP_ACTION_EDITOR_FIELDS, list(
 	list("id"="name", "label"="Название", "type"="text", "section"="Основное"),
 	list("id"="action_scope", "label"="Цель действия", "type"="enum", "section"="Основное"),
 	list("id"="required_init_organ",   "label"="Орган инициатора", "type"="enum", "section"="Ограничения", "options"="organs"),
@@ -70,7 +70,7 @@ var/global/list/ERP_ACTION_EDITOR_FIELDS = list(
 	list("id"="message_finish",         "label"="Сообщение: финиш",    "type"="multiline", "section"="Сообщения"),
 	list("id"="message_climax_active",  "label"="Оргазм: актер",       "type"="multiline", "section"="Сообщения"),
 	list("id"="message_climax_passive", "label"="Оргазм: цель",        "type"="multiline", "section"="Сообщения"),
-)
+))
 
 GLOBAL_LIST_INIT(erp_race_body_zone_bonus, list(
 	/datum/species/elf = list(
@@ -122,7 +122,7 @@ GLOBAL_LIST_INIT(erp_race_body_zone_bonus, list(
 GLOBAL_LIST_INIT(available_kinks, generate_kink_list())
 GLOBAL_LIST_INIT(relationship_settings, list("love_potion_settings" = list("sex_mult" = 0.8,"other_sex_mult" = 1.2,"observe_min" = 10,"observe_gain" = 1,"observe_cap" = 30,"flag" = REL_LOVE_POTION)))
 
-var/global/list/ERP_ORGAN_ORDER = list(SEX_ORGAN_BODY,SEX_ORGAN_MOUTH,SEX_ORGAN_BREASTS,SEX_ORGAN_HANDS,SEX_ORGAN_PENIS,SEX_ORGAN_VAGINA,SEX_ORGAN_ANUS,SEX_ORGAN_TAIL,SEX_ORGAN_LEGS)
+GLOBAL_LIST_INIT(ERP_ORGAN_ORDER, list(SEX_ORGAN_BODY,SEX_ORGAN_MOUTH,SEX_ORGAN_BREASTS,SEX_ORGAN_HANDS,SEX_ORGAN_PENIS,SEX_ORGAN_VAGINA,SEX_ORGAN_ANUS,SEX_ORGAN_TAIL,SEX_ORGAN_LEGS))
 
 /proc/generate_kink_list()
 	var/list/kinks = list()

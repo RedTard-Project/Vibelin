@@ -273,3 +273,29 @@
 	)
 	return ..()
 #endif
+
+// UPSTREAM BUG (remove these overrides once fixed upstream): four outfits hand out abstract
+// clothing types, so every mob wearing them throws "Abstract type (...) initialised!" on
+// spawn. /obj/item/clothing/head/helmet and /obj/item/clothing/shoes/boots both declare
+// themselves abstract_type. Repointed at concrete subtypes that match what each outfit is
+// already wearing; the fencer's own boots already exist, its assignment just never got
+// updated past the "placeholder until i can fix the boots" comment.
+/datum/outfit/mercenary/fencer
+	shoes = /obj/item/clothing/shoes/boots/fencer
+
+/datum/outfit/adventurer/heartfeltlord
+	head = /obj/item/clothing/head/helmet/bascinet
+
+/datum/outfit/heartfelt_lord
+	head = /obj/item/clothing/head/helmet/bascinet
+
+/datum/outfit/rockhill/mayor
+	head = /obj/item/clothing/head/helmet/bascinet
+
+// Same bug in a runtime roll rather than a static var: /datum/outfit/skeleton/pre_equip's
+// headgear switch has the bare abstract helmet on roll 9 of 9. Patched after the parent
+// runs so the switch itself is left alone.
+/datum/outfit/skeleton/pre_equip(mob/living/carbon/human/equipped_human)
+	. = ..()
+	if(head == /obj/item/clothing/head/helmet)
+		head = /obj/item/clothing/head/helmet/nasal

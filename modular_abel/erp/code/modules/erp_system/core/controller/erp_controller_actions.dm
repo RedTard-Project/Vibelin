@@ -256,7 +256,7 @@
 	if(!istype(I) || !islist(required_tags) || !required_tags.len)
 		return FALSE
 
-	var/name_lower = lowertext(I.name)
+	var/name_lower = LOWER_TEXT(I.name)
 	if(islist(I.erp_item_tags) && I.erp_item_tags.len)
 		for(var/t in required_tags)
 			if(t in I.erp_item_tags)
@@ -266,7 +266,7 @@
 		if(!istext(t))
 			continue
 
-		var/tag_lower = lowertext("[t]")
+		var/tag_lower = LOWER_TEXT("[t]")
 		if(findtext(name_lower, tag_lower))
 			return TRUE
 

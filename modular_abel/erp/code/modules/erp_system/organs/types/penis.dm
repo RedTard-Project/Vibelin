@@ -86,7 +86,7 @@
 /obj/item/organ/penis
 	var/manual_erection_override = FALSE
 
-/obj/item/organ/penis/Insert(mob/living/carbon/M, special = 0, drop_if_replaced = TRUE, new_zone = null)
+/obj/item/organ/penis/Insert(mob/living/carbon/M, special = FALSE, movement_flags = NONE, new_zone = null)
 	. = ..()
 	if(!M)
 		return .
@@ -97,7 +97,7 @@
 
 	return .
 
-/obj/item/organ/penis/Remove(mob/living/carbon/M, special, drop_if_replaced)
+/obj/item/organ/penis/Remove(mob/living/carbon/M, special, movement_flags)
 	. = ..()
 	if(!M)
 		return .

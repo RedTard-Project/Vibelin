@@ -275,7 +275,7 @@
 		to_chat(src, span_warning("That link is too long."))
 		return FALSE
 
-	var/lower = lowertext(url)
+	var/lower = LOWER_TEXT(url)
 	if(!(findtext(lower, "http://") == 1 || findtext(lower, "https://") == 1))
 		to_chat(src, span_warning("Only http/https links are allowed."))
 		return FALSE

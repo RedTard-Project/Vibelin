@@ -107,7 +107,7 @@
 	if(!length(organ_dna_by_slot))
 		return
 
-	for(var/slot as anything in organ_dna_by_slot)
+	for(var/slot in organ_dna_by_slot)
 		var/obj/item/organ/existing = H.getorganslot(slot)
 		if(existing)
 			continue
