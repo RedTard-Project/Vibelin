@@ -22,6 +22,16 @@ Layout:
   (unported Twilight reference material).
 - `woodcarving/` — carved wooden trinkets and their recipes, ported from Azure-Peak
   after PR #5. See `woodcarving/README.md`.
+- `ceramics/` — fired clay vessels and their pottery-wheel recipes, ported from
+  Azure-Peak after PR #5. See `ceramics/README.md`.
+- `neck_amulets/` — gold and silver carved gem amulets, ported from Azure-Peak after
+  PR #5 (batch 1 of the clothing port). See `neck_amulets/README.md`.
+- `facemasks/` — padded, leather and chainmaille face masks, ported from Azure-Peak
+  after PR #5 (batch 2 of the clothing port). See `facemasks/README.md`.
+- `garments/` — dresses, robes, a winter coat, a toga and a formal skirt with their
+  sewing recipes, ported from Azure-Peak after PR #5 (batch 3). See `garments/README.md`.
+- `snouted_helms/` — snouted helmet variants of existing Vanderlin helmets, sprites from
+  Azure-Peak after PR #5. See `snouted_helms/README.md`.
 - `tools/` — map generation and QA scripts.
 
 - Source map: `Azure-Peak/Azure-Peak:_maps/map_files/dun_world/dun_world.dmm`
