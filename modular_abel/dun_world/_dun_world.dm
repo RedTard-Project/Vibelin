@@ -8,6 +8,7 @@
 #include "keys.dm"
 #include "map_adjustment.dm"
 #include "mapgen.dm"
+#include "no_dungeon.dm"
 #include "mobs.dm"
 #include "residents/grant.dm"
 #include "residents/residents.dm"
