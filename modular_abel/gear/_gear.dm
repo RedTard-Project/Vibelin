@@ -16,6 +16,7 @@
 #include "clothing/head.dm"
 #include "clothing/belt.dm"
 #include "clothing/pants.dm"
+#include "items/bakers_trough.dm"
 #include "items/items.dm"
 #include "items/recipes.dm"
 #include "items/enchantingkit.dm"

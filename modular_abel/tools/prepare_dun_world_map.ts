@@ -61,6 +61,7 @@ const MONSTER_AREA_PATTERN = /\/(?:under|cave)(?:\/|$)/;
 export async function prepareDunWorldMap() {
   const config = readConfig();
   const replacements = config.replacements || {};
+  validateReplacementTargets(replacements);
   await generateMap({
     name: 'Twilight Axis',
     source: config.source,
@@ -108,9 +109,15 @@ async function generateMap(options: {
   const sourceText = await loadSourceText(options.source, options.name);
   const structurallyAdjustedText =
     applySourcePathStructuralAdjustments(sourceText);
-  const { text, replacementCount, configuredReplacementCount } =
-    applyPathReplacements(structurallyAdjustedText, options.replacements);
-  const adjustedText = applyDmmVarAdjustments(text);
+  const explicit = applyPathReplacements(
+    structurallyAdjustedText,
+    options.replacements,
+  );
+  const subtype = applySubtypeReplacements(explicit.text, options.replacements);
+  const replacementCount =
+    explicit.replacementCount + subtype.replacementCount;
+  const configuredReplacementCount = explicit.configuredReplacementCount;
+  const adjustedText = applyDmmVarAdjustments(subtype.text);
 
   validateMapPaths(adjustedText, options.name);
 
@@ -126,8 +133,11 @@ async function generateMap(options: {
     return;
   }
 
+  const subtypeNote = subtype.replacementCount
+    ? ` (${subtype.replacementCount} resolved as subtypes of a mapped parent)`
+    : '';
   console.log(
-    `modular_abel: generated ${options.outputPath} with ${replacementCount} path replacements.`,
+    `modular_abel: generated ${options.outputPath} with ${replacementCount} path replacements${subtypeNote}.`,
   );
 }
 
@@ -184,9 +194,7 @@ function applyPathReplacements(
   sourceText: string,
   replacements: Record<string, string>,
 ) {
-  const entries = Object.entries(replacements)
-    .filter(([from, to]) => from.length > 0 && to.length > 0)
-    .sort(([left], [right]) => right.length - left.length);
+  const entries = sortedReplacementEntries(replacements);
 
   let text = sourceText;
   let replacementCount = 0;
@@ -206,6 +214,80 @@ function applyPathReplacements(
     replacementCount,
     configuredReplacementCount: entries.length,
   };
+}
+
+function sortedReplacementEntries(replacements: Record<string, string>) {
+  return Object.entries(replacements)
+    .filter(([from, to]) => from.length > 0 && to.length > 0)
+    .sort(([left], [right]) => right.length - left.length);
+}
+
+function validateReplacementTargets(replacements: Record<string, string>) {
+  const declared = declaredTypePaths();
+  const stale = sortedReplacementEntries(replacements)
+    .filter(([, to]) => !declared.has(to))
+    .map(([from, to]) => `${from} -> ${to}`)
+    .sort();
+
+  if (stale.length === 0) {
+    return;
+  }
+
+  console.warn(
+    `modular_abel: WARNING - ${CONFIG_PATH} has ${stale.length} replacement(s) pointing at a type that no longer exists. Upstream most likely renamed or deleted it, so the mapped content will not spawn. Retarget them at a current type or port the missing one into modular_abel:\n  ${stale.join('\n  ')}`,
+  );
+}
+
+function applySubtypeReplacements(
+  sourceText: string,
+  replacements: Record<string, string>,
+) {
+  const declared = declaredTypePaths();
+  const entries = sortedReplacementEntries(replacements);
+  const resolved = new Map<string, string | null>();
+
+  const resolvePath = (sourcePath: string): string | null => {
+    const cached = resolved.get(sourcePath);
+    if (cached !== undefined) {
+      return cached;
+    }
+
+    let result: string | null = null;
+    if (!declared.has(sourcePath)) {
+      for (const [from, to] of entries) {
+        if (!sourcePath.startsWith(`${from}/`)) {
+          continue;
+        }
+        const candidate = `${to}${sourcePath.slice(from.length)}`;
+        if (declared.has(candidate)) {
+          result = candidate;
+          break;
+        }
+      }
+    }
+
+    resolved.set(sourcePath, result);
+    return result;
+  };
+
+  let replacementCount = 0;
+  const text = sourceText
+    .split(/\r?\n/)
+    .map((line) => {
+      const match = line.match(/^(\/[A-Za-z0-9_/]+)[,{)]/);
+      if (!match) {
+        return line;
+      }
+      const replacement = resolvePath(match[1]);
+      if (!replacement) {
+        return line;
+      }
+      replacementCount += 1;
+      return `${replacement}${line.slice(match[1].length)}`;
+    })
+    .join('\n');
+
+  return { text, replacementCount };
 }
 
 function applySourcePathStructuralAdjustments(sourceText: string): string {
