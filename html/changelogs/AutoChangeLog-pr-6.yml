@@ -1,0 +1,12 @@
+author: "trueroguan"
+delete-after: True
+changes:
+  - rscadd: "Added Abyssor dream-cult content to Twilight Axis: dream materials, dream seeds and dream pylons that grant buffs"
+  - rscadd: "Added the Painter job, available only on Twilight Axis"
+  - rscadd: "Added the Abyssal language"
+  - map: "The dream pool, abyssal grotto and undercurrents now spawn on Twilight Axis"
+  - map: "Fixed map content that was silently failing to spawn - 32 missing types are down to 1"
+  - bugfix: "Fixed compilation after the upstream merge"
+  - config: "Abyssor content is toggled by the abyssor_cult key in a map's json, off by default"
+  - image: "Ported Abyssor sprites from Azure-Peak"
+  - sound: "Ported Abyssor sounds from Azure-Peak"
