@@ -49,3 +49,7 @@ formal skirt.
 | `icons/garments_world.dmi` | Azure `shirts.dmi`, `armor.dmi`, `cloaks.dmi`, `pants.dmi` | 11 |
 | `icons/garments_onmob.dmi` | the matching Azure `onmob/` sheets | 11 |
 | `icons/garments_sleeves.dmi` | Azure `onmob/helpers/sleeves_shirts.dmi`, `sleeves_armor.dmi` | 5 |
+
+## Loadout
+
+`loadout.dm` registers these in the donator loadout panel under the **Azure Content** tab (`ui_category = LOADOUT_PANEL_CATEGORY_AZURE`) — 10 entries, one per garment. See `modular_abel/loadout_panel/README.md`.

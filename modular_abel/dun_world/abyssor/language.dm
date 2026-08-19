@@ -1,10 +1,3 @@
-// The tongue of Abyssor's dreamworld.
-// Ported from Azure-Peak code/modules/language/roguetown/abyssal.dm.
-//
-// Azure styles this with its own SPAN_ABYSS chat class. Vanderlin has no such class and
-// the chat CSS lives in upstream tgui, so it borrows SPAN_DEEPSPEAK instead - already
-// styled, and thematically the Deepfather's own register.
-
 /datum/language/abyssal
 	name = "Abyssal"
 	desc = "An ancient and mysterious language spoken by those who have a link to Abyssor's Dreamworld."

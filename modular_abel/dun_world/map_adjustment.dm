@@ -23,7 +23,6 @@
 		/datum/job/archivist/dun_world_clerk = 1,
 		/datum/job/minor_noble/dun_world_suitor = 0,
 		/datum/job/servant/dun_world_bathhouse_attendant = 5,
-		// Abyssor dream cult - only Twilight Axis opts in, see abyssor/map_config.dm.
 		/datum/job/painter = 1,
 	)
 

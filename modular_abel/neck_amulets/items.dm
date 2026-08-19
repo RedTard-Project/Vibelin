@@ -1,15 +1,3 @@
-// Gold and silver carved gem amulets, wearable on the neck or the wrist.
-// Ported from Azure-Peak code/modules/clothing/rogueclothes/neck.dm, added upstream after
-// Vibelin PR #5.
-//
-// Vanderlin already carries the plain stone amulets (/obj/item/clothing/neck/jadeamulet and
-// friends, icon_state "amulet_*"); these are the precious-metal settings of the same stones,
-// which it does not have. They keep Azure's neck-or-wrist behaviour: worn on the wrist the
-// overlay swaps to the wrist sheet.
-//
-// Gem names follow Vanderlin's, not Azure's - joapstone, ceruleabaster, heartstone - so the
-// existing amulets and these read as the same material.
-
 /obj/item/clothing/neck/carved
 	abstract_type = /obj/item/clothing/neck/carved
 	name = "carved amulet"
@@ -33,10 +21,6 @@
 		mob_overlay_icon = 'modular_abel/neck_amulets/icons/amulets_wrists.dmi'
 	else
 		mob_overlay_icon = 'modular_abel/neck_amulets/icons/amulets_onmob.dmi'
-
-// ---------------------------------------------------------------------------
-// Silver settings.
-// ---------------------------------------------------------------------------
 
 /obj/item/clothing/neck/carved/silverjade
 	name = "silver joapstone amulet"
@@ -77,10 +61,6 @@
 	name = "silver shell amulet"
 	desc = "A silver amulet encrusted with a polished piece of shell, donnable both on neck and wrist."
 	icon_state = "silver_shell"
-
-// ---------------------------------------------------------------------------
-// Gold settings - the same stones, worth more.
-// ---------------------------------------------------------------------------
 
 /obj/item/clothing/neck/carved/gold
 	abstract_type = /obj/item/clothing/neck/carved/gold
@@ -125,10 +105,6 @@
 	name = "golden joapstone amulet"
 	desc = "A luxurious golden amulet encrusted with a polished piece of joapstone, donnable both on neck and wrist."
 	icon_state = "gold_jade"
-
-// ---------------------------------------------------------------------------
-// Not an amulet, but it rode along in the same file.
-// ---------------------------------------------------------------------------
 
 /obj/item/clothing/neck/furscarf
 	name = "fur scarf"

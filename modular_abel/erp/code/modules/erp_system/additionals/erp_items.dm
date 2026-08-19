@@ -1,4 +1,3 @@
-
 /obj/item/dildo
 	erp_item_tags = list("dildo")
 
@@ -103,9 +102,6 @@
 		/datum/kink/bondage = 1
 	)
 
-// The old /datum/crafting_recipe system these were written against no longer exists - clothing recipes now
-// live under /datum/repeatable_crafting_recipe/leather (see code/modules/crafting/quality_of_crafting/leatherworking.dm),
-// which already covers "needle + cured hide" sewing. Reimplemented on that base with the same reqs/outputs.
 /datum/repeatable_crafting_recipe/leather/pony_corset
 	name = "pony corset"
 	requirements = list(

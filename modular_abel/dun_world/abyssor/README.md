@@ -103,3 +103,5 @@ out. Both are inert rather than broken — nothing references them.
 and `whale.ogg` were copied because Vanderlin does not carry them; the rest of the audio
 (`lever.ogg`, `slip.ogg`, `cosmic_expansion.ogg`, `teleport_diss.ogg`) already exists
 upstream and is referenced from there.
+
+The Painter vestment sprites are by ket.

@@ -1,9 +1,3 @@
-// Recipes for the ported face masks.
-//
-// Azure ships these as loot only, but Vanderlin's craftable_clothes unit test requires every
-// garment to have a recipe, and its own masks are all craftable. Soft masks are sewn; maille
-// masks are forged from the matching ingot, following /datum/anvil_recipe/armor conventions.
-
 /datum/repeatable_crafting_recipe/sewing/padded_mask
 	name = "padded mask"
 	output = /obj/item/clothing/face/facemask/padded

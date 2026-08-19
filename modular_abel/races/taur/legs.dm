@@ -1,13 +1,5 @@
-// Taur limb attach/detach behaviour.
-//
-// This used to override /mob/living/carbon/human/add_bodypart and remove_bodypart, but
-// upstream marks both SHOULD_NOT_OVERRIDE(TRUE) and dreamchecker rejects the build for it.
-// The sanctioned hooks are the bodypart's own on_adding/on_removal, which add_bodypart and
-// remove_bodypart call for us, so the logic lives there now and delegates to the mob.
-//
-// The mob-side halves stay as procs on /mob/living/carbon/human deliberately: the prebuckle
-// signal has to be registered with the human as the registrant, otherwise PROC_REF would
-// resolve taur_consent_prebuckle against the bodypart and the handler would never fire.
+// Do not move this back onto add_bodypart/remove_bodypart: upstream marks both
+// SHOULD_NOT_OVERRIDE(TRUE) and dreamchecker rejects the build for it.
 
 /obj/item/bodypart/taur/on_adding(mob/living/carbon/new_owner)
 	. = ..()

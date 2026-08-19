@@ -15,10 +15,9 @@
 	var/offset_x = -16
 	var/offset_y = 0
 	var/body_offset_y = 0
-	// Per-body genital placement. Pixels added to penis/testicles/vagina overlays on a taur.
-	// Negative Y = lower (toward the belly/tail); positive Y = higher (toward the human pelvis).
-	// X shifts left/right. Tune these per subtype below to sit genitals on each beast body.
+	/// Pixels added to the penis/testicles/vagina overlays, left/right.
 	var/genital_offset_x = 0
+	/// Pixels added to the penis/testicles/vagina overlays. Negative sits them lower, toward the belly.
 	var/genital_offset_y = -10
 	var/bellyride_victim_y_offset = 0
 	var/bellyride_quadruped = FALSE

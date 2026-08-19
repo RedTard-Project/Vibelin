@@ -1,10 +1,4 @@
-// The undercurrent turf that rings the abyssal grotto's dream pool.
-// Ported from Azure-Peak code/modules/roguetown/roguemachine/abyssorcult/dream_pool.dm.
-//
-// This one is load-bearing for map generation: /turf/open/rebound is an area/turf
-// path used directly by the Twilight Axis .dmm, so it has to exist in the compile
-// or every tile that uses it corrupts.
-
+// Required by the generated map: the Twilight Axis .dmm places this turf path directly.
 /turf/open/rebound
 	name = "undercurrent"
 	desc = "These waters reject those without proper will."

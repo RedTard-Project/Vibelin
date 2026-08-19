@@ -3,20 +3,15 @@
 	ignore_dir_errors = TRUE
 
 /datum/asset/spritesheet_batched/loadout_panel_icons/create_spritesheets()
-	var/list/ids = list()
+	var/list/inserted_ids = list()
 	for(var/path in GLOB.loadout_items)
 		var/datum/loadout_item/item = GLOB.loadout_items[path]
-		var/atom/movable/typepath = item.item_path
-		if(!typepath)
+		if(!item.item_path || !item.ui_icon || !item.ui_icon_state)
 			continue
-		var/icon = item.ui_icon
-		var/icon_state = item.ui_icon_state
-		if(!icon || !icon_state)
+		var/id = sanitize_css_class_name("[item.item_path]")
+		if(inserted_ids[id])
 			continue
-		var/id = sanitize_css_class_name("[typepath]")
-		if(id in ids)
-			continue
-		ids += id
-		var/datum/universal_icon/new_icon = uni_icon(icon, icon_state)
-		new_icon.scale(128, 128)
-		insert_icon(id, new_icon)
+		inserted_ids[id] = TRUE
+		var/datum/universal_icon/entry_icon = uni_icon(item.ui_icon, item.ui_icon_state)
+		entry_icon.scale(128, 128)
+		insert_icon(id, entry_icon)

@@ -17,6 +17,11 @@ Items added upstream after Vibelin PR #5 that did not belong to any of the cloth
   flavour items — the taste lives in the name and description, not in a bespoke reagent.
   If the westleach line is ever ported, these should be repointed at it.
 
+- **`detail_tag`.** The parent tabard carries `detail_tag = "_spl"` for its heraldic split.
+  The traditional tabard is a fixed white design with no `_spl` state, so it clears the tag;
+  leave that `detail_tag = null` in place or the `item_detail_sanity` unit test fails on the
+  missing icon.
+
 ## Not ported
 
 - **The bared traditional tabard** (`psydontabard/white/alt`). It declares
@@ -27,3 +32,7 @@ Items added upstream after Vibelin PR #5 that did not belong to any of the cloth
 
 `icons/sundries_world.dmi` / `sundries_onmob.dmi` — the `whitepsydontabard` state extracted
 from Azure's `cloaks.dmi` and `onmob/cloaks.dmi`.
+
+## Loadout
+
+`loadout.dm` registers these in the donator loadout panel under the **Azure Content** tab (`ui_category = LOADOUT_PANEL_CATEGORY_AZURE`) — 1 entry, the traditional tabard. The zigs are consumables, not wearables, so they stay out. See `modular_abel/loadout_panel/README.md`.

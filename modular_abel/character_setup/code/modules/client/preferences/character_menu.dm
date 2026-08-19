@@ -1133,7 +1133,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 
 	#undef CHARACTER_SETUP_PROCESS_OVERLAYS_OR_UNDERLAYS
 
-
 /datum/preferences/proc/character_setup_apply_to_view(atom/movable/screen/map_view/view, mob/living/carbon/human/dummy/body, view_dir)
 	if(!view)
 		return
@@ -1844,10 +1843,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			return TRUE
 	if(character_setup_handle_system_action(user, href_list))
 		return TRUE
-	// Datum prefs AND all core browser-prefs (job, antag, markings, descriptors, customizers,
-	// role_settings, ...) route to the core handler, which owns the proper task switches.
-	// Previously non-datum keys hit `return TRUE` and were silently swallowed, which is why job
-	// priority / antag toggles never applied. Core CRASHes only on a genuinely invalid key.
 	. = ..()
 	update_menu_data(user)
 	return .

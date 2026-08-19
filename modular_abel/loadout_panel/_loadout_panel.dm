@@ -1,4 +1,7 @@
+#include "_defines.dm"
+#include "config.dm"
 #include "prefs.dm"
+#include "access.dm"
 #include "panel.dm"
 #include "apply.dm"
 #include "spritesheet.dm"

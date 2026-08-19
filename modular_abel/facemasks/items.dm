@@ -1,17 +1,3 @@
-// Padded, leather and chainmaille face masks.
-// Ported from Azure-Peak code/modules/clothing/rogueclothes/mask.dm, added upstream after
-// Vibelin PR #5.
-//
-// Batch 2 of the clothing port. Vanderlin's /obj/item/clothing/face/facemask family is all
-// rigid metal and carved stone; this fills in the soft and maille end of it - the masks a
-// footman or a townsman would actually own.
-//
-// Azure declares armour inline as `armor = ARMOR_PADDED` with ARMOR_INT_MASK_* integrity
-// constants. Vanderlin uses `armor_type = /datum/armor/...` datums and plain integrity
-// numbers, and has none of those constants, so both are expressed the Vanderlin way:
-// padded/leather ride /datum/armor/mask/padded, maille rides /datum/armor/mask/metal.
-// Integrity follows the surrounding Vanderlin masks (iron sits at 100).
-
 /obj/item/clothing/face/facemask/padded
 	name = "padded mask"
 	desc = "A padded cloth mask with a visor, it will prevent bad smells more than damage."
@@ -62,7 +48,6 @@
 
 /obj/item/clothing/face/facemask/steel/maille
 	name = "steel chainmaille mask"
-	// Maille gets less protection but more durability than the fullplate masks.
 	desc = "A padded chainmaille mask that will protect against some damage and can be rolled down to the neck."
 	icon = 'modular_abel/facemasks/icons/masks_world.dmi'
 	mob_overlay_icon = 'modular_abel/facemasks/icons/masks_onmob.dmi'

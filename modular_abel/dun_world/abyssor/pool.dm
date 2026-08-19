@@ -1,12 +1,3 @@
-// The dream pool and its gate.
-// Ported from Azure-Peak code/modules/roguetown/roguemachine/abyssorcult/dream_pool.dm.
-//
-// NOT ported yet: the group-ritual processing (handle_ritual_start / coordinate_channeling_loop /
-// spawn_deep_one_wave / generate_inundation_loot). Those drive Azure's /datum/tgui_module/
-// vortex_ritual_selection window, and Vanderlin has no /datum/tgui_module base - that layer
-// needs a real tgui interface written against SStgui rather than a straight port. The pool
-// itself, its gate and the redstone hookup all work; the ritual chain is the follow-up.
-
 /obj/structure/roguemachine/dream_pool
 	name = "dream pool"
 	desc = ""

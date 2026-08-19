@@ -462,11 +462,8 @@
 	name = "Will-o'-the-wisp"
 	desc = "A small, fiery ball of light made up of mystical energy."
 
-// === Twilight Axis dun_world secret-door props (ported) ===
-// These bookcase-disguised redstone structures are used by the dun_world map but were never
-// ported to Vanderlin. The missing types made `new` return null on mapload, so their
-// redstone_id map var leaked onto the underlying turf -> "Undefined variable
-// /turf/.../redstone_id" runtimes in preloader_load. Defining them stops the leak.
+// Required by the generated map: without these types `new` returns null on mapload and
+// their redstone_id leaks onto the underlying turf.
 /obj/structure/lever/bookcase
 	name = "Bookcase"
 	desc = "Refuge for few, an irrelevance to most."

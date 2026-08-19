@@ -34,6 +34,8 @@ Layout:
   Azure-Peak after PR #5. See `snouted_helms/README.md`.
 - `sundries/` — the traditional Psydonian tabard and flavoured zigs, ported from
   Azure-Peak after PR #5. See `sundries/README.md`.
+- `loadout_panel/` — the donator loadout window and the **Azure Content** tab that
+  collects the Azure-Peak wearables. See `loadout_panel/README.md`.
 - `tools/` — map generation and QA scripts.
 
 - Source map: `Azure-Peak/Azure-Peak:_maps/map_files/dun_world/dun_world.dmm`

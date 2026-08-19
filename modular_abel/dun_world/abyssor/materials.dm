@@ -1,13 +1,9 @@
-// Dream materials - the crafting/ritual currency of the Abyssor cult.
-// Ported from Azure-Peak code/modules/roguetown/roguemachine/abyssorcult/dream_materials.dm
-
 /obj/item/dream_material
 	name = "dream item"
 	desc = "you shouldn't see this."
 	w_class = WEIGHT_CLASS_TINY
 	icon = 'modular_abel/dun_world/abyssor/icons/dream_materials.dmi'
 
-// Tier 1
 /obj/item/dream_material/dream_spike
 	name = "effervescent spike"
 	desc = "A spike that seems to boil internally with patterns that are out of this world. It seems brittle."
@@ -23,7 +19,6 @@
 	desc = "A ring that seems oddly shiny for something that's hardly metallic in nature. It feels like a piece of coral, in a way. It seems brittle."
 	icon_state = "ring"
 
-// Tier 2
 /obj/item/dream_material/dream_effigy
 	name = "glittering effigy"
 	desc = "An effigy said to have been made by a creature of the dream. Seems workable."
@@ -39,7 +34,6 @@
 	desc = "A collection of shards that form a blade. Yet it refuses to be put back together, as if the material itself decided it rather remains broken. Seems workable."
 	icon_state = "blade"
 
-// Tier 3
 /obj/item/dream_material/dream_shards
 	name = "distant shards"
 	desc = "These shards appear close at first, but looking at them makes them creep away in the distance. Yet they fit in your palm, how can they be near and faraway at the same time? Seems exquisite."
@@ -50,7 +44,6 @@
 	desc = "Holding this star fills the head with whispers. It tells tales, how it used to shine in the sky but then it saw what a mess we're making of the place. It crashed down on its own accord from the great dream's sky. 'I can fix it, if you'll allow me.' Seems exquisite."
 	icon_state = "star"
 
-// Tierless
 /obj/item/dream_material/parchment_silver
 	name = "quicksilver parchment"
 	desc = "A piece of parchment treated with a quicksilver like paint. The paint binds visions, or so they say."

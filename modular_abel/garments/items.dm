@@ -1,20 +1,3 @@
-// Dresses, robes, a winter tunic, a toga and a formal skirt.
-// Ported from Azure-Peak's rogueclothes shirts.dm / robes.dm / cloaks.dm / pants/skirt.dm,
-// added upstream after Vibelin PR #5.
-//
-// Batch 3 of the clothing port.
-//
-// Path notes: Azure's /obj/item/clothing/suit/roguetown/shirt/* is /obj/item/clothing/shirt/*
-// here, and its /obj/item/clothing/under/roguetown/skirt/* lives under
-// /obj/item/clothing/pants/skirt/*.
-//
-// The four gowns carry no sleeve states in any Azure sheet - they are sleeveless by design -
-// so they set no `sleeved` and inherit the parent's sleeve status.
-
-// ---------------------------------------------------------------------------
-// Gowns.
-// ---------------------------------------------------------------------------
-
 /obj/item/clothing/shirt/dress/blue
 	name = "blue dress"
 	desc = "A modest blue dress of the kind worn by townswomen on days that matter."
@@ -38,10 +21,6 @@
 	mob_overlay_icon = 'modular_abel/garments/icons/garments_onmob.dmi'
 	icon_state = "taverndress"
 	sellprice = 20
-
-// ---------------------------------------------------------------------------
-// Robes.
-// ---------------------------------------------------------------------------
 
 /obj/item/clothing/shirt/robe/leopard
 	name = "leopard bathrobe"
@@ -74,10 +53,6 @@
 	sleeved = 'modular_abel/garments/icons/garments_sleeves.dmi'
 	icon_state = "magerobe"
 	sellprice = 40
-
-// ---------------------------------------------------------------------------
-// Outerwear and the rest.
-// ---------------------------------------------------------------------------
 
 /obj/item/clothing/shirt/tunic/winter
 	name = "winter coat"

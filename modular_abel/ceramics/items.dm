@@ -1,15 +1,3 @@
-// Fired ceramic vessels.
-// Ported from Azure-Peak code/game/objects/items/rogueitems/ceramics.dm, added upstream
-// after Vibelin PR #5.
-//
-// Azure's ceramics is a two-stage system: a wheel recipe makes an unfired /obj/item/natural/clay
-// subtype, which a kiln then fires into the finished vessel. Vanderlin's own pottery wheel
-// (code/datums/pottery_recipes/) hands the finished item straight back, so only the fired
-// halves are ported and the recipes in recipes.dm plug into that system instead.
-//
-// Azure's glaze_bonus_pct belongs to its glazing mechanic, which Vanderlin does not have,
-// so it is dropped.
-
 /obj/item/reagent_containers/glass/bottle/ceramic
 	abstract_type = /obj/item/reagent_containers/glass/bottle/ceramic
 	icon = 'modular_abel/ceramics/icons/ceramics.dmi'
@@ -27,7 +15,7 @@
 	name = "ceramic amphora"
 	desc = "A large ceramic amphora, a vessel with an ancient design that originated off of Etrusca's coast."
 	icon_state = "clayamphorabaked"
-	volume = 200 // Amphoras can store large amounts of liquid.
+	volume = 200
 	sellprice = 24
 
 /obj/item/reagent_containers/glass/bottle/ceramic/tallvase

@@ -1,11 +1,4 @@
-// Painter vestments and the paint staff spawner.
-// Ported from Azure-Peak code/modules/roguetown/roguemachine/abyssorcult/dream_equipment.dm.
-//
-// Azure keeps these under /obj/item/clothing/suit/roguetown/... ; Vanderlin dropped the
-// "roguetown" segment years ago, so they live at the Vanderlin paths here and the Azure
-// paths are pointed at them from modular_abel/dun_world/config/map.json.
-
-/obj/item/clothing/shirt/robe/abyssor_painter // thanks to ket for the abyssor clothing sprites
+/obj/item/clothing/shirt/robe/abyssor_painter
 	name = "rainfall robe"
 	desc = "A long robe formed of many layers of thin, light fabric; designed not to become over-heavy \
 	while waterlogged. \

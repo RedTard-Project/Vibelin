@@ -66,7 +66,7 @@
 /mob/living/simple_animal/hostile/retaliate/camel/tamed(mob/user)
 	. = ..()
 	deaggroprob = 30
-	if(.) // was already tamed
+	if(.)
 		return
 	if(can_buckle)
 		AddElement(/datum/element/ridable, /datum/component/riding/creature/saiga)

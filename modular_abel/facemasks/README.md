@@ -38,3 +38,7 @@ stone; this fills in the soft and maille end of it.
 | --- | --- | --- |
 | `icons/masks_world.dmi` | Azure `icons/roguetown/clothing/masks.dmi` | 6 |
 | `icons/masks_onmob.dmi` | Azure `icons/roguetown/clothing/onmob/masks.dmi` | 6 |
+
+## Loadout
+
+`loadout.dm` registers these in the donator loadout panel under the **Azure Content** tab (`ui_category = LOADOUT_PANEL_CATEGORY_AZURE`) — 6 entries, one per mask. See `modular_abel/loadout_panel/README.md`.

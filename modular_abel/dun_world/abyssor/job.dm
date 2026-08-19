@@ -1,16 +1,3 @@
-// The Painter - Abyssor's dream-scryer.
-// Ported from Azure-Peak code/modules/jobs/job_types/roguetown/church/painter.dm.
-//
-// Adapted for Vanderlin: Azure's subclass_stats/subclass_skills lists are Vanderlin's
-// /datum/attribute_holder/sheet, TRAIT_WATERBREATHING is TRAIT_NODROWN, and Azure's
-// TRAIT_RITUALIST is dropped entirely - it gates Azure's chalk-circle ritual system,
-// which Vanderlin does not have.
-//
-// Slots are 0 by default so the job is invisible on every stock map. Twilight Axis turns
-// it on through its map_adjustment slot_adjust; see modular_abel/dun_world/map_adjustment.dm.
-// map_check() additionally hard-gates it on the per-map abyssor_cult switch so an admin
-// re-opening slots on a map that never opted in still cannot spawn one.
-
 /datum/attribute_holder/sheet/job/painter
 	raw_attribute_list = list(
 		STAT_INTELLIGENCE = 2,
@@ -59,7 +46,6 @@
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_PAINTER
 	factions = list(FACTION_TOWN)
-	// Twilight Axis opens these through its map_adjustment; every other map leaves them shut.
 	total_positions = 0
 	spawn_positions = 0
 

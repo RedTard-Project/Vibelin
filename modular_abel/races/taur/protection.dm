@@ -1,4 +1,3 @@
-// Taurs may wear ordinary footwear/pants for the armor, but only purpose-made horseshoes render on a beast lower body; everything else is worn invisibly.
 /obj/item/clothing/shoes/build_worn_icon(age = AGE_ADULT, default_layer = 0, default_icon_file = null, isinhands = FALSE, femaleuniform = NO_FEMALE_UNIFORM, override_state = null, coom = FALSE, customi = null, sleeveindex, force_child = FALSE)
 	var/mob/living/carbon/human/H = loc
 	if(!isinhands && istype(H) && H.get_taur_tail() && !istype(src, /obj/item/clothing/shoes/taur_horseshoes))

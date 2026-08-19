@@ -1,9 +1,3 @@
-// Per-map switch for the Abyssor dream-cult content pack.
-//
-// Upstream /datum/map_config/LoadConfig() ignores keys it does not know about, so
-// the flag is read back out of the same json here instead of editing upstream.
-// Defaults to FALSE: stock maps stay exactly as they are unless they opt in.
-
 /datum/map_config
 	/// Whether this map runs the Abyssor dream-cult content (dream pool, rituals, Painter).
 	var/abyssor_cult = FALSE

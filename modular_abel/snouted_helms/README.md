@@ -41,3 +41,7 @@ follows its own family's existing pattern (`volfplate_puritan`: steel + steel, c
 | `icons/helms_tall.dmi` | Azure `icons/roguetown/clothing/onmob/32x40/head.dmi` | 1 |
 
 The psydonic helm uses the tall 32x40 mob sheet, as its parent family does.
+
+## Loadout
+
+`loadout.dm` registers these in the donator loadout panel under the **Azure Content** tab (`ui_category = LOADOUT_PANEL_CATEGORY_AZURE`) — 8 entries, one per helm. See `modular_abel/loadout_panel/README.md`.

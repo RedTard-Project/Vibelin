@@ -46,3 +46,7 @@ Three sheets extracted from Azure, none of whose states Vanderlin carries:
 | `icons/amulets_world.dmi` | `icons/roguetown/clothing/neck.dmi` | 17 |
 | `icons/amulets_onmob.dmi` | `icons/roguetown/clothing/onmob/neck.dmi` | 18 |
 | `icons/amulets_wrists.dmi` | `icons/roguetown/clothing/onmob/wrists.dmi` | 31 |
+
+## Loadout
+
+`loadout.dm` registers these in the donator loadout panel under the **Azure Content** tab (`ui_category = LOADOUT_PANEL_CATEGORY_AZURE`) — 17 entries (the 16 settings plus the fur scarf). See `modular_abel/loadout_panel/README.md`.

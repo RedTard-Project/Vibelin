@@ -1,11 +1,3 @@
-// Dream pylons and the infusion buffs they hand out.
-// Ported from Azure-Peak code/modules/spells/roguetown/acolyte/abyssor/dream_pylon.dm
-// and paint_infusion.dm / paint_infusions.dm.
-//
-// Adapted for Vanderlin: Azure's STATKEY_* buff keys are Vanderlin's STAT_* attribute
-// paths, and TRAIT_AZURENATIVE (hostile-flora immunity) maps onto Vanderlin's
-// TRAIT_MANEATER_IMMUNITY + TRAIT_FLOWERFIELD_IMMUNITY pair.
-
 /obj/structure/dream_pylon
 	name = "painted pylon"
 	desc = "A strange pulsing pylon that seems to be made out of thick, solidified swirls of abyssal paints."
@@ -136,10 +128,6 @@
 	can_recharge = TRUE
 	update_pylon_appearance()
 
-// ---------------------------------------------------------------------------
-// The tethered buff itself.
-// ---------------------------------------------------------------------------
-
 /datum/status_effect/infusion
 	id = "Pylon Infusion"
 	duration = 20 MINUTES
@@ -247,7 +235,6 @@
 		qdel(src)
 		return
 
-	// Calculate ratio of what's remaining based on original duration
 	var/ratio_consumed = total_effective_consumed / original_duration
 	var/ratio_remaining = max(0, 1 - ratio_consumed)
 
@@ -279,10 +266,6 @@
 
 		pylon_outline = I
 		owner.client.images += pylon_outline
-
-// ---------------------------------------------------------------------------
-// Infusion flavours.
-// ---------------------------------------------------------------------------
 
 /datum/status_effect/infusion/intelligence
 	id = "Intelligence Infusion"
@@ -318,7 +301,6 @@
 	id = "Strength Infusion"
 	alert_type = /atom/movable/screen/alert/status_effect/buff/strength_infusion
 	effectedstats = list(STAT_STRENGTH = 1)
-	// 30 seconds out of range
 	decay_multiplier = 40
 	examine_text = "SUBJECTPRONOUN looks surrounded by a shimmering, muscle-fostering aura of dark paint."
 

@@ -135,11 +135,8 @@
 /area/rogue/indoors/inq/basement
 	name = "Twilight Axis - Indoors / Inquisition / Basement"
 
-// chapel/embassy were missed in the original port. A map model whose area path doesn't compile
-// loses that member at parse (text2path -> null), which makes the model's TURF the last member;
-// reader.dm's build_coordinate then treats it as the area and does `new /turf/...(null)` -> the
-// "bad loc" runtime on every chapel/embassy tile (441 on file-z3 + 145 on file-z4 = the exact 586
-// runtimes CI counted). The turf never gets placed either, so the building was loading half-empty.
+// Required by the generated map: an area path that does not compile makes reader.dm
+// place the model's turf as the area and every tile using it runtimes on load.
 /area/rogue/indoors/inq/chapel
 	name = "Twilight Axis - Indoors / Inquisition / Chapel"
 

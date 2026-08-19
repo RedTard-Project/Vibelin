@@ -1,15 +1,3 @@
-// Anvil recipes for the gold and silver gem amulets.
-//
-// Azure ships these purely as loot. Vanderlin makes every other amulet craftable - the plain
-// stone ones on the carving bench (code/modules/crafting/quality_of_crafting/carving.dm) and
-// the bare metal ones at the anvil (code/modules/crafting/anvil_recipes/valuables.dm) - and
-// its craftable_clothes unit test enforces that every garment has a recipe, so these get one
-// too rather than an exemption.
-//
-// The setting is the anvil half of that pair: a precious ingot plus the matching cut gem,
-// following the "+1 X" naming and additional_items convention already used for armour.
-// craftdiff mirrors /datum/anvil_recipe/valuables/{silver,gold}.
-
 /datum/anvil_recipe/valuables/silver/carved_amulet
 	abstract_type = /datum/anvil_recipe/valuables/silver/carved_amulet
 	output_amount = 1
@@ -54,8 +42,6 @@
 	additional_items = list(/obj/item/carvedgem/shell/cutgem)
 	created_item = /obj/item/clothing/neck/carved/silvershell
 
-// ---------------------------------------------------------------------------
-
 /datum/anvil_recipe/valuables/gold/carved_amulet
 	abstract_type = /datum/anvil_recipe/valuables/gold/carved_amulet
 	output_amount = 1
@@ -99,10 +85,6 @@
 	name = "Golden Shell Amulet (+1 Cut Shell)"
 	additional_items = list(/obj/item/carvedgem/shell/cutgem)
 	created_item = /obj/item/clothing/neck/carved/gold/shell
-
-// ---------------------------------------------------------------------------
-// The fur scarf is sewn, not forged.
-// ---------------------------------------------------------------------------
 
 /datum/repeatable_crafting_recipe/sewing/furscarf
 	name = "fur scarf"

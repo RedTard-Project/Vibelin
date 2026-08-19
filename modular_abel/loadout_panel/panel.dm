@@ -1,6 +1,3 @@
-/datum/config_entry/string/boostyurl
-	config_entry_value = ""
-
 /datum/loadout_panel
 	var/datum/preferences/owner_prefs
 
@@ -20,65 +17,89 @@
 		ui = new(user, src, "LoadoutPanel")
 		ui.open()
 
-/datum/loadout_panel/proc/build_item_entry(datum/loadout_item/item, mob/user)
+/datum/loadout_panel/ui_assets(mob/user)
+	return list(get_asset_datum(/datum/asset/spritesheet_batched/loadout_panel_icons))
+
+/datum/loadout_panel/proc/build_item_entry(datum/loadout_item/item, client/user_client)
 	var/path_str = "[item.item_path]"
-	var/id = sanitize_css_class_name(path_str)
-	var/unavailable_reason = null
-	if(item.loadout_flags & LOADOUT_FLAG_GIVEAWAY_ONLY)
-		unavailable_reason = "Только с розыгрышей."
-	else if(item.required_award && !item.is_unlocked_for(user.client))
-		unavailable_reason = "Требуется достижение."
-	else if((item.loadout_flags & LOADOUT_FLAG_PATREON_LOCKED) && !user.client?.patreon?.is_donator())
-		unavailable_reason = "Требуется донат-статус."
 	return list(
 		"name" = item.name,
 		"path" = path_str,
-		"icon_class_name" = "loadout_panel_icons128x128 [id]",
+		"iconClass" = "loadout_panel_icons128x128 [sanitize_css_class_name(path_str)]",
 		"isDonatorItem" = item.panel_donator,
-		"unavailable" = !isnull(unavailable_reason),
-		"unavailableReason" = unavailable_reason,
-		"requiredTier" = 0,
-		"triumphCost" = 0,
+		"unavailableReason" = item.panel_block_reason(user_client),
 	)
 
-/datum/loadout_panel/ui_static_data(mob/user)
-	var/list/data = list()
-	var/list/categories = list()
-	categories["Всё"] = list()
-	categories["Донат"] = list()
+/datum/loadout_panel/proc/build_slot_tiers()
+	return list(
+		list("tier" = ACCESS_THANKS_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER1),
+		list("tier" = ACCESS_ASSISTANT_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER2),
+		list("tier" = ACCESS_COMMAND_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER3),
+		list("tier" = ACCESS_TRAITOR_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER4),
+		list("tier" = ACCESS_NUKIE_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER5),
+	)
 
+/datum/loadout_panel/proc/build_categories(client/user_client)
+	var/list/every_entry = list()
+	var/list/by_category = list()
 	for(var/path in GLOB.loadout_items)
 		var/datum/loadout_item/item = GLOB.loadout_items[path]
 		if(!item.item_path)
 			continue
 		if(item.loadout_flags & LOADOUT_FLAG_NO_EQUIP)
 			continue
-		var/list/entry = build_item_entry(item, user)
-		categories["Всё"] += list(entry)
-		var/cat = item.panel_donator ? "Донат" : item.ui_category
-		if(!(cat in categories))
-			categories[cat] = list()
-		categories[cat] += list(entry)
+		var/list/entry = build_item_entry(item, user_client)
+		every_entry += list(entry)
+		var/category = item.panel_donator ? LOADOUT_PANEL_CATEGORY_DONATOR : item.ui_category
+		if(!by_category[category])
+			by_category[category] = list()
+		by_category[category] += list(entry)
 
-	data["categories"] = categories
-	data["isDonator"] = !!user.client?.patreon?.is_donator()
-	data["donatTier"] = user.client?.patreon?.access_rank || 0
-	data["triumphDiscount"] = 0
-	data["maxLoadoutSlots"] = owner_prefs.get_panel_loadout_size(user)
-	return data
+	var/list/categories = list()
+	categories[LOADOUT_PANEL_CATEGORY_ALL] = every_entry
+	for(var/category in list(LOADOUT_PANEL_CATEGORY_DONATOR, LOADOUT_PANEL_CATEGORY_AZURE))
+		if(!by_category[category])
+			continue
+		categories[category] = by_category[category]
+		by_category -= category
+	for(var/category in by_category)
+		categories[category] = by_category[category]
+	return categories
+
+/datum/loadout_panel/ui_static_data(mob/user)
+	return list(
+		"categories" = build_categories(user?.client),
+		"maxLoadoutSlots" = owner_prefs.get_panel_loadout_size(user),
+		"slotTiers" = build_slot_tiers(),
+	)
 
 /datum/loadout_panel/ui_data(mob/user)
-	var/list/data = list()
 	var/list/selected = list()
 	for(var/path_str in owner_prefs.panel_loadout_items)
 		var/datum/loadout_item/item = GLOB.loadout_items[text2path(path_str)]
 		if(!item)
 			continue
 		selected += list(list("path" = path_str, "name" = item.name))
-	data["selectedLoadoutItems"] = selected
-	data["triumphDiscountUsed"] = 0
-	data["curLoadoutSlots"] = length(owner_prefs.panel_loadout_items)
-	return data
+	return list(
+		"selectedLoadoutItems" = selected,
+		"curLoadoutSlots" = length(owner_prefs.panel_loadout_items),
+	)
+
+/datum/loadout_panel/proc/add_item(mob/user, path_str)
+	var/datum/loadout_item/item = GLOB.loadout_items[text2path(path_str)]
+	if(!item?.item_path)
+		return
+	if(path_str in owner_prefs.panel_loadout_items)
+		return
+	if(length(owner_prefs.panel_loadout_items) >= owner_prefs.get_panel_loadout_size(user))
+		to_chat(user, span_warning("Лимит исчерпан!"))
+		return
+	var/block_reason = item.panel_block_reason(user.client)
+	if(block_reason)
+		to_chat(user, span_warning(block_reason))
+		return
+	owner_prefs.panel_loadout_items += path_str
+	owner_prefs.save_character()
 
 /datum/loadout_panel/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
@@ -86,46 +107,21 @@
 		return
 
 	var/mob/user = ui.user
-
 	switch(action)
 		if("add")
-			var/path_str = params["item"]
-			var/datum/loadout_item/item = GLOB.loadout_items[text2path(path_str)]
-			if(!item)
-				return TRUE
-			if(path_str in owner_prefs.panel_loadout_items)
-				return TRUE
-			if(length(owner_prefs.panel_loadout_items) >= owner_prefs.get_panel_loadout_size(user))
-				to_chat(user, "Лимит исчерпан!")
-				return TRUE
-			if(item.loadout_flags & (LOADOUT_FLAG_NO_EQUIP | LOADOUT_FLAG_GIVEAWAY_ONLY))
-				to_chat(user, "Недоступно.")
-				return TRUE
-			if(item.required_award && !item.is_unlocked_for(user.client))
-				to_chat(user, "Требуется достижение.")
-				return TRUE
-			owner_prefs.panel_loadout_items += path_str
-			owner_prefs.save_character()
+			add_item(user, params["item"])
 			return TRUE
-
 		if("remove")
 			owner_prefs.panel_loadout_items -= params["item"]
 			owner_prefs.save_character()
 			return TRUE
-
 		if("clear")
 			owner_prefs.panel_loadout_items = list()
 			owner_prefs.save_character()
-			to_chat(user, "Лодаут очищен!")
+			to_chat(user, span_notice("Лодаут очищен!"))
 			return TRUE
-
 		if("boosty")
-			var/boostyurl = CONFIG_GET(string/boostyurl)
-			if(boostyurl)
-				user << link(boostyurl)
+			var/boosty_url = CONFIG_GET(string/boostyurl)
+			if(boosty_url)
+				user << link(boosty_url)
 			return TRUE
-
-/datum/loadout_panel/ui_assets(mob/user)
-	return list(
-		get_asset_datum(/datum/asset/spritesheet_batched/loadout_panel_icons)
-	)

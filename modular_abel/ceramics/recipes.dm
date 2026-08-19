@@ -1,19 +1,3 @@
-// Pottery wheel recipes for the ported ceramic vessels.
-// Ported from Azure-Peak code/modules/roguetown/roguecrafting/ceramics.dm.
-//
-// Azure declares these as /datum/crafting_recipe/roguetown/ceramics with reqs/result and a
-// separate firing step. Vanderlin already has its own wheel (code/datums/pottery_recipes/),
-// where each unit of clay is one throwing step and the finished piece comes off the wheel
-// directly - so the clay cost becomes that many recipe_steps.
-//
-// Difficulty: Azure grades these craftdiff 1-5. Vanderlin's difficulty feeds
-// success_chance = 25 * ((skill - difficulty) + 1), and its own recipes sit at 0-1, so the
-// Azure spread is compressed into 1-3 rather than copied literally - a 5 would be
-// unthrowable for anyone below master.
-//
-// Not ported: Azure's clay mug (Vanderlin already has /datum/pottery_recipe/mug) and its
-// clay box, which fires into a porcelain storage container Vanderlin has no equivalent for.
-
 /datum/pottery_recipe/ceramic
 	abstract_type = /datum/pottery_recipe/ceramic
 	skill = /datum/attribute/skill/craft/crafting

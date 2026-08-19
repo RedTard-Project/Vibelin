@@ -1,14 +1,3 @@
-// Carved wooden trinkets.
-// Ported from Azure-Peak code/game/objects/items/rogueitems/wood_items.dm, plus the
-// wooden bottle from its waterskin.dm.
-//
-// Vanderlin's own carving system (code/modules/crafting/quality_of_crafting/carving.dm)
-// only covers gemstones, so none of this overlaps with existing content.
-//
-// Azure's has_item_quality / is_carved / was_crafted vars belong to its item-quality
-// system and do not exist here, so they are dropped. Sellprices follow the /obj/item/carvedgem
-// convention of pricing the finished piece, scaled well below stone since this is firewood.
-
 /obj/item/carvedwood
 	name = "wooden bug beaver"
 	desc = "You shouldn't be seeing this."
@@ -19,10 +8,6 @@
 	w_class = WEIGHT_CLASS_NORMAL
 	obj_flags = UNIQUE_RENAME
 	sellprice = 0
-
-// ---------------------------------------------------------------------------
-// Novice - whittled from a single stick.
-// ---------------------------------------------------------------------------
 
 /obj/item/carvedwood/marble
 	name = "wooden marble"
@@ -59,10 +44,6 @@
 	desc = "A plain prism carved out of wood."
 	icon_state = "prism_wood"
 	sellprice = 2
-
-// ---------------------------------------------------------------------------
-// Apprentice.
-// ---------------------------------------------------------------------------
 
 /obj/item/carvedwood/figurine
 	name = "wooden figurine"
@@ -148,10 +129,6 @@
 	grid_width = 32
 	sellprice = 8
 
-// ---------------------------------------------------------------------------
-// Journeyman.
-// ---------------------------------------------------------------------------
-
 /obj/item/carvedwood/sun
 	name = "wooden sun"
 	desc = "A medium sized sun statue carved out of wood."
@@ -188,15 +165,9 @@
 	grid_width = 64
 	sellprice = 14
 
-// ---------------------------------------------------------------------------
-// Expert.
-// ---------------------------------------------------------------------------
-
 /obj/item/carvedwood/shrine
 	name = "wooden shrine"
 	desc = "A humble, portable shrine carved out of wood. It is dedicated to no deity in particular. Could also be used to keep one's books upright on a shelf."
-	// Azure declares this as "shrine_wood", which does not exist in its own carvedwood.dmi -
-	// the sprite is stored as "wood_shrine". Corrected here so the item actually renders.
 	icon_state = "wood_shrine"
 	grid_height = 64
 	grid_width = 32
@@ -216,17 +187,13 @@
 	icon_state = "beaver_wood"
 	sellprice = 18
 
-// ---------------------------------------------------------------------------
-// The one carved piece that is not a trinket.
-// ---------------------------------------------------------------------------
-
 /obj/item/reagent_containers/glass/bottle/waterskin/wood
 	name = "wooden bottle"
 	desc = "A bottle carved out of wood."
 	icon = 'modular_abel/woodcarving/icons/carvedwood.dmi'
 	icon_state = "bottle_wood"
 	reagent_flags = OPENCONTAINER
-	volume = 60 // just a little more than a regular bottle, worse than a waterskin
+	volume = 60
 	sewrepair = FALSE
 	slot_flags = ITEM_SLOT_HIP
 	dropshrink = FALSE

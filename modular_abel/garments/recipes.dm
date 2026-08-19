@@ -1,13 +1,3 @@
-// Sewing recipes for the ported garments.
-//
-// Azure has its own sewing recipes for these (crafting_recipe/roguetown/sewing/*), which is
-// the batch-4 item of the port list - they belong with the garments rather than on their own,
-// so they are here. Re-expressed for /datum/repeatable_crafting_recipe/sewing: hold the
-// needle, click the cloth, pick the garment.
-//
-// Cloth costs follow Azure's reqs where it declares them and the surrounding Vanderlin
-// sewing recipes otherwise. craftdiff uses Vanderlin's 0-6 scale, not Azure's SKILL_LEVEL_*.
-
 /datum/repeatable_crafting_recipe/sewing/taverndress
 	name = "tavern dress"
 	output = /obj/item/clothing/shirt/dress/tavern
@@ -62,9 +52,6 @@
 	requirements = list(/obj/item/natural/cloth = 4)
 	craftdiff = 3
 
-// The open-fronted variant is its own garment upstream (Vanderlin does the same for
-// robe/eora/alt, which has its own weaving recipe), so it gets its own sewing recipe rather
-// than an exemption.
 /datum/repeatable_crafting_recipe/sewing/leopardrobe_open
 	name = "open leopard bathrobe"
 	output = /obj/item/clothing/shirt/robe/leopard/alt

@@ -35,9 +35,6 @@ GLOBAL_LIST_INIT(modular_outsider_categories, list(
 		return
 	if(length(allowed_races) < 7)
 		return
-	// Faith/patron-gated classes (clerics etc.) are themed around the hallowed races; the proxy
-	// mechanism in /datum/job/New() still adds modular races to any that explicitly allow rakshari/elf,
-	// but don't blanket-add exotic luxless races to them here.
 	if(length(allowed_patrons))
 		return
 	if(!length(category_tags))

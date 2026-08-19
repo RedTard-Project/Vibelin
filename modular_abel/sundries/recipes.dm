@@ -1,18 +1,8 @@
-// The tabard is a garment, so craftable_clothes wants a recipe for it. Sewn from cloth,
-// matching the other tabards' weight. The zigs are not clothing subtypes for the test's
-// purposes only in the sense that they are - /obj/item/clothing/face/cigarette - so they are
-// covered by the existing rollie crafting upstream; if that ever changes they need one too.
-
 /datum/repeatable_crafting_recipe/sewing/psydon_traditional_tabard
 	name = "traditional tabard"
 	output = /obj/item/clothing/cloak/tabard/psydon_traditional
 	requirements = list(/obj/item/natural/cloth = 3)
 	craftdiff = 2
-
-// The flavoured zigs are rolled the same way as the plain westleach one
-// (/datum/repeatable_crafting_recipe/sigdry), with dried apple worked into the leaf. Azure's mentha has no Vanderlin
-// equivalent, so the mentha-apple zig differs only by being the finer roll of the two.
-// craftable_clothes counts cigarettes as clothing, so they need these.
 
 /datum/repeatable_crafting_recipe/sigdry/apple
 	name = "apple zig"
