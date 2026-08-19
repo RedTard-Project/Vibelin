@@ -21,7 +21,6 @@ in a `save_character()` override. Three other modules do the same (`erp`, `races
 
 ## Topic census
 
-`code/modules/client/topic_census.dm` is temporary instrumentation from the topic-storm /
-tgui-panel-crash investigation. It is the one place where upstream files carry modular edits
-(three call sites in `code/modules/client/client_procs.dm`), and `GLOB.topic_census_debug`
-defaults to `TRUE`. Remove both once that investigation is closed.
+The topic census moved out of this module into `modular_abel/telemetry/`, together with the new
+tgui census. Its three call sites in `code/modules/client/client_procs.dm` are unchanged — the
+procs it calls are global, so only the file location moved.

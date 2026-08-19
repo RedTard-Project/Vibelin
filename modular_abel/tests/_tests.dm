@@ -170,6 +170,43 @@
 			else
 				seen[path] = list_name
 
+/datum/unit_test/modular_telemetry/Run()
+	var/list/before = GLOB.tgui_census_interfaces.Copy()
+	var/list/record = tgui_census_record("UnitTestInterface")
+	for(var/field in list("opens", "closes", "full", "partial", "process", "process_ms", "payloads", "payload_ms", "payload_ms_max", "full_payload_ms", "full_payloads", "bytes", "bytes_max", "static_bytes", "static_repeats", "acts", "act_ms", "act_ms_max", "slow"))
+		if(isnull(record[field]))
+			TEST_FAIL("tgui census record has no \"[field]\" counter, so tgui_census_format will print null for it")
+	if(!islist(record["actions"]))
+		TEST_FAIL("tgui census record has no actions list")
+
+	record["payloads"] = 4
+	record["payload_ms"] = 10
+	record["bytes"] = 400
+	record["acts"] = 2
+	record["act_ms"] = 3
+	record["actions"]["unit_test_action"] = 2
+	var/formatted = tgui_census_format("UnitTestInterface", record)
+	if(!findtext(formatted, "UnitTestInterface") || !findtext(formatted, "unit_test_action"))
+		TEST_FAIL("tgui_census_format dropped the interface or its actions: [formatted]")
+
+	tgui_census_flush()
+	if(length(GLOB.tgui_census_interfaces))
+		TEST_FAIL("tgui_census_flush left [length(GLOB.tgui_census_interfaces)] interfaces behind instead of resetting the window")
+	GLOB.tgui_census_interfaces = before
+
+	var/list/cases = list(
+		list("tgui" = 1, "type" = "act/toggle") = "act/toggle",
+		list("tgui" = 1, "type" = "ready") = "ready",
+		list("tgui" = 1) = "tgui:?",
+		list("_src_" = "prefs", "proc" = "set_name") = "legacy:prefs/set_name",
+	)
+	for(var/list/href_list in cases)
+		var/classified = topic_census_classify(href_list, null)
+		if(classified != cases[href_list])
+			TEST_FAIL("topic_census_classify returned \"[classified]\" for [json_encode(href_list)], expected \"[cases[href_list]]\"")
+	if(topic_census_classify(list(), null) != "raw")
+		TEST_FAIL("topic_census_classify does not fall back to \"raw\" for an empty href list")
+
 /datum/unit_test/modular_abyssor_gating/Run()
 	for(var/datum/map_config/map_type as anything in subtypesof(/datum/map_config))
 		if(initial(map_type.abyssor_cult))

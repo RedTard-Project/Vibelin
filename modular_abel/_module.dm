@@ -1,5 +1,6 @@
 #pragma warn unused_var
 
+#include "telemetry/_telemetry.dm"
 #include "localization/_localization.dm"
 #include "erp/_erp.dm"
 #include "character_setup/_character_setup.dm"

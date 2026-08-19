@@ -12,6 +12,10 @@
 /datum/config_entry/string/boostyurl
 	config_entry_value = ""
 
+/datum/config_entry/flag/loadout_panel_free_for_all
+	config_entry_value = TRUE
+	default = TRUE
+
 /datum/preferences
 	var/list/panel_loadout_items = list()
 	var/datum/loadout_panel/loadout_panel_ui
@@ -24,6 +28,8 @@
 	return ..()
 
 /datum/preferences/proc/get_panel_loadout_size(mob/user)
+	if(CONFIG_GET(flag/loadout_panel_free_for_all))
+		return LOADOUT_PANEL_SLOTS_TIER5
 	var/client/user_client = user?.client || parent
 	switch(user_client?.patreon?.access_rank)
 		if(ACCESS_THANKS_RANK)
@@ -85,7 +91,7 @@
 		return "Недоступно."
 	if(loadout_flags & LOADOUT_FLAG_GIVEAWAY_ONLY)
 		return "Только с розыгрышей."
-	if((loadout_flags & LOADOUT_FLAG_PATREON_LOCKED) && !user_client?.patreon?.is_donator())
+	if((loadout_flags & LOADOUT_FLAG_PATREON_LOCKED) && !CONFIG_GET(flag/loadout_panel_free_for_all) && !user_client?.patreon?.is_donator())
 		return "Требуется донат-статус."
 	if(required_award && (!user_client || !is_unlocked_for(user_client)))
 		return "Требуется достижение."

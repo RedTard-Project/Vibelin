@@ -62,10 +62,13 @@ halves stay as procs on `/mob/living/carbon/human` deliberately — the prebuckl
 be registered with the human as the registrant, or `PROC_REF` resolves against the bodypart and
 the handler never fires.
 
-## `character_setup/code/modules/client/topic_census.dm`
+## `telemetry/_telemetry.dm`
 
-Temporary instrumentation from the topic-storm / tgui-panel-crash investigation, and the only
-place where upstream files carry modular edits (three call sites in
-`code/modules/client/client_procs.dm`). `GLOB.topic_census_debug` defaults to `TRUE`; it can be
-switched off live. Remove both sides once that investigation is closed. See
-`modular_abel/character_setup/README.md`.
+Temporary instrumentation for the tgui optimisation pass, and the only place where upstream
+files carry modular edits: three `TOPIC-CENSUS TEMP` call sites in
+`code/modules/client/client_procs.dm` (lines 53, 80, 95). Everything else in the module hooks
+tgui by same-type redefinition and chains through `..()`, so no upstream body is copied.
+
+`GLOB.topic_census_debug`, `GLOB.tgui_census_debug` and `GLOB.tgui_census_payload_bytes` all
+default to `TRUE` and can be switched off live. Remove the module and the three call sites once
+the optimisation pass is finished. See `modular_abel/telemetry/README.md`.

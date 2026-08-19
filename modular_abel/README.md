@@ -36,6 +36,9 @@ Layout:
   Azure-Peak after PR #5. See `sundries/README.md`.
 - `loadout_panel/` — the donator loadout window and the **Azure Content** tab that
   collects the Azure-Peak wearables. See `loadout_panel/README.md`.
+- `telemetry/` — temporary instrumentation for the tgui optimisation pass: the topic census
+  and the tgui census, with live toggles and two dedicated log files. See
+  `telemetry/README.md`. Remove once the optimisation pass is done.
 - `tests/` — the module's own unit tests (`tests/_tests.dm`), compiled only under
   `UNIT_TESTS`/`SPACEMAN_DMM`. They cover what upstream's suite does not reach: the loadout
   panel's key contract, the morphing-elixir invariants, and the exclusion lists in

@@ -32,7 +32,7 @@ exactly this invariant — keep it green.
 
 ## Slots
 
-`get_panel_loadout_size()` reads `client.patreon.access_rank`:
+`get_panel_loadout_size()` reads `client.patreon.access_rank` when donator gating is on:
 
 | Rank | Slots |
 | --- | --- |
@@ -46,6 +46,18 @@ exactly this invariant — keep it green.
 The window's tier tooltips render from `slotTiers` in `ui_static_data`, so the numbers live in
 the defines only and cannot drift between the two sides.
 
+**Everything is currently free.** `BOOSTY`-style gating is switched off by the config flag
+`LOADOUT_PANEL_FREE_FOR_ALL`, which defaults to `TRUE`:
+
+- `get_panel_loadout_size()` returns `LOADOUT_PANEL_SLOTS_TIER5` (27) for everyone, whatever
+  their `access_rank`;
+- `panel_block_reason()` stops rejecting `LOADOUT_FLAG_PATREON_LOCKED` items.
+
+`required_award` is still enforced. The tier table above stays in the code and comes back by
+setting `LOADOUT_PANEL_FREE_FOR_ALL FALSE` in the server config — no rebuild. The "Донат" tab
+and the purple `Донат` badge on a tile are unaffected, so donator content is still visibly
+donator content.
+
 **`access_rank` is not trustworthy.** `/datum/patreon_data/New` returns early when
 `SSdbcore.IsConnected()` is false, leaving `access_rank` at 0 while `owned_rank` is set to
 `NUKIE_RANK` — so on a DB-less round every client reads as a donator with 3 slots. Nothing may
@@ -58,8 +70,8 @@ is left alone, warned about, and capped at spawn by `apply_panel_loadout()`.
 `panel_block_reason(client)` is the only place that decides whether a client may take an item,
 and both the tile rendering and the `add` action call it. Adding a restriction means editing
 that one proc. It rejects, in order: `LOADOUT_FLAG_NO_EQUIP`, `LOADOUT_FLAG_GIVEAWAY_ONLY`,
-`LOADOUT_FLAG_PATREON_LOCKED` without donator status, and an unmet `required_award` (an absent
-client counts as unmet).
+`LOADOUT_FLAG_PATREON_LOCKED` without donator status (skipped while `LOADOUT_PANEL_FREE_FOR_ALL`
+is on), and an unmet `required_award` (an absent client counts as unmet).
 
 ## Tabs
 
