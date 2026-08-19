@@ -240,7 +240,8 @@ GLOBAL_LIST_EMPTY(tgui_census_clients)
 		return
 	tgui_census_start_flush_loop()
 	tgui_census_opened_at = world.time
-	tgui_census_record(interface)["opens"] += 1
+	var/list/record = tgui_census_record(interface)
+	record["opens"] += 1
 
 /datum/tgui/close(can_be_suspended = TRUE)
 	if(GLOB.tgui_census_debug)
@@ -252,12 +253,14 @@ GLOBAL_LIST_EMPTY(tgui_census_clients)
 
 /datum/tgui/send_full_update(custom_data, force)
 	if(GLOB.tgui_census_debug)
-		tgui_census_record(interface)["full"] += 1
+		var/list/record = tgui_census_record(interface)
+		record["full"] += 1
 	return ..()
 
 /datum/tgui/send_update(custom_data, force)
 	if(GLOB.tgui_census_debug)
-		tgui_census_record(interface)["partial"] += 1
+		var/list/record = tgui_census_record(interface)
+		record["partial"] += 1
 	return ..()
 
 /datum/tgui/process(delta_time, force)

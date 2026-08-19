@@ -141,7 +141,7 @@
 				continue
 			var/obj/item/clothing/target_clothing = target_type
 			var/obj/item/clothing/result_clothing = result_type
-			if(initial(target_clothing.armor_type) != initial(result_clothing.armor_type))
+			if(initial(target_clothing:armor_type) != initial(result_clothing:armor_type))
 				TEST_FAIL("[kit_type] changes armor_type when morphing [target_type] into [result_type]")
 			if(initial(target_clothing.max_integrity) != initial(result_clothing.max_integrity))
 				TEST_FAIL("[kit_type] changes max_integrity when morphing [target_type] into [result_type]")
