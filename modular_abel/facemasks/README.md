@@ -32,6 +32,13 @@ stone; this fills in the soft and maille end of it.
   straightforward; they are held back to keep this batch to one coherent group.
 - **Flavoured rollies (apple, menthaapple)** — belong with the smoking content rather than clothing.
 
+## Not in the loadout
+
+These are not reskins — each mask carries its own `armor_type`, `max_integrity` and
+`prevent_crits`, so handing them out from the donator panel would be handing out gear. They
+stay craft-only: soft masks are sewn, maille masks are forged. See
+`modular_abel/loadout_panel/README.md` for the rule.
+
 ## Assets
 
 | File | From | States |
@@ -39,6 +46,3 @@ stone; this fills in the soft and maille end of it.
 | `icons/masks_world.dmi` | Azure `icons/roguetown/clothing/masks.dmi` | 6 |
 | `icons/masks_onmob.dmi` | Azure `icons/roguetown/clothing/onmob/masks.dmi` | 6 |
 
-## Loadout
-
-`loadout.dm` registers these in the donator loadout panel under the **Azure Content** tab (`ui_category = LOADOUT_PANEL_CATEGORY_AZURE`) — 6 entries, one per mask. See `modular_abel/loadout_panel/README.md`.

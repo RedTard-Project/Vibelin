@@ -1,6 +1,3 @@
-// Do not move this back onto add_bodypart/remove_bodypart: upstream marks both
-// SHOULD_NOT_OVERRIDE(TRUE) and dreamchecker rejects the build for it.
-
 /obj/item/bodypart/taur/on_adding(mob/living/carbon/new_owner)
 	. = ..()
 	if(!ishuman(new_owner))

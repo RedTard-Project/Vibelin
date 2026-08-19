@@ -135,8 +135,6 @@
 /area/rogue/indoors/inq/basement
 	name = "Twilight Axis - Indoors / Inquisition / Basement"
 
-// Required by the generated map: an area path that does not compile makes reader.dm
-// place the model's turf as the area and every tile using it runtimes on load.
 /area/rogue/indoors/inq/chapel
 	name = "Twilight Axis - Indoors / Inquisition / Chapel"
 

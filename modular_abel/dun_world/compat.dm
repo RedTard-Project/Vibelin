@@ -462,8 +462,6 @@
 	name = "Will-o'-the-wisp"
 	desc = "A small, fiery ball of light made up of mystical energy."
 
-// Required by the generated map: without these types `new` returns null on mapload and
-// their redstone_id leaks onto the underlying turf.
 /obj/structure/lever/bookcase
 	name = "Bookcase"
 	desc = "Refuge for few, an irrelevance to most."

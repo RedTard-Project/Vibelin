@@ -1,7 +1,3 @@
-// TOPIC-CENSUS TEMP INSTRUMENTATION — remove after the topic-storm / tgui-panel-crash debugging pass.
-// All logic lives here; upstream client/Topic() only carries call sites marked "TOPIC-CENSUS TEMP".
-// Toggle off live with: GLOB.topic_census_debug = FALSE
-
 GLOBAL_VAR_INIT(topic_census_debug, TRUE)
 
 /client/var/list/topic_census_state
