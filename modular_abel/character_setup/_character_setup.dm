@@ -1,5 +1,6 @@
 #include "code\modules\smallclothes\accessories.dm"
 #include "code\modules\smallclothes\customizers.dm"
+#include "code\modules\client\preferences\tgui_theme.dm"
 #include "code\modules\client\preferences\character_menu.dm"
 #include "code\modules\client\preferences\features_tgui.dm"
 #include "code\modules\client\preferences\character_setup_hooks.dm"

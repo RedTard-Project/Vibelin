@@ -289,7 +289,7 @@ GLOBAL_LIST_EMPTY(tgui_census_clients)
 	if(elapsed > record["act_ms_max"])
 		record["act_ms_max"] = elapsed
 	var/list/actions = record["actions"]
-	var/action_name = copytext(act_type, 5) || "?"
+	var/action_name = act_type || "?"
 	actions[action_name] = (actions[action_name] || 0) + 1
 	tgui_census_touch_client(user?.client, "acts")
 	if(GLOB.tgui_census_slow_call_ms && elapsed >= GLOB.tgui_census_slow_call_ms)

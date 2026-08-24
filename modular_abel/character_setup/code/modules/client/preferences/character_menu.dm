@@ -1,6 +1,6 @@
 /datum/preferences/var/character_setup_preferences_initial_tab = "identity"
 /datum/preferences/var/character_setup_preferences_open_sequence = 0
-/datum/preferences/var/character_setup_tgui_theme = "grim"
+/datum/preferences/var/character_setup_tgui_theme = TGUI_THEME_DEFAULT
 /datum/preferences/var/character_setup_preferences_fullscreen = TRUE
 /datum/preferences/var/character_setup_preferences_scale = 1
 /datum/preferences/var/character_setup_preferences_scale_version = 3
@@ -310,8 +310,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/loaded_scale_version
 	S["character_setup_preferences_scale_version"] >> loaded_scale_version
 
-	if(!istext(character_setup_tgui_theme) || !length(character_setup_tgui_theme))
-		character_setup_tgui_theme = initial(character_setup_tgui_theme)
+	character_setup_tgui_theme = sanitize_tgui_theme(character_setup_tgui_theme)
 	character_setup_preferences_fullscreen = !!character_setup_preferences_fullscreen
 	if(!isnum(loaded_scale_version) || loaded_scale_version < character_setup_preferences_scale_version)
 		character_setup_preferences_scale = initial(character_setup_preferences_scale)
@@ -1421,6 +1420,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	data["initial_tab"] = character_setup_preferences_initial_tab
 	data["open_sequence"] = character_setup_preferences_open_sequence
 	data["tgui_theme"] = character_setup_tgui_theme
+	data["tgui_themes"] = tgui_theme_options()
 	data["preferences_fullscreen"] = !!character_setup_preferences_fullscreen
 	data["preferences_scale"] = character_setup_preferences_scale
 	data["species_name"] = pref_species ? pref_species.name : "Human"
@@ -1813,8 +1813,8 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			update_menu_data(user)
 			return TRUE
 		if("character_setup_tgui_theme")
-			var/new_theme = href_list["theme"]
-			if(new_theme)
+			var/new_theme = sanitize_tgui_theme(href_list["theme"])
+			if(new_theme != character_setup_tgui_theme)
 				character_setup_tgui_theme = new_theme
 				save_preferences()
 				SStgui.update_uis(src)
