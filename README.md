@@ -1,3 +1,5 @@
+<img width="512" height="512" alt="Gemini_Generated_Image_aub9e6aub9e6aub9" src="https://github.com/user-attachments/assets/4a549649-633a-4ca9-a895-6e8145fbdb14" />
+
 # VIBELIN
 [![BYOND Build](https://github.com/trueroguan/Vibelin/actions/workflows/ci_suite.yml/badge.svg)](https://github.com/trueroguan/Vibelin/actions/workflows/ci_suite.yml)
 <img src="https://media.klipy.com/path/to/reaction-meme-168.gif" width="300" alt="Reaction Meme">
