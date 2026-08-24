@@ -1,4 +1,4 @@
-#define TGUI_THEME_DEFAULT "grim"
+#define TGUI_THEME_DEFAULT "vibelin"
 
 GLOBAL_LIST_INIT(tgui_themes, list(
 	"grim" = "Grim",

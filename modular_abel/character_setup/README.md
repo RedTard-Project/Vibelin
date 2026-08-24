@@ -31,9 +31,24 @@ procs it calls are global, so only the file location moved.
 validates against it, and the picker in `PreferencesMenu.tsx` renders whatever the server sends
 in `data["tgui_themes"]`, so the two lists cannot drift.
 
-Only two themes ship: **Grim** (`tgui/packages/tgui/styles/themes/grim.scss`) and **Vibelin**
-(`vibelin.scss`, the same structure with a gold-on-black palette). Both are loaded from
-`tgui/packages/tgui/styles/main.scss`.
+Only two themes ship: **Vibelin** (`tgui/packages/tgui/styles/themes/vibelin.scss`, the house
+theme and the default) and **Grim** (`grim.scss`, the red-on-black original it was derived
+from). Both are loaded from `tgui/packages/tgui/styles/main.scss`.
+
+`TGUI_THEME_DEFAULT` is `vibelin`, and it is the fallback in all four places a theme can come
+from: `sanitize_tgui_theme()`, the `get_payload` override, `PreferencesMenu.tsx`'s prop, and
+`Layout.tsx`'s default prop — that last one used to be `nanotrasen`, a class with no stylesheet
+anywhere in the bundle.
+
+`character_setup_tgui_theme` is `null` until the player actually picks something, and every
+read resolves through `sanitize_tgui_theme()`. Nothing stores the default, so "no choice made"
+stays representable and the default can be changed later without touching a single savefile.
+
+One caveat for savefiles written before 2026-08-24: `client/New()` calls `save_preferences()`
+on every non-admin login, and the old code defaulted the var to `"grim"`, so those files hold a
+literal `grim` that nobody chose. Those players keep Grim until they pick something. There is no
+way to tell that apart from a real choice after the fact — moving them across would need a
+deliberate one-time reset.
 
 The picker used to offer eleven more (Default, Paper, Neutral, Retro, Hackerman, Syndicate,
 Wizard, Malfunction, Cardtable, Abductor, NtOS, Admin) and every one of them broke the window.
@@ -51,6 +66,12 @@ that list will reproduce the original bug.
 `sanitize_tgui_theme()` falls anything unknown back to `TGUI_THEME_DEFAULT`, both when the
 savefile loads and when the client sends a theme, so an old save holding `hackerman` heals
 itself on next login and a crafted href cannot set an arbitrary class.
+`/datum/unit_test/modular_tgui_themes` holds that contract: the default must be a listed theme,
+every entry must have a label, and unknown or null input must fall back.
+
+No modular interface pins its own theme any more: `EroticRolePlayPanel.tsx` used to hardcode
+`theme="grim"` and now inherits, and `LoadoutPanel.tsx` never set one. They all follow the
+player's choice.
 
 The theme also reaches **every** tgui window now, not just this one. Upstream
 `/datum/tgui/get_payload` hardcodes `"theme" = "grim"` (`code/modules/tgui/tgui.dm:262`);

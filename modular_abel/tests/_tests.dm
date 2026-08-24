@@ -207,6 +207,31 @@
 	if(topic_census_classify(list(), null) != "raw")
 		TEST_FAIL("topic_census_classify does not fall back to \"raw\" for an empty href list")
 
+/datum/unit_test/modular_tgui_themes/Run()
+	if(!length(GLOB.tgui_themes))
+		TEST_FAIL("GLOB.tgui_themes is empty, so the theme picker renders nothing")
+		return
+	if(sanitize_tgui_theme(TGUI_THEME_DEFAULT) != TGUI_THEME_DEFAULT)
+		TEST_FAIL("the default theme \"[TGUI_THEME_DEFAULT]\" is not in GLOB.tgui_themes, so every client falls back to a stylesheet that may not exist")
+	if(sanitize_tgui_theme("hackerman") != TGUI_THEME_DEFAULT)
+		TEST_FAIL("sanitize_tgui_theme let an unshipped theme through; a stale savefile or a crafted href would leave the window unstyled")
+	if(sanitize_tgui_theme(null) != TGUI_THEME_DEFAULT)
+		TEST_FAIL("sanitize_tgui_theme does not fall back on a null theme")
+
+	for(var/value in GLOB.tgui_themes)
+		if(!istext(value) || !length(value))
+			TEST_FAIL("GLOB.tgui_themes holds a non-text key, which cannot become a theme-<name> class")
+			continue
+		if(!istext(GLOB.tgui_themes[value]) || !length(GLOB.tgui_themes[value]))
+			TEST_FAIL("theme \"[value]\" has no label, so its picker button renders blank")
+
+	var/list/options = tgui_theme_options()
+	if(length(options) != length(GLOB.tgui_themes))
+		TEST_FAIL("tgui_theme_options() emitted [length(options)] entries for [length(GLOB.tgui_themes)] themes")
+	for(var/list/option in options)
+		if(!GLOB.tgui_themes[option["value"]])
+			TEST_FAIL("tgui_theme_options() offers \"[option["value"]]\", which is not a known theme")
+
 /datum/unit_test/modular_abyssor_gating/Run()
 	for(var/datum/map_config/map_type as anything in subtypesof(/datum/map_config))
 		if(initial(map_type.abyssor_cult))

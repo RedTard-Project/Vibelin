@@ -2149,7 +2149,7 @@ export const PreferencesMenu = () => {
       title={tp('Character Setup')}
       width={windowWidth}
       height={windowHeight}
-      theme={data.tgui_theme || 'grim'}
+      theme={data.tgui_theme || 'vibelin'}
       buttons={<WindowControls />}
     >
       <Window.Content>
