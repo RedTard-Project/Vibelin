@@ -4638,6 +4638,7 @@
 /obj/structure/window/openclose/reinforced{
 	dir = 1
 	},
+/obj/structure/curtain/dun_world/green,
 /turf/open/floor/ruinedwood/chevron,
 /area/rogue/indoors/town)
 "aTS" = (
@@ -9703,6 +9704,11 @@
 	},
 /turf/open/floor/wood,
 /area/rogue/indoors/town/magician)
+"bOH" = (
+/obj/structure/window,
+/obj/structure/curtain/dun_world/green,
+/turf/open/floor/blocks/newstone/alt,
+/area/rogue/indoors/town)
 "bOI" = (
 /obj/machinery/light/fueled/torchholder/c,
 /turf/open/floor/church/dun_world,
@@ -16485,6 +16491,7 @@
 /area/rogue/outdoors/woods/southeast)
 "daY" = (
 /obj/structure/window/openclose/reinforced,
+/obj/structure/curtain/dun_world/green,
 /turf/open/floor/blocks/newstone/alt,
 /area/rogue/indoors/town)
 "dba" = (
@@ -59175,6 +59182,7 @@
 /obj/structure/fluff/railing/border{
 	dir = 4
 	},
+/obj/structure/curtain/dun_world/green,
 /turf/open/floor/blocks/stonered/tiny,
 /area/rogue/indoors/town)
 "kMw" = (
@@ -76318,6 +76326,7 @@
 	dir = 4
 	},
 /obj/structure/window/openclose/reinforced,
+/obj/structure/curtain/dun_world/green,
 /turf/open/floor/ruinedwood/chevron,
 /area/rogue/indoors/town)
 "nRH" = (
@@ -83318,6 +83327,7 @@
 /area/rogue/indoors/town/steward)
 "paa" = (
 /obj/structure/window/openclose/reinforced,
+/obj/structure/curtain/dun_world/green,
 /turf/open/floor/ruinedwood/chevron,
 /area/rogue/indoors/town)
 "pae" = (
@@ -92788,7 +92798,7 @@
 /obj/structure/door{
 	icon_state = "wcv";
 	lock = /datum/lock/key/locked;
-	lockids = list("manor");
+	lockids = list("seneschal");
 	name = "Seneschal's Quarters"
 	},
 /turf/open/floor/concrete,
@@ -110162,7 +110172,7 @@
 	pixel_x = -32
 	},
 /obj/structure/bed/inn,
-/obj/item/bedsheet/fabric,
+/obj/item/bedsheet/fabric_double,
 /turf/open/floor/woodturned,
 /area/rogue/indoors/town)
 "tTb" = (
@@ -112529,6 +112539,7 @@
 /obj/structure/window/openclose/reinforced{
 	dir = 1
 	},
+/obj/structure/curtain/dun_world/green,
 /turf/open/floor/ruinedwood/chevron,
 /area/rogue/indoors/town)
 "upM" = (
@@ -115974,11 +115985,6 @@
 /obj/structure/closet/dirthole/closed,
 /turf/open/floor/dirt/road,
 /area/rogue/under/underdark/north)
-"uWb" = (
-/obj/machinery/light/fueled/wallfire/candle/dun_world,
-/obj/machinery/light/fueled/wallfire/candle/r/dun_world,
-/turf/open/floor/ruinedwood,
-/area/rogue/indoors/town)
 "uWc" = (
 /obj/effect/decal/cobbleedge/dun_world{
 	dir = 10;
@@ -405664,7 +405670,7 @@ ttj
 bGf
 bGf
 uBc
-uWb
+aEz
 hqI
 uWP
 duz
@@ -505493,8 +505499,8 @@ aBB
 aBB
 aBB
 afK
-lgb
-lgb
+bOH
+bOH
 afK
 kgg
 kgg
