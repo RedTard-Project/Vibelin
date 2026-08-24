@@ -124,6 +124,32 @@
 	. = ..()
 	enchant(/datum/enchantment/silver)
 
+/obj/item/weapon/polearm/woodstaff/quarterstaff/gold
+	name = "golden quarterstaff"
+	desc = "The astute may point out that this staff is poorly designed. They would be correct. Gold, even low karat, is a bad material for a \
+	weapon. This one additionally manages to be doubly-sinned by having a heavy chunk of gold at the end. It's almost a polehammer. Practical? \
+	No. But it makes a statement."
+	icon_state = "quarterstaff_gold"
+	force = DAMAGE_STAFF + 6
+	force_wielded =  DAMAGE_STAFF_WIELD + 7
+	gripped_intents = list(POLEARM_BASH, MACE_SMASH)
+	max_integrity = INTEGRITY_STRONGEST * 0.8
+	minstr = 8
+	item_weight = 1.5 KILOGRAMS
+	melting_material = /datum/material/gold
+	melt_amount = 75
+
+/obj/item/weapon/polearm/woodstaff/quarterstaff/blacksteel
+	name = "blacksteel quarterstaff"
+	desc = "A quarterstaff reinforced with blacksteel tips. One might imagine that the elegance of such a design hardly befits the people \
+	who'd traditionally wield such a weapon; then again, who are we to judge?"
+	icon_state = "quarterstaff_blacksteel"
+	force = DAMAGE_STAFF + 8
+	force_wielded =  DAMAGE_STAFF_WIELD + 8
+	max_integrity = INTEGRITY_BLACKSTEEL
+	melting_material = /datum/material/blacksteel
+	melt_amount = 75
+
 /obj/item/weapon/polearm/woodstaff/seer
 	name = "staff of the rous seer"
 	desc = "A staff used by the rousman seers, mainly to protect themselves."
@@ -173,6 +199,17 @@
 	smeltresult = /obj/item/ingot/steel_slag
 	sellprice = 40
 	item_weight = 1 KILOGRAMS
+
+/obj/item/weapon/polearm/spear/steel/baotha
+	name = "laced swordstaff"
+	desc = "Keep the rest at arm's length, lest you're burdened with the pain of rememberance."
+	icon_state = "swordstaff"
+	gripped_intents = list(POLEARM_THRUST, SPEAR_CUT, POLEARM_CHOP, POLEARM_BASH)
+	max_integrity = INTEGRITY_BLACKSTEEL
+
+/obj/item/weapon/polearm/spear/steel/baotha/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/on_hit/baothagift)
 
 /obj/item/weapon/polearm/spear/steel/partizan
 	name = "partizan"
@@ -522,6 +559,21 @@
 				return list("shrink" = 0.6,"sx" = 5,"sy" = -3,"nx" = -5,"ny" = -2,"wx" = -5,"wy" = -1,"ex" = 3,"ey" = -2,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 7,"sturn" = -7,"wturn" = 16,"eturn" = -22,"nflip" = 8,"sflip" = 0,"wflip" = 8,"eflip" = 0)
 			if("onbelt")
 				return list("shrink" = 0.3,"sx" = -2,"sy" = -5,"nx" = 4,"ny" = -5,"wx" = 0,"wy" = -5,"ex" = 2,"ey" = -5,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 0,"nflip" = 0,"sflip" = 0,"wflip" = 0,"eflip" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0)
+
+/obj/item/weapon/polearm/halberd/blacksteel
+	name = "blacksteel halberd"
+	desc = "A graceful blacksteel weapon, shaped much like the wing of a dragon. May it sweep through your foes with grace, splattering flowing crimson with every blow."
+	icon_state = "bs_halberd"
+	force = DAMAGE_SPEARPLUS
+	force_wielded = DAMAGE_HALBERD_WIELD + 2
+	wbalance = HARD_TO_DODGE
+	max_integrity = INTEGRITY_BLACKSTEEL
+	max_blade_int = 450
+	smeltresult = null
+	melting_material = /datum/material/blacksteel
+	melt_amount = 200
+	sellprice = 250
+	axe_cut = 20
 
 //................ Psydonian Halberd ............... //
 /obj/item/weapon/polearm/halberd/psydon
