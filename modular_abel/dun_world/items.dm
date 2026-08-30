@@ -274,3 +274,53 @@
 	name = "wooden amulet of Malum"
 	desc = "Losing is fun; not because of what you once had, but because of the chance to start again."
 	icon_state = "malum_w"
+
+/obj/item/leechtick
+	name = "leech tick"
+	desc = "A pestran invader of Abyssor's divine sea. These are well known to latch onto the corpses of underwater leviathans. More than a pest, leechticks suck the soul out of those that disturb them, digesting the lux of assailants."
+	icon = 'modular_abel/dun_world/icons/heart_items.dmi'
+	icon_state = "leechtick"
+	w_class = WEIGHT_CLASS_NORMAL
+	isbait = TRUE
+	baitpenalty = 5
+	dropshrink = 0.85
+
+/obj/item/leechtick_bloated
+	name = "bloated leech tick"
+	desc = "This leechtick has feasted on lux and digested it. A crazy person might use this for revival..."
+	icon = 'modular_abel/dun_world/icons/heart_items.dmi'
+	icon_state = "leechthick"
+	w_class = WEIGHT_CLASS_NORMAL
+	isbait = TRUE
+	baitpenalty = 0
+	dropshrink = 0.85
+
+/obj/random/loot
+	var/loot_table
+
+/obj/random/loot/Initialize()
+	. = ..()
+	pick_loot()
+	qdel(src)
+
+/obj/random/loot/proc/pick_loot()
+	var/item_to_spawn = pickweight(loot_table)
+	if(item_to_spawn)
+		new item_to_spawn(get_turf(src))
+
+/obj/random/loot/ingots
+	loot_table = list(
+		/obj/item/ingot/copper = 2,
+		/obj/item/ingot/tin = 2,
+		/obj/item/ingot/bronze = 10,
+		/obj/item/ingot/iron = 10,
+		/obj/item/ingot/steel = 15,
+		/obj/item/ingot/gold = 15,
+		/obj/item/ingot/blacksteel = 10,
+		/obj/item/ingot/steelholy = 3,
+		/obj/item/ingot/silver = 15,
+		/obj/item/ingot/silverblessed = 3,
+		/obj/item/ingot/lithmyc = 5,
+		/obj/item/ingot/purifiedaalloy = 5,
+		/obj/item/ingot/aalloy = 2,
+		)
