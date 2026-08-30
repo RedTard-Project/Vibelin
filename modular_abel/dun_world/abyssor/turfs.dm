@@ -1,4 +1,3 @@
-// Required by the generated map: the Twilight Axis .dmm places this turf path directly.
 /turf/open/rebound
 	name = "undercurrent"
 	desc = "These waters reject those without proper will."

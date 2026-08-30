@@ -36,6 +36,13 @@ Layout:
   Azure-Peak after PR #5. See `sundries/README.md`.
 - `loadout_panel/` — the donator loadout window and the **Azure Content** tab that
   collects the Azure-Peak wearables. See `loadout_panel/README.md`.
+- `telemetry/` — temporary instrumentation for the tgui optimisation pass: the topic census
+  and the tgui census, with live toggles and two dedicated log files. See
+  `telemetry/README.md`. Remove once the optimisation pass is done.
+- `tests/` — the module's own unit tests (`tests/_tests.dm`), compiled only under
+  `UNIT_TESTS`/`SPACEMAN_DMM`. They cover what upstream's suite does not reach: the loadout
+  panel's key contract, the morphing-elixir invariants, and the exclusion lists in
+  `upstream_fixes.dm`.
 - `tools/` — map generation and QA scripts.
 
 - Source map: `Azure-Peak/Azure-Peak:_maps/map_files/dun_world/dun_world.dmm`
@@ -132,6 +139,13 @@ The modular `SSmapping/PreInit()` override in `dun_world/force_load.dm`
 force-loads Twilight Axis from `_maps/dun_world.json`. Unit tests and random world
 generation retain their own map selection paths. The override is also disabled
 for `LOWMEMORYMODE`, `NO_DUNGEON`, and `ABSOLUTE_MINIMUM_MODE` builds.
+
+`modular_abel/upstream_fixes.dm` also carries the modular additions to the upstream unit-test
+exclusion lists, hoisted into `GLOB.modular_craftable_clothes_exclusions` and
+`GLOB.modular_craftable_clothes_subtree_exclusions` so `/datum/unit_test/modular_test_exclusions`
+can check they have not been emptied or duplicated. An entry belongs there only when the item
+genuinely has no recipe: mapped-in or antag-only kit, and the Abyssor painter vestments, which
+come out of Azure's unported robe rituals (see `dun_world/abyssor/README.md`).
 
 `modular_abel/upstream_fixes.dm` keeps upstream files untouched by overriding
 them from the module: the mercenary stabard color fallback (upstream

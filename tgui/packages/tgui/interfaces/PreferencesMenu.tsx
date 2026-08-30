@@ -121,6 +121,7 @@ type PrefsData = {
   real_name: string;
   initial_tab: string;
   tgui_theme: string;
+  tgui_themes: { value: string; label: string }[];
   open_sequence: number;
   preferences_fullscreen: Booleanish;
   preferences_scale: number;
@@ -218,22 +219,6 @@ const charSections = [
 const systemSections = [
   { id: 'erp', label: 'Intimacy', icon: 'heart' },
   { id: 'settings', label: 'Settings', icon: 'cog' },
-];
-
-const TGUI_THEMES: { value: string; label: string }[] = [
-  { value: 'grim', label: 'Grim' },
-  { value: 'nanotrasen', label: 'Default' },
-  { value: 'paper', label: 'Paper' },
-  { value: 'neutral', label: 'Neutral' },
-  { value: 'retro', label: 'Retro' },
-  { value: 'hackerman', label: 'Hackerman' },
-  { value: 'syndicate', label: 'Syndicate' },
-  { value: 'wizard', label: 'Wizard' },
-  { value: 'malfunction', label: 'Malfunction' },
-  { value: 'cardtable', label: 'Cardtable' },
-  { value: 'abductor', label: 'Abductor' },
-  { value: 'ntos', label: 'NtOS' },
-  { value: 'admin', label: 'Admin' },
 ];
 
 const UNDERWEAR_KEY = '__underwear__';
@@ -1989,7 +1974,7 @@ export const PreferencesMenu = () => {
 
         <Panel title="Interface Theme" icon="palette">
           <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {TGUI_THEMES.map((t) => (
+            {(data.tgui_themes ?? []).map((t) => (
               <Button
                 key={t.value}
                 selected={data.tgui_theme === t.value}
@@ -2164,7 +2149,7 @@ export const PreferencesMenu = () => {
       title={tp('Character Setup')}
       width={windowWidth}
       height={windowHeight}
-      theme={data.tgui_theme || 'grim'}
+      theme={data.tgui_theme || 'vibelin'}
       buttons={<WindowControls />}
     >
       <Window.Content>

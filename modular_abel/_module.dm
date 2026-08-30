@@ -1,5 +1,6 @@
 #pragma warn unused_var
 
+#include "telemetry/_telemetry.dm"
 #include "localization/_localization.dm"
 #include "erp/_erp.dm"
 #include "character_setup/_character_setup.dm"
@@ -21,3 +22,4 @@
 #include "cyrillic_say_fix.dm"
 #include "ear_flick.dm"
 #include "upstream_fixes.dm"
+#include "tests/_tests.dm"

@@ -2037,7 +2037,7 @@ export const EroticRolePlayPanel: React.FC = () => {
       });
   }, [kinkEntries, q, cat]);
   return (
-    <Window title={tr.t('window.title')} width={520} height={740} theme="grim">
+    <Window title={tr.t('window.title')} width={520} height={740}>
       <Window.Content scrollable>
         <Stack vertical fill>
           <Stack.Item>

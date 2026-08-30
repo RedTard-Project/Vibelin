@@ -17,7 +17,6 @@
 	if(mode == "norulervote")
 		SSticker.voting = FALSE
 
-// UPSTREAM BUG (remove this override once fixed upstream): /obj/structure/vine/Crossed types the crosser as /mob and reads crosser.m_intent, but non-mob movers (e.g. the wandering /obj/item/reagent_containers/food/snacks/smallrat) cross vines and runtime on the undefined var. Reimplemented with an ismob() guard; replicates /atom/movable/Crossed (COMSIG_MOVABLE_CROSSED) and /obj/structure/Crossed (climb offset) because the same-type redefinition bypasses the upstream ..() chain.
 /obj/structure/vine/Crossed(atom/movable/crosser, oldloc)
 	SEND_SIGNAL(src, COMSIG_MOVABLE_CROSSED, crosser)
 	if(isliving(crosser) && !crosser.throwing && climb_offset)
@@ -48,11 +47,6 @@
 	var/cbt_multiplier = (user && HAS_TRAIT(user, TRAIT_NUTCRACKER)) ? 2 : 1
 	return round(dam / 5) * cbt_multiplier
 
-// UPSTREAM BUG: moondust animates affected_mob.client without a null-check (powder.dm:241). A clientless NPC
-// metabolizing it crashes "invalid object type 0:0". Same-type modular redefinitions CHAIN here (the modular
-// proc's ..() calls the upstream body), so guarding by calling ..() unconditionally still runs the crashing
-// upstream animate. Instead: clients take the upstream path via ..(); clientless mobs get a faithful
-// re-implementation that skips only the animate(). The ..() reference keeps SHOULD_CALL_PARENT satisfied.
 /datum/reagent/moondust/on_mob_metabolize(mob/living/affected_mob)
 	if(affected_mob.client)
 		return ..()
@@ -81,11 +75,6 @@
 	affected_mob.remove_status_effect(/datum/status_effect/buff/moondust_purest)
 	affected_mob.remove_chem_effect(CE_PULSE, "[type]")
 
-// UPSTREAM BUG: /datum/tgui/open() null-checks user.client at the top, then yields (send_assets) before
-// get_payload() re-reads user.client.prefs (tgui.dm:260). If the client vanishes during that yield - e.g.
-// AGGRESSIVE_CHANGELOG force-opening the Changelog for a guest mid-login - get_payload crashes
-// "Cannot read null.prefs". Guard the client read; same-type redefs CHAIN, so ..() builds the real payload
-// whenever the client is still valid, and the orphaned UI is reaped by the tgui process loop.
 /datum/tgui/get_payload(custom_data, with_data, with_static_data)
 	if(!user?.client)
 		return list()
@@ -228,8 +217,7 @@
 		return
 	return ..()
 
-/datum/unit_test/craftable_clothes/Run()
-	excluded_paths += list(
+GLOBAL_LIST_INIT(modular_craftable_clothes_exclusions, list(
 		/obj/item/clothing/neck/loveamulet,
 		/obj/item/clothing/head/flowercrown/rosa/twilight_resprite,
 		/obj/item/clothing/head/roguehood/newmoon,
@@ -269,23 +257,22 @@
 		/obj/item/clothing/cloak/etrcape,
 		/obj/item/clothing/cloak/sheriff,
 		/obj/item/clothing/cloak/dunestalker,
-	)
-	excluded_paths_with_their_subtypes += list(
+	))
+
+GLOBAL_LIST_INIT(modular_craftable_clothes_subtree_exclusions, list(
 		/obj/item/clothing/neck/psycross/wooden_divine,
 		/obj/item/clothing/head/sultan,
 		/obj/item/clothing/shirt/robe/unholy,
 		/obj/item/clothing/shirt/robe/monk,
 		/obj/item/clothing/shirt/robe/tabardwhite,
-	)
+	))
+
+/datum/unit_test/craftable_clothes/Run()
+	excluded_paths += GLOB.modular_craftable_clothes_exclusions
+	excluded_paths_with_their_subtypes += GLOB.modular_craftable_clothes_subtree_exclusions
 	return ..()
 #endif
 
-// UPSTREAM BUG (remove these overrides once fixed upstream): four outfits hand out abstract
-// clothing types, so every mob wearing them throws "Abstract type (...) initialised!" on
-// spawn. /obj/item/clothing/head/helmet and /obj/item/clothing/shoes/boots both declare
-// themselves abstract_type. Repointed at concrete subtypes that match what each outfit is
-// already wearing; the fencer's own boots already exist, its assignment just never got
-// updated past the "placeholder until i can fix the boots" comment.
 /datum/outfit/mercenary/fencer
 	shoes = /obj/item/clothing/shoes/boots/fencer
 
@@ -298,10 +285,11 @@
 /datum/outfit/rockhill/mayor
 	head = /obj/item/clothing/head/helmet/bascinet
 
-// Same bug in a runtime roll rather than a static var: /datum/outfit/skeleton/pre_equip's
-// headgear switch has the bare abstract helmet on roll 9 of 9. Patched after the parent
-// runs so the switch itself is left alone.
 /datum/outfit/skeleton/pre_equip(mob/living/carbon/human/equipped_human)
 	. = ..()
 	if(head == /obj/item/clothing/head/helmet)
 		head = /obj/item/clothing/head/helmet/nasal
+
+/datum/mind/Destroy()
+	soulOwner = null
+	return ..()

@@ -1,0 +1,60 @@
+// Vibelin house theme. Structurally identical to grim.scss so the two can be tuned
+// side by side; only the palette differs — antique gold on near-black instead of red.
+
+.theme-vibelin:root {
+  // Base
+  --color-base: #0c0d12;
+  --color-primary: #b5893a;
+  --color-text: #a89c86;
+
+  --titlebar-text: #e0d3b8;
+
+  --font-size: 14px;
+  --font-family: 'Pterra';
+  --line-height: 170%;
+
+  --color-good: hsl(94, 55%, 24%);
+  --color-average: hsl(38, 62%, 38%);
+  --color-bad: hsl(4, 55%, 30%);
+
+  --color-border-primary: var(--color-primary);
+
+  // Title
+  .TitleBar {
+    &__title {
+      font-size: 1.4em;
+      font-family: 'Blackmoor LET';
+      font-weight: normal;
+    }
+    &__KitchenSink {
+      background-color: hsl(
+        from var(--color-primary) h s calc(l - var(--adjust-hover))
+      );
+      &:hover {
+        background-color: var(--color-primary) !important;
+      }
+    }
+  }
+
+  // Components
+  --section-separator-color: #6f6552;
+
+  --button-color-transparent: hsl(from var(--color-text) h s l / 0.8);
+  --button-background-default: #5a4218;
+  --button-background-selected: var(--color-primary);
+
+  .Button {
+    transition: all 0.3s;
+    --color-text: var(--color-primary);
+  }
+
+  .Button--color--transparent {
+    --button-background-hover: #7a6538;
+    --button-background-active: #7a6538;
+    --button-background-disabled: transparent;
+  }
+
+  .Button--color--transparent.Button--disabled {
+    --button-color: #5e5959;
+  }
+}
