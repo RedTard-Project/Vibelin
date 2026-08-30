@@ -15,6 +15,9 @@ or other script you can run instead - see the links below for details.
 * **Pre-commit**: Runs [mapmerge2] to reduce the diff on any changed maps.
 * **DMI merger**: Attempts to [fix icon conflicts] when performing a Git merge.
 * **DMM merger**: Attempts to [fix map conflicts] when performing a Git merge.
+* **Ours merger**: Keeps this fork's version of files listed with `merge=ours` in
+  `.gitattributes`, discarding the upstream version. Used for `.github/CODEOWNERS`,
+  which is fork-specific infrastructure rather than game content.
 
 ## Adding New Hooks
 

@@ -3,3 +3,6 @@
 ## Merger hooks, run tools/hooks/install.bat or install.sh to set up
 *.dmm text eol=lf merge=dmm
 *.dmi binary merge=dmi
+
+## Fork-owned files, upstream version is discarded on merge
+.github/CODEOWNERS merge=ours
