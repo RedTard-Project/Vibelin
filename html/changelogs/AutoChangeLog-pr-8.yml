@@ -1,0 +1,14 @@
+author: "trueroguan"
+delete-after: True
+changes:
+  - rscadd: "Blood magic — a full spell school, the Sanguine language, the Wretch blood mage, and bloodsteel"
+  - rscadd: "Field medicine — splints, tourniquets, fracture support, and the court physician's IFAK"
+  - rscadd: "New roles: Kingsfield Constable, Cleric King, Blood Sorcerer, and mercenary hours"
+  - rscadd: "New weapons, weapon attachments, clothing accessories, and vampire lord armor"
+  - map: "Vanderlin, Daftmarsh and CentCom updated; the bandit camp is refurbished"
+  - map: "The merchant, apothecary and tailor plots now cycle, and a clinic was added"
+  - balance: "Weapon integrity overhaul, Enervating Elegy nerf, and tighter skill clamping"
+  - rscdel: "The pocket dimension enchantment is disabled, and the wolves are gone from the pits"
+  - bugfix: "Lost-key vice keys no longer spawn in water or midair, and the \"mobile\" stove works"
+  - bugfix: "Pickpocketing logic, a duplicate crafting entry, and LOOC now marks ghosts"
+  - image: "Amulet sprites, hair tweaks, elf ears, and tiefling tails"
