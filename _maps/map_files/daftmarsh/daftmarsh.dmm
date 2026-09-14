@@ -802,8 +802,7 @@
 "aGE" = (
 /obj/machinery/light/fueled/lanternpost/fixed{
 	dir = 1;
-	pixel_x = 3;
-	pixel_y = 0
+	pixel_x = 3
 	},
 /turf/open/floor/blocks,
 /area/outdoors/town)
@@ -2090,12 +2089,10 @@
 	pixel_y = -7
 	},
 /obj/item/lockpickring/mundane{
-	pixel_x = 1;
-	pixel_y = 0
+	pixel_x = 1
 	},
 /obj/item/lockpickring/mundane{
-	pixel_x = 1;
-	pixel_y = 0
+	pixel_x = 1
 	},
 /turf/open/floor/tile,
 /area/indoors/town/keep/courtagent)
@@ -2265,8 +2262,7 @@
 	pixel_y = -1
 	},
 /obj/item/flashlight/flare/torch/metal{
-	pixel_x = -12;
-	pixel_y = 0
+	pixel_x = -12
 	},
 /obj/item/flashlight/flare/torch/metal{
 	pixel_x = -8;
@@ -2748,7 +2744,7 @@
 /area/indoors/town)
 "cac" = (
 /obj/machinery/light/fueled/wallfire/candle,
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /turf/open/floor/carpet/royalblack,
 /area/indoors/town/keep/garrison)
 "cag" = (
@@ -2932,8 +2928,7 @@
 /obj/effect/mapping_helpers/access/keyset/town/smith,
 /obj/structure/bridge_stakes{
 	dir = 8;
-	pixel_x = -9;
-	pixel_y = 0
+	pixel_x = -9
 	},
 /turf/open/floor/blocks/stonered/tiny,
 /area/indoors/town/dwarfin)
@@ -3049,8 +3044,7 @@
 /area/outdoors/town/roofs)
 "cog" = (
 /obj/structure/closet/keyrack{
-	pixel_y = -32;
-	pixel_x = 0
+	pixel_y = -32
 	},
 /obj/effect/mapping_helpers/access/keyset/manor/courtagent,
 /obj/effect/mapping_helpers/access/locker,
@@ -3166,6 +3160,13 @@
 	dir = 4
 	},
 /turf/open/floor/ruinedwood/spiral,
+/area/outdoors/town)
+"crT" = (
+/obj/structure/fluff/railing/wood{
+	dir = 4
+	},
+/obj/structure/mercstatue,
+/turf/open/floor/twig,
 /area/outdoors/town)
 "cso" = (
 /turf/open/floor/grass/yel,
@@ -5048,8 +5049,7 @@
 /obj/effect/mapping_helpers/access/locker,
 /obj/structure/bridge_stakes{
 	dir = 4;
-	pixel_x = 8;
-	pixel_y = 0
+	pixel_x = 8
 	},
 /turf/open/floor/ruinedwood/spiral,
 /area/indoors/town/smithy)
@@ -5180,7 +5180,7 @@
 /turf/open/floor/ruinedwood/darker,
 /area/indoors/town)
 "dXz" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /obj/item/broom,
 /obj/item/natural/cloth,
 /obj/item/natural/cloth,
@@ -5275,15 +5275,16 @@
 	pixel_x = 32;
 	pixel_y = 0
 	},
-/obj/item/flint,
+/obj/structure/table/wood/reinforced_alter,
+/obj/item/repair_kit/metal/empty,
 /obj/item/flint{
 	pixel_x = 8
 	},
+/obj/item/flint,
 /obj/item/flint{
 	pixel_x = -5;
 	pixel_y = 6
 	},
-/obj/structure/table/wood/reinforced_alter,
 /turf/open/floor/ruinedwood/spiral,
 /area/indoors/town/smithy)
 "eaE" = (
@@ -5577,7 +5578,7 @@
 /turf/open/floor/wood,
 /area/indoors/town/shop)
 "elT" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /obj/machinery/light/fueled/wallfire/candle/r,
 /turf/open/floor/tile,
 /area/indoors/town/keep/knight)
@@ -7852,8 +7853,7 @@
 /obj/effect/mapping_helpers/access/keyset/town/smith,
 /obj/structure/bridge_stakes{
 	dir = 8;
-	pixel_x = -10;
-	pixel_y = 0
+	pixel_x = -10
 	},
 /turf/open/floor/blocks/stonered/tiny,
 /area/indoors/town/dwarfin)
@@ -9503,6 +9503,10 @@
 	},
 /turf/closed/wall/mineral/stone/moss,
 /area/under/town/basement)
+"hCH" = (
+/obj/structure/mercstatue,
+/turf/open/floor/grass,
+/area/outdoors/town/keep)
 "hCR" = (
 /obj/structure/fluff/walldeco/church/line{
 	dir = 8
@@ -10927,7 +10931,7 @@
 /turf/open/floor/ruinedwood/spiral,
 /area/indoors/town/smithy)
 "iKR" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /obj/structure/fluff/railing/border{
 	dir = 8
 	},
@@ -11067,7 +11071,6 @@
 	pixel_y = 13
 	},
 /obj/item/plate/silver{
-	pixel_x = 0;
 	pixel_y = 13
 	},
 /obj/item/plate/silver{
@@ -11171,9 +11174,7 @@
 /turf/open/floor/tile,
 /area/indoors/town/keep/knight)
 "iWe" = (
-/obj/structure/fluff/statue{
-	name = "The Veiled Lady"
-	},
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/blocks,
 /area/outdoors/exposed/church/graveyard)
 "iWp" = (
@@ -11411,7 +11412,7 @@
 /turf/open/floor/churchbrick,
 /area/indoors/town/church/inquisition)
 "jdb" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /turf/open/floor/ruinedwood/spiralfade,
 /area/indoors/town/tavern)
 "jdA" = (
@@ -12058,7 +12059,7 @@
 	},
 /area/indoors/soilsons)
 "jCu" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /obj/structure/fluff/railing/border{
 	dir = 4
 	},
@@ -12577,7 +12578,7 @@
 /obj/machinery/light/fueled/wallfire/candle{
 	pixel_y = -32
 	},
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /turf/open/floor/wood,
 /area/indoors/town/keep/garrison)
 "kbX" = (
@@ -13087,8 +13088,7 @@
 /area/outdoors/town)
 "kvp" = (
 /obj/effect/decal/carpet/kover_black{
-	pixel_x = 16;
-	pixel_y = 0
+	pixel_x = 16
 	},
 /turf/open/floor/carpet/stellar,
 /area/indoors/town/shop)
@@ -13213,7 +13213,6 @@
 /area/indoors/town/orphanage)
 "kyg" = (
 /obj/effect/decal/carpet/square{
-	pixel_x = 0;
 	pixel_y = 11
 	},
 /turf/open/floor/tile/brownbrick,
@@ -13952,6 +13951,9 @@
 /obj/structure/table/wood/plain_alt,
 /turf/open/floor/ruinedwood/darker,
 /area/indoors/town/keep/magician)
+"lcs" = (
+/turf/open/floor/grass,
+/area/under/cave)
 "lcL" = (
 /obj/structure/table/wood/reinf_long{
 	dir = 4
@@ -14654,8 +14656,7 @@
 "lNR" = (
 /obj/effect/landmark/start/merchant,
 /obj/effect/decal/carpet/kover_black{
-	pixel_x = -12;
-	pixel_y = 0
+	pixel_x = -12
 	},
 /turf/open/floor/carpet/stellar,
 /area/indoors/town/shop)
@@ -15921,7 +15922,6 @@
 "mJX" = (
 /obj/machinery/light/fueled/wallfire/candle/r,
 /obj/structure/fluff/big_chain{
-	pixel_y = 0;
 	pixel_x = 10
 	},
 /turf/open/floor/metal/barograte/open,
@@ -16904,8 +16904,7 @@
 	},
 /obj/item/servant_bell,
 /obj/item/servant_bell{
-	pixel_x = 7;
-	pixel_y = 0
+	pixel_x = 7
 	},
 /turf/open/floor/cobble,
 /area/indoors/town/keep/servanthead)
@@ -18775,7 +18774,6 @@
 	},
 /obj/item/plate/gold,
 /obj/item/servant_bell/lord{
-	pixel_x = 0;
 	pixel_y = 19
 	},
 /obj/item/servant_bell/lord{
@@ -19988,6 +19986,7 @@
 "qpG" = (
 /obj/structure/fluff/railing/border,
 /obj/structure/rack/shelf/biggest,
+/obj/item/repair_kit/cloth/empty,
 /turf/open/floor/tile/diamond/purple,
 /area/indoors/town)
 "qpU" = (
@@ -20884,7 +20883,7 @@
 /obj/item/clothing/shirt/undershirt/sailor,
 /obj/item/clothing/shirt/undershirt/sailor,
 /obj/item/clothing/shirt/undershirt/sailor,
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /turf/open/floor/wood,
 /area/indoors/town/shop)
 "reY" = (
@@ -20938,7 +20937,7 @@
 /turf/open/floor/carpet,
 /area/indoors/town/keep)
 "rgr" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /turf/open/floor/tile,
 /area/indoors/town/keep/knight)
 "rgz" = (
@@ -21620,8 +21619,7 @@
 /obj/structure/table/wood/plain_alt,
 /obj/machinery/light/fueled/wallfire/candle/r,
 /obj/item/bouquet/calendula{
-	pixel_x = 9;
-	pixel_y = 0
+	pixel_x = 9
 	},
 /turf/open/floor/carpet/green,
 /area/indoors/town)
@@ -22690,7 +22688,6 @@
 "sFV" = (
 /obj/machinery/light/fueled/wallfire/candle/l,
 /obj/structure/fluff/big_chain{
-	pixel_y = 0;
 	pixel_x = -10
 	},
 /turf/open/floor/metal/barograte/open,
@@ -22785,8 +22782,7 @@
 	dir = 8
 	},
 /obj/item/natural/feather{
-	pixel_x = 3;
-	pixel_y = 0
+	pixel_x = 3
 	},
 /obj/item/needle{
 	pixel_x = -8;
@@ -22800,8 +22796,7 @@
 	dir = 1
 	},
 /obj/item/weapon/knife/scissors/steel{
-	pixel_x = -4;
-	pixel_y = 0
+	pixel_x = -4
 	},
 /turf/open/floor/tile/diamond/purple,
 /area/indoors/town)
@@ -23564,8 +23559,7 @@
 	pixel_y = -15
 	},
 /obj/structure/fluff/walldeco/gear/small{
-	pixel_x = -17;
-	pixel_y = 0
+	pixel_x = -17
 	},
 /turf/open/openspace,
 /area/indoors/town/clocktower)
@@ -26555,7 +26549,7 @@
 	},
 /area/outdoors/town/roofs)
 "vWZ" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /obj/item/weapon/mace/woodclub,
 /obj/machinery/light/fueled/wallfire/candle/l,
 /turf/open/floor/ruinedwood/spiral,
@@ -27050,7 +27044,7 @@
 /turf/open/floor/wood,
 /area/indoors/town/shop)
 "wsC" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /obj/item/clothing/cloak/apron/cook,
 /turf/open/floor/ruinedwood/spiralfade,
 /area/indoors/town/tavern)
@@ -27932,6 +27926,10 @@
 	},
 /turf/open/openspace,
 /area/outdoors/town/roofs)
+"xcP" = (
+/obj/structure/fluff/traveltile/oracle_cave,
+/turf/open/floor/dirt,
+/area/under/cave)
 "xdg" = (
 /obj/structure/closet/crate/crafted_closet,
 /obj/item/weapon/sword/rapier/dec,
@@ -27985,7 +27983,7 @@
 /obj/item/clothing/head/hatfur,
 /obj/item/clothing/armor/basiceast/crafteast,
 /obj/item/clothing/pants/trou/shadowpants,
-/obj/item/clothing/shoes/boots/armor/matthios/lord,
+/obj/item/clothing/shoes/boots/armor/inhumen/matthios/lord,
 /obj/machinery/light/fueled/wallfire/candle,
 /turf/open/floor/tile/bfloorz,
 /area/indoors/town/keep/lord_appt)
@@ -28722,7 +28720,7 @@
 /turf/open/floor/dirt,
 /area/outdoors/exposed/church/graveyard)
 "xMx" = (
-/obj/structure/closet/crate/crafted_closet/crafted,
+/obj/structure/closet/crate/crafted_closet,
 /obj/item/broom,
 /obj/item/natural/cloth,
 /obj/item/natural/cloth,
@@ -127037,7 +127035,7 @@ xuJ
 oQv
 iHi
 dcH
-bYV
+crT
 ffK
 lfe
 owc
@@ -130632,7 +130630,7 @@ eUn
 ttL
 ttL
 iiV
-vVc
+hCH
 tea
 tea
 tea
@@ -139767,8 +139765,8 @@ bJI
 bJI
 qkx
 qkx
-ftQ
-ftQ
+qfU
+qfU
 ftQ
 ftQ
 hQz
@@ -139968,9 +139966,9 @@ bJI
 bJI
 kpb
 ovC
-ftQ
-ftQ
-hQz
+lcs
+lcs
+qfU
 ftQ
 ftQ
 ftQ
@@ -140169,10 +140167,10 @@ gPm
 uSD
 bJI
 bJI
-ftQ
-ftQ
-ftQ
-ftQ
+qfU
+lcs
+lcs
+qfU
 ftQ
 ftQ
 hQz
@@ -140371,10 +140369,10 @@ qTg
 rNd
 bJI
 ftQ
-ftQ
-hQz
-ftQ
-ftQ
+qfU
+qfU
+qfU
+lcs
 hQz
 hQz
 ftQ
@@ -140573,9 +140571,9 @@ pVd
 kpb
 ftQ
 ftQ
-ftQ
-hQz
-hQz
+lcs
+xcP
+xcP
 hQz
 ftQ
 ftQ
@@ -140775,7 +140773,7 @@ fTY
 ftQ
 ftQ
 ftQ
-ftQ
+qfU
 ftQ
 hQz
 ftQ

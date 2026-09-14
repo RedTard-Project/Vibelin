@@ -7,6 +7,7 @@
 #define STATS_ALIVE_AASIMAR "alive_aasimar"
 #define STATS_ALIVE_HOLLOWKINS "alive_hollowkins"
 #define STATS_ALIVE_HALFLINGS "alive_halflings"
+#define STATS_ALIVE_DWARF_ORCS "alive_dwarforcs"
 #define STATS_VAMPIRES "vampires"
 #define STATS_ALIVE_GARRISON "alive_garrison"
 #define STATS_ALIVE_GALLOWBAND "alive_gallowband"
@@ -124,7 +125,7 @@
 #define STATS_CRUEL_PRANKS "cruel_pranks"
 
 // Malum
-#define STATS_MASTERWORKS_FORGED "masterworks_forged"
+#define STATS_MASTERWORKS_PRODUCED "masterworks_forged"
 #define STATS_ROCKS_MINED "ores_mined"
 #define STATS_CRAFT_SKILLS "craft_skills"
 #define STATS_BEARDS_SHAVED "beards_shaved"
@@ -197,7 +198,7 @@ GLOBAL_LIST_INIT(vanderlin_round_stats, list(
 	STATS_PRAYERS_MADE = 0,
 	STATS_FISH_CAUGHT = 0,
 	STATS_ITEMS_PICKPOCKETED = 0,
-	STATS_MASTERWORKS_FORGED = 0,
+	STATS_MASTERWORKS_PRODUCED = 0,
 	STATS_TAXES_COLLECTED = 0,
 	STATS_ORGANS_EATEN = 0,
 	STATS_KISSES_MADE = 0,
@@ -266,6 +267,7 @@ GLOBAL_LIST_INIT(vanderlin_round_stats, list(
 	STATS_ALIVE_TRITONS = 0,
 	STATS_ALIVE_MEDICATORS = 0,
 	STATS_ALIVE_HALFLINGS = 0,
+	STATS_ALIVE_DWARF_ORCS = 0,
 	STATS_PEOPLE_DROWNED = 0,
 	STATS_MANA_SPENT = 0,
 	STATS_WATER_CONSUMED  = 0,

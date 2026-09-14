@@ -210,16 +210,20 @@ GLOBAL_LIST_INIT(traits_by_type, list(
 		"Graceless" = TRAIT_UNPARRYING,
 		"Agent of the Court" = TRAIT_COURTAGENT,
 		"Know Gallowband Secrets" = TRAIT_GALLOWBAND_SECRETS,
+		"Member of Gallowband" = TRAIT_GALLOWBAND,
 		"Virgin" = TRAIT_VIRGIN,
 		"Gatekeeper" = TRAIT_GATEKEEPER,
 		"Member of the Lunar Order" = TRAIT_LUNAR_ORDER,
+		"Dream Cave Access" = TRAIT_DREAM_CAVE,
 		"Close Combatant" = TRAIT_CLOSECOMBAT,
 		"Steel Hearted" = TRAIT_STEELHEARTED,
 		"Sorcerer" = TRAIT_SORCERER,
 		"Blood Mage" = TRAIT_BLOOD_MAGE,
 		"Blood Sorcerer" = TRAIT_BLOOD_SORCERER,
+		"Blood Student" = TRAIT_BLOOD_STUDENT,
 		"Blood Sense" = TRAIT_BLOOD_SENSE,
 		"Vitae User" = TRAIT_VITAE_USER,
+		"Sanguine Block" = TRAIT_BLOOD_MAGIC_BLOCKED,
 	),
 	/obj/item/bodypart = list(
 		"TRAIT_PARALYSIS" = TRAIT_PARALYSIS
@@ -260,7 +264,7 @@ GLOBAL_LIST_INIT(roguetraits, list(
 	TRAIT_UNDODGING = span_danger("I am unable to dodge."),
 	TRAIT_UNPARRYING = span_danger("I am unable to block and parry attacks."),
 	TRAIT_BLINDFIGHTING = span_info("I have an incredible sense of awareness, allowing me to parry even when I can't see it coming."),
-	TRAIT_THIEFSENSE = span_info("I have supreme awareness of my belongings, surely no one would try to steal from me."),
+	TRAIT_THIEFSENSE = span_info("I have supreme awareness of my belongings, stealing from me would be impossible."),
 	TRAIT_MEDIUMARMOR = "I can move freely in medium armor.",
 	TRAIT_HEAVYARMOR = "I can move freely in heavy armor.",
 	TRAIT_DODGEEXPERT = "I can dodge easily while only wearing light armor.",
@@ -369,6 +373,8 @@ GLOBAL_LIST_INIT(roguetraits, list(
 	TRAIT_SORCERER = SPAN_GOD_NOC("I am a sorcerer, unable to wield magickal tomes but gifted with innate power."),
 	TRAIT_BLOOD_MAGE = span_bloody("I am a skilled blood mage, wielding the unholy power of blood magic. Woe unto those who oppose me."),
 	TRAIT_BLOOD_SORCERER = span_bloody("I am a gifted blood sorcerer, wielding innate power over blood magic. Woe unto those who oppose me. I cannot use magickal tomes."),
+	TRAIT_BLOOD_STUDENT = span_bloody("I am a student of blood magic."),
+	TRAIT_BLOOD_MAGIC_BLOCKED = span_bloody("I am permanently blocked from using blood magic!"),
 ))
 
 /// value -> trait name, generated on use from trait_by_type global
