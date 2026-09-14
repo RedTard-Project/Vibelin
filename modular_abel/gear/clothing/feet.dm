@@ -7,7 +7,7 @@
 	item_state = "bsoldierboots"
 	armor_class = AC_LIGHT
 	armor_type = /datum/armor/maille/bronze
-	max_integrity = INTEGRITY_STANDARD + 50
+	max_integrity = INTEGRITY_OLD_STANDARD + 50
 	smeltresult = /obj/item/ingot/bronze
 	melting_material = /datum/material/bronze
 	melt_amount = 75
@@ -22,7 +22,7 @@
 	item_state = "shalfplateboots"
 	armor_type = /datum/armor/boots/maille
 	armor_class = AC_LIGHT
-	max_integrity = INTEGRITY_STRONG
+	max_integrity = INTEGRITY_OLD_STRONG
 	smeltresult = /obj/item/ingot/steel_slag
 
 /obj/item/clothing/shoes/heels

@@ -6,7 +6,7 @@
 	icon_state = "bhaubergeon"
 	item_state = "bhaubergeon"
 	armor_type = /datum/armor/maille/bronze
-	max_integrity = INTEGRITY_STRONG + 75
+	max_integrity = INTEGRITY_OLD_STRONG + 75
 	smeltresult = /obj/item/ingot/bronze
 	melting_material = /datum/material/bronze
 
@@ -18,7 +18,7 @@
 	icon_state = "bhauberk"
 	item_state = "bhauberk"
 	armor_type = /datum/armor/maille/bronze
-	max_integrity = INTEGRITY_STRONG + 75
+	max_integrity = INTEGRITY_OLD_STRONG + 75
 	smeltresult = /obj/item/ingot/bronze
 	melting_material = /datum/material/bronze
 
@@ -63,7 +63,7 @@
 	mob_overlay_icon = 'modular_abel/gear/icons/onmob/armor.dmi'
 	icon_state = "blamellar"
 	armor_type = /datum/armor/maille/bronze
-	max_integrity = INTEGRITY_STRONG - 25
+	max_integrity = INTEGRITY_OLD_STRONG - 25
 	smeltresult = /obj/item/ingot/bronze
 	melting_material = /datum/material/bronze
 
@@ -74,7 +74,7 @@
 	mob_overlay_icon = 'modular_abel/gear/icons/onmob/armor.dmi'
 	icon_state = "ilamellar"
 	armor_type = /datum/armor/maille/iron
-	max_integrity = INTEGRITY_STANDARD + 50
+	max_integrity = INTEGRITY_OLD_STANDARD + 50
 	smeltresult = /obj/item/ingot/iron
 	melting_material = /datum/material/iron
 
@@ -89,7 +89,7 @@
 	armor_type = /datum/armor/minimal
 	nodismemsleeves = TRUE
 	body_parts_covered = CHEST|GROIN|VITALS|LEGS|ARMS
-	max_integrity = INTEGRITY_STRONG
+	max_integrity = INTEGRITY_OLD_STRONG
 	armor_class = AC_MEDIUM
 
 /obj/item/clothing/armor/chainmail/hauberk/donator

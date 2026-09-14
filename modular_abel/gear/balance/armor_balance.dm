@@ -16,4 +16,4 @@
 
 /obj/item/clothing/shoes/boots/armor/bronze
 	armor_type = /datum/armor/plate/bronze
-	max_integrity = INTEGRITY_STRONG + 100
+	max_integrity = INTEGRITY_OLD_STRONG + 100

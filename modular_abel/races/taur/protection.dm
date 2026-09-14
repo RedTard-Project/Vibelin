@@ -61,7 +61,7 @@
 	item_state = "iron_horseshoes"
 	color = "#8a5a2b"
 	armor_type = /datum/armor/boots/leather
-	max_integrity = INTEGRITY_STANDARD
+	max_integrity = INTEGRITY_OLD_STANDARD
 	armor_class = AC_LIGHT
 	anvilrepair = null
 	sewrepair = /datum/attribute/skill/craft/tanning/patching
