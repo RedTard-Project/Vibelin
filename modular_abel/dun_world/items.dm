@@ -324,3 +324,91 @@
 		/obj/item/ingot/purifiedaalloy = 5,
 		/obj/item/ingot/aalloy = 2,
 		)
+
+/obj/item/scrap
+	name = "iron scrap"
+	desc = "Shingles and scrap, born from violence upon iron. There may yet still be a use for these pieces."
+	icon = 'icons/roguetown/items/misc.dmi'
+	icon_state = "scrap"
+	grid_width = 32
+	grid_height = 32
+	dropshrink = 0.7
+	anvilrepair = /datum/attribute/skill/craft/blacksmithing
+	sellprice = 2
+
+/obj/item/repair_kit/attempt_refill(mob/living/user, obj/item/tool)
+	if(!istype(src, /obj/item/repair_kit/metal) || !istype(tool, /obj/item/scrap))
+		return ..()
+	if(repairable_integrity >= maximum_capacity)
+		return NONE
+	repairable_integrity = min(maximum_capacity, repairable_integrity + refill_amount)
+	to_chat(user, span_notice("I refill [src] with [tool] to [PERCENT(repairable_integrity / maximum_capacity)]% capacity."))
+	qdel(tool)
+	update_appearance(UPDATE_ICON_STATE)
+	return ITEM_INTERACT_SUCCESS
+
+/obj/item/ration_lootbox
+	name = "mysterious ration package"
+	desc = "An unassuming paper bundle. It feels surprisingly heavy, like it contains a bounty of assorted goodies. Perhaps a RIGHT hand can reveal the bounty?"
+	icon = 'modular_abel/dun_world/icons/ration.dmi'
+	icon_state = "ration_large"
+	color = "#b58fe6"
+	w_class = WEIGHT_CLASS_HUGE
+	grid_width = 32
+	grid_height = 32
+	var/static/list/ration_loot = list(
+		/obj/item/reagent_containers/food/snacks/chocolate,
+		/obj/item/reagent_containers/food/snacks/chocolate/chunk,
+		/obj/item/reagent_containers/food/snacks/raisins,
+		/obj/item/reagent_containers/food/snacks/biscuit,
+		/obj/item/reagent_containers/food/snacks/griddlecake/apple,
+		/obj/item/reagent_containers/food/snacks/griddlecake/berry,
+		/obj/item/reagent_containers/food/snacks/griddlecake/lemon,
+		/obj/item/reagent_containers/food/snacks/breadslice/toast,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/apple,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/blackberry,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/lemon,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/lime,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/pear,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/plum,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/raspberry,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/strawberry,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/tangerine,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/mango,
+		/obj/item/reagent_containers/food/snacks/produce/fruit/pineapple,
+		/obj/item/reagent_containers/food/snacks/fish/carp,
+		/obj/item/reagent_containers/food/snacks/fish/eel,
+		/obj/item/reagent_containers/food/snacks/fish/shrimp,
+		/obj/item/reagent_containers/food/snacks/fish/clownfish,
+		/obj/item/reagent_containers/food/snacks/fish/swordfish,
+		/obj/item/reagent_containers/food/snacks/cooked/ham,
+		/obj/item/reagent_containers/food/snacks/cooked/coppiette,
+		/obj/item/reagent_containers/food/snacks/cooked/sausage,
+		/obj/item/reagent_containers/food/snacks/meat/salami/slice,
+		/obj/item/reagent_containers/food/snacks/fat/salo/slice,
+		/obj/item/reagent_containers/food/snacks/cheese_wedge,
+		/obj/item/reagent_containers/food/snacks/cheese_wedge/aged,
+		/obj/item/reagent_containers/food/snacks/cheese/gote,
+		/obj/item/reagent_containers/food/snacks/produce/mushroom,
+		/obj/item/reagent_containers/food/snacks/produce/mushroom/borowiki,
+		/obj/item/reagent_containers/food/snacks/produce/tea,
+		/obj/item/reagent_containers/food/snacks/produce/coffeebeansroasted,
+		/obj/item/reagent_containers/food/snacks/truffles,
+		/obj/item/reagent_containers/food/snacks/spiderhoney/honey,
+		)
+
+/obj/item/ration_lootbox/attack_self_secondary(mob/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+	if(!ishuman(user))
+		return
+	if(!do_after(user, 2 SECONDS, src))
+		return TRUE
+	to_chat(user, span_notice("You unwrap the mysterious package..."))
+	var/turf/loot_turf = get_turf(src)
+	for(var/i in 1 to rand(9, 15))
+		var/loot_type = pick(ration_loot)
+		new loot_type(loot_turf)
+	qdel(src)
+	return TRUE

@@ -49,7 +49,7 @@
 	name = "Twilight Axis - Indoors / Town"
 
 /area/rogue/indoors/vampire_manor
-	parent_type = /area/indoors/vampire_manor
+	parent_type = /area/indoors/antag/vampire_manor
 	dun_world_lighting_compat = TRUE
 	name = "Twilight Axis - Indoors / Vampire Manor"
 

@@ -10,12 +10,14 @@ Layout:
 - `_module.dm` — single entry point: includes `erp/_erp.dm` (ERP system),
   `dun_world/_dun_world.dm` (the Twilight Axis map import), and `upstream_fixes.dm`.
 - `dun_world/` — everything for the Twilight Axis import in one place: the support
-  `.dm` files (`areas`, `compat`, `furniture`, `items`, `jobs`, `keys`, `mapgen`,
-  `mobs`, `structures`, `map_adjustment`), plus
+  `.dm` files (`areas`, `compat`, `food`, `furniture`, `items`, `jobs`, `keys`,
+  `machines`, `mapgen`, `mobs`, `structures`, `map_adjustment`), plus
   `dun_world/config/` (`map.json` replacement table, `maps_fragment.txt`),
   `dun_world/icons/` (ported Azure sprites) and `dun_world/abyssor/` (the Abyssor
   dream-cult content pack — see `dun_world/abyssor/README.md`).
-  `dun_world/_dun_world.dm` is the sub-include list.
+  `dun_world/_dun_world.dm` is the sub-include list. Azure types ported so the map
+  stops asking for content the compile lacks are recorded in
+  `dun_world/PORTED_CONTENT.md`.
 - `erp/` — everything for the ERP system in one place: `erp/_erp.dm` (the
   include list), `erp/code/` (the ERP/sexcon/organ/sprite-accessory sources),
   `erp/icons/` and `erp/sound/` (ERP assets), and `erp/_parked_twilight/`

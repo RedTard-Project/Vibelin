@@ -1499,6 +1499,10 @@
 /obj/structure/flora/grass/bush,
 /turf/open/floor/grass/yel,
 /area/rogue/outdoors/woods/vampire_lair)
+"fY" = (
+/obj/structure/fake_machine/mail/r,
+/turf/open/floor/tile/brick,
+/area/rogue/indoors/vampire_manor)
 "fZ" = (
 /obj/structure/bed/sleepingbag{
 	dir = 1
@@ -2079,6 +2083,10 @@
 /obj/machinery/light/fueled/wallfire/candle/r/dun_world,
 /turf/open/floor/blocks/stonered,
 /area/rogue/indoors/vampire_manor)
+"iz" = (
+/obj/structure/fake_machine/mail/r,
+/turf/open/floor/tile,
+/area/rogue/under/cave/inhumen)
 "iA" = (
 /obj/effect/decal/cleanable/blood/old{
 	icon_state = "floor5-old"
@@ -4251,6 +4259,12 @@
 /obj/machinery/light/fueled/wallfire/candle/r/dun_world,
 /turf/open/floor/carpet/red,
 /area/rogue/under/cave/inhumen)
+"qQ" = (
+/obj/structure/fake_machine/hailer{
+	pixel_y = 32
+	},
+/turf/open/floor/grass,
+/area/rogue/outdoors/woods/wretch_lair)
 "qR" = (
 /obj/effect/decal/carpet/square,
 /turf/open/floor/ruinedwood/spiral,
@@ -4521,8 +4535,10 @@
 /turf/open/floor/naturalstone,
 /area/rogue/under/cave/inhumen)
 "rV" = (
-/obj/structure/chair/bench/church/r,
 /obj/effect/landmark/start/wretch{
+	dir = 1
+	},
+/obj/structure/chair/bench/church/r{
 	dir = 1
 	},
 /turf/open/floor/churchbrick,
@@ -4539,6 +4555,9 @@
 "rZ" = (
 /obj/structure/fluff/railing/border{
 	dir = 1
+	},
+/obj/structure/fake_machine/hailer{
+	pixel_y = 32
 	},
 /turf/open/floor/dirt,
 /area/rogue/outdoors/woods/vampire_lair)
@@ -4886,6 +4905,7 @@
 /obj/item/paper/scroll,
 /obj/item/paper/scroll,
 /obj/item/natural/feather,
+/obj/structure/fake_machine/mail/r,
 /turf/open/floor/tile/masonic/inverted,
 /area/rogue/indoors/vampire_manor)
 "ti" = (
@@ -6770,8 +6790,10 @@
 /turf/open/floor/cobble/mossy/dun_world,
 /area/rogue/outdoors/woods/wretch_lair)
 "AO" = (
-/obj/structure/chair/bench/church/mid,
 /obj/effect/landmark/start/wretch{
+	dir = 1
+	},
+/obj/structure/chair/bench/church/mid{
 	dir = 1
 	},
 /turf/open/floor/churchbrick,
@@ -7693,6 +7715,12 @@
 "EC" = (
 /turf/open/floor/churchbrick,
 /area/rogue/outdoors/banditcamp)
+"ED" = (
+/obj/structure/fake_machine/hailer,
+/turf/closed/wall/mineral/wooddark/end{
+	dir = 4
+	},
+/area/rogue/indoors/banditcamp)
 "EE" = (
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle{
 	pixel_y = -9
@@ -8108,8 +8136,10 @@
 "Gu" = (
 /obj/machinery/light/fueled/wallfire/candle/dun_world,
 /obj/effect/decal/cleanable/blood,
-/obj/structure/fake_machine/mail/r,
-/obj/structure/fluff/clock,
+/obj/structure/fluff/clock{
+	dir = 1;
+	pixel_x = 6
+	},
 /turf/open/floor/tile,
 /area/rogue/under/cave/inhumen)
 "Gv" = (
@@ -8167,6 +8197,12 @@
 	dir = 10
 	},
 /turf/open/floor/cobble/dun_world,
+/area/rogue/under/cave/inhumen)
+"GH" = (
+/obj/structure/chair/bench/church/r{
+	dir = 1
+	},
+/turf/open/floor/churchbrick,
 /area/rogue/under/cave/inhumen)
 "GI" = (
 /obj/effect/decal/cobbleedge/dun_world{
@@ -8914,7 +8950,6 @@
 /area/rogue/indoors/vampire_manor)
 "JQ" = (
 /obj/structure/table/church,
-/obj/effect/spawner/map_spawner/loot/coin/med,
 /turf/open/floor/twig,
 /area/rogue/under/cave/inhumen)
 "JR" = (
@@ -9100,7 +9135,9 @@
 /turf/open/floor/tile/brick,
 /area/rogue/indoors/vampire_manor)
 "Kx" = (
-/obj/structure/chair/bench/church/mid,
+/obj/structure/chair/bench/church/mid{
+	dir = 1
+	},
 /turf/open/floor/churchbrick,
 /area/rogue/under/cave/inhumen)
 "Ky" = (
@@ -11090,8 +11127,10 @@
 /turf/open/floor/blocks/stonered,
 /area/rogue/indoors/vampire_manor)
 "SS" = (
-/obj/structure/chair/bench/church/mid,
 /obj/effect/decal/cleanable/debris,
+/obj/structure/chair/bench/church/mid{
+	dir = 1
+	},
 /turf/open/floor/churchbrick,
 /area/rogue/under/cave/inhumen)
 "ST" = (
@@ -14314,7 +14353,7 @@ JQ
 wV
 dh
 rV
-sa
+GH
 rV
 Mh
 IW
@@ -31464,7 +31503,7 @@ Ev
 lB
 jh
 Gu
-bK
+iz
 bK
 Zl
 Zl
@@ -32370,7 +32409,7 @@ Dq
 qW
 qW
 UM
-Xm
+qQ
 Ev
 Ev
 Ev
@@ -34539,7 +34578,7 @@ nk
 iL
 iL
 eE
-DR
+ED
 DR
 Ux
 yI
@@ -43963,7 +44002,7 @@ or
 or
 jA
 Uj
-Xw
+fY
 Ue
 aF
 mU

@@ -10,7 +10,7 @@
 	emote_see = list("looks around.", "chews some leaves.")
 	speak_chance = 1
 	see_in_dark = 6
-	lighting_alpha = LIGHTING_PLANE_ALPHA_MOSTLY_VISIBLE
+	lighting_alpha = LIGHTING_PLANE_ALPHA_DARKVISION
 	move_to_delay = 8
 	animal_species = /mob/living/simple_animal/hostile/retaliate/camel
 	botched_butcher_results = list(/obj/item/reagent_containers/food/snacks/meat/steak = 2,
