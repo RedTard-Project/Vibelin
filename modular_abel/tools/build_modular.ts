@@ -13,14 +13,6 @@ const MODULAR_RSC = 'vanderlin.modular_abel.rsc';
 const FINAL_DMB = 'vanderlin.dmb';
 const FINAL_RSC = 'vanderlin.rsc';
 const END_INCLUDE = '// END_INCLUDE';
-const BEGIN_INCLUDE = '// BEGIN_INCLUDE';
-const FORCE_DUN_WORLD_DEFINES = [
-  '#ifndef FORCE_MAP',
-  '#define FORCE_MAP "dun_world" // modular_abel temporary force',
-  '#define FORCE_MAP_DIRECTORY "_maps" // modular_abel temporary force',
-  '#endif',
-  '',
-].join('\n');
 
 type BuildOptions = {
   target: string;
@@ -173,7 +165,7 @@ async function compileModularDme(options: BuildOptions) {
 
 function writeModularDme() {
   const dme = fs.readFileSync(UPSTREAM_DME, 'utf-8');
-  fs.writeFileSync(MODULAR_DME, withForcedDunWorld(withModularIncludes(dme)));
+  fs.writeFileSync(MODULAR_DME, withModularIncludes(dme));
 }
 
 async function prepareTgsBuild(options: BuildOptions) {
@@ -193,22 +185,7 @@ async function prepareTgsBuild(options: BuildOptions) {
 
 function writeModularDmeInPlace() {
   const dme = fs.readFileSync(UPSTREAM_DME, 'utf-8');
-  fs.writeFileSync(UPSTREAM_DME, withForcedDunWorld(withModularIncludes(dme)));
-}
-
-function withForcedDunWorld(dme: string) {
-  if (dme.includes('#define FORCE_MAP "dun_world"')) {
-    return dme;
-  }
-
-  if (!dme.includes(BEGIN_INCLUDE)) {
-    throw new Error(`${UPSTREAM_DME} does not contain ${BEGIN_INCLUDE}`);
-  }
-
-  return dme.replace(
-    BEGIN_INCLUDE,
-    `${FORCE_DUN_WORLD_DEFINES}${BEGIN_INCLUDE}`,
-  );
+  fs.writeFileSync(UPSTREAM_DME, withModularIncludes(dme));
 }
 
 function withModularIncludes(dme: string): string {
