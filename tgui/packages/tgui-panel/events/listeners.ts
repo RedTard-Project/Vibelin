@@ -8,6 +8,10 @@ import {
   telemetryRequest,
   testTelemetryCommand,
 } from '../telemetry/handlers';
+import {
+  localizationConfig,
+  localizationDeclensions,
+} from '../localization/handlers';
 import { handleLoadAssets } from './handlers/assets';
 import { roundrestart } from './handlers/roundrestart';
 
@@ -17,6 +21,8 @@ const listeners = {
   'audio/playMusic': playMusic,
   'audio/stopMusic': stopMusic,
   'chat/message': chatMessage,
+  'localization/config': localizationConfig,
+  'localization/declensions': localizationDeclensions,
   'ping/reply': pingReply,
   'ping/soft': pingSoft,
   roundrestart,

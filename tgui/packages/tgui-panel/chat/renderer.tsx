@@ -6,6 +6,7 @@
 
 import { createRoot } from 'react-dom/client';
 import { createLogger } from 'tgui/logging';
+import { translateNode } from '../localization/translate';
 import { Tooltip } from 'tgui-core/components';
 import { EventEmitter } from 'tgui-core/events';
 import { classes } from 'tgui-core/react';
@@ -404,6 +405,9 @@ class ChatRenderer {
         } else {
           logger.error('Error: message is missing text payload', message);
         }
+        // Swap in translated text before anything else reads this subtree.
+        // No-op unless the player is on RU and the dictionary has loaded.
+        translateNode(node);
         // Get all nodes in this message that want to be rendered like jsx
         const nodes = node.querySelectorAll('[data-component]');
         for (let i = 0; i < nodes.length; i++) {

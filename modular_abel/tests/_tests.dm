@@ -237,4 +237,192 @@
 		if(initial(map_type.abyssor_cult))
 			TEST_FAIL("[map_type] enables abyssor_cult in code; the pack is meant to be switched on per map from _maps/*.json only")
 
+/// Counts capturing groups in a regex source, so a template cannot reference a
+/// $N the pattern never captures.
+/proc/count_capture_groups(pattern)
+	var/groups = 0
+	var/total = length_char(pattern)
+	var/i = 1
+	while(i <= total)
+		var/char = copytext_char(pattern, i, i + 1)
+		if(char == "\\")
+			i += 2
+			continue
+		if(char == "(" && copytext_char(pattern, i + 1, i + 2) != "?")
+			groups++
+		i++
+	return groups
+
+/datum/unit_test/modular_chat_localization/Run()
+	var/static/list/valid_cases = list("nom", "gen", "dat", "acc", "ins", "pre")
+
+	var/datum/asset/json/chat_localization/asset = get_asset_datum(/datum/asset/json/chat_localization)
+	if(!asset)
+		TEST_FAIL("the chat localization asset does not exist, so the panel is never handed a dictionary and chat stays English")
+		return
+
+	var/list/payload = asset.generate()
+	for(var/section in list("nouns", "fragments", "patterns"))
+		if(!length(payload[section]))
+			TEST_FAIL("dictionary section \"[section]\" came back empty; its strings file is missing or every line in it was skipped")
+
+	var/list/nouns = payload["nouns"]
+	for(var/noun in nouns)
+		var/list/cases = nouns[noun]
+		if(!islist(cases) || !length(cases))
+			TEST_FAIL("noun \"[noun]\" has no cases, so every pattern declining it silently renders the English word")
+			continue
+		if(length(cases) != length(GLOB.chat_noun_cases))
+			TEST_FAIL("noun \"[noun]\" resolved [length(cases)] of [length(GLOB.chat_noun_cases)] cases; a blank field renders that case in English")
+		for(var/case_key in cases)
+			if(!(case_key in valid_cases))
+				TEST_FAIL("noun \"[noun]\" declares case \"[case_key]\", which no template can ever ask for")
+		if(findtext(noun, regex(@"^(?:the|an|a)\s", "i")))
+			TEST_FAIL("noun \"[noun]\" carries an article; the panel strips articles before lookup, so this entry can never be found")
+
+	var/list/body_parts = asset.load_nouns("nouns.txt")
+	for(var/noun in asset.load_nouns("items.txt"))
+		if(body_parts[noun])
+			TEST_NOTICE(src, "\"[noun]\" is declined in both items.txt and nouns.txt; the body part wins and the other meaning renders wrong")
+
+	var/list/fragments = payload["fragments"]
+	for(var/english in fragments)
+		if(!length(fragments[english]))
+			TEST_FAIL("fragment \"[english]\" maps to an empty string, which blanks the line out in chat instead of leaving it in English")
+		if(english == fragments[english])
+			TEST_FAIL("fragment \"[english]\" maps to itself, so the entry costs a lookup and changes nothing")
+
+	var/regex/token_regex = new(@"\$(\d+)(?:\|([a-z]+))?", "g")
+	var/list/seen_patterns = list()
+	for(var/list/entry as anything in payload["patterns"])
+		var/pattern = entry["re"]
+		var/template = entry["ru"]
+		if(!length(pattern) || !length(template))
+			TEST_FAIL("a pattern entry is missing its \"re\" or \"ru\" field and will be dropped on load")
+			continue
+
+		if(seen_patterns[pattern])
+			TEST_FAIL("pattern \"[pattern]\" is listed twice; only the first can ever match, so the second translation is dead")
+		else
+			seen_patterns[pattern] = TRUE
+
+		var/groups = count_capture_groups(pattern)
+		token_regex.index = 0
+		while(token_regex.Find(template))
+			var/index = text2num(token_regex.group[1])
+			var/case_key = token_regex.group[2]
+			if(index > groups)
+				TEST_FAIL("template \"[template]\" uses $[index] but pattern \"[pattern]\" only captures [groups] group(s), so chat prints the token literally")
+			if(case_key && !(case_key in valid_cases))
+				TEST_FAIL("template \"[template]\" asks for case \"[case_key]\", which is not one of [jointext(valid_cases, ", ")]")
+
+/datum/unit_test/modular_examine_descriptions/Run()
+	var/datum/asset/json/chat_localization/asset = get_asset_datum(/datum/asset/json/chat_localization)
+	if(!asset)
+		TEST_FAIL("the localization asset is missing, so no description can be loaded")
+		return
+
+	var/list/pairs = asset.read_pairs("descriptions.txt")
+	if(!length(pairs))
+		TEST_FAIL("descriptions.txt produced no entries; the file is missing or every line was skipped")
+		return
+
+	var/list/seen = list()
+	for(var/list/pair as anything in pairs)
+		var/path = text2path(pair[1])
+		if(!ispath(path))
+			TEST_FAIL("\"[pair[1]]\" is not a type; the entry is dead and the item keeps its English description")
+			continue
+		if(!ispath(path, /atom))
+			TEST_FAIL("[path] is not an /atom, so get_examine_desc() never runs for it")
+			continue
+		if(seen[path])
+			TEST_FAIL("[path] is translated twice, and only the last of the two can ever win")
+		else
+			seen[path] = TRUE
+
+		var/atom/subject = path
+		if(!initial(subject.desc))
+			TEST_NOTICE(src, "[path] has no English desc of its own, so this translation replaces an inherited one")
+
+	load_examine_descriptions()
+	if(length(GLOB.examine_descriptions) != length(seen))
+		TEST_FAIL("loaded [length(GLOB.examine_descriptions)] descriptions but [length(seen)] keys resolved; some were dropped at load")
+
+/datum/unit_test/modular_description_composites/Run()
+	for(var/obj/item/spellbook/path as anything in subtypesof(/obj/item/spellbook))
+		var/form = initial(path.themed_form)
+		if(!form)
+			continue
+		if(!GLOB.spellbook_theme_flavor_ru[form])
+			TEST_FAIL("[path] is themed \"[form]\", which has no Russian flavour line; the book would examine as its plain tier text")
+		if(!examine_description_for_type(path))
+			TEST_FAIL("[path] resolves to no translated ancestor, so the theme line would be appended to nothing")
+
+		if(examine_description_for_type(path) == GLOB.examine_descriptions[/obj/item/spellbook])
+			TEST_FAIL("[path] falls all the way back to the generic spellbook text; its own tier is missing from descriptions.txt")
+
+/datum/unit_test/modular_dreams/Run()
+	var/list/pool = get_dream_pool()
+	if(!length(pool))
+		TEST_FAIL("the dream pool is empty, so sleeping players see nothing")
+		return
+
+	var/list/seen_beats = list()
+	for(var/datum/dream/entry as anything in pool)
+		if(!length(entry.en))
+			TEST_FAIL("[entry.type] has no English beats, so English players get a silent dream")
+		if(!length(entry.ru))
+			TEST_FAIL("[entry.type] has no Russian beats, so Russian players get a silent dream")
+		if(length(entry.en) != length(entry.ru))
+			TEST_FAIL("[entry.type] has [length(entry.en)] English beats against [length(entry.ru)] Russian ones; the two languages would pace differently")
+
+		for(var/beat in entry.en + entry.ru)
+			if(!istext(beat) || !length(beat))
+				TEST_FAIL("[entry.type] carries an empty beat, which prints as \"... ...\"")
+			if(seen_beats[beat])
+				TEST_FAIL("[entry.type] repeats the beat \"[beat]\", already used by [seen_beats[beat]]")
+			else
+				seen_beats[beat] = entry.type
+
+	// dream_sequence() consumes the list it is handed with Cut(), so what comes
+	// out of fragments_for() must not be the datum's own beats.
+	// ui_lang_code(null) answers RU, so this exercises the Russian list.
+	var/datum/dream/sample = pool[1]
+	var/before = length(sample.ru)
+	var/list/handed_out = sample.fragments_for(null)
+	handed_out.Cut(1, 2)
+	if(length(sample.ru) != before)
+		TEST_FAIL("fragments_for() handed out the datum's own list; consuming it blanks that dream out for the rest of the round")
+
+/datum/unit_test/modular_declension_prefs/Run()
+	var/static/list/valid_cases = list("gen", "dat", "acc", "ins", "pre")
+	var/list/seen_cases = list()
+	var/list/seen_keys = list()
+
+	for(var/datum/preference/text/declension/pref as anything in subtypesof(/datum/preference/text/declension))
+		var/case_key = initial(pref.case_key)
+		var/savefile_key = initial(pref.savefile_key)
+
+		if(!(case_key in valid_cases))
+			TEST_FAIL("[pref] declares case \"[case_key]\", which the chat dictionary can never ask for")
+		else if(seen_cases[case_key])
+			TEST_FAIL("[pref] and [seen_cases[case_key]] both claim case \"[case_key]\"; one of them can never reach chat")
+		else
+			seen_cases[case_key] = pref
+
+		if(!savefile_key)
+			TEST_FAIL("[pref] has no savefile_key, so what the player types is never saved")
+		else if(seen_keys[savefile_key])
+			TEST_FAIL("[pref] reuses savefile_key \"[savefile_key]\" with [seen_keys[savefile_key]], so the two cases overwrite each other")
+		else
+			seen_keys[savefile_key] = pref
+
+		if(!initial(pref.prompt))
+			TEST_FAIL("[pref] has no prompt, so the input box gives the player no idea which case is wanted")
+
+	for(var/case_key in valid_cases)
+		if(!seen_cases[case_key])
+			TEST_FAIL("no preference offers case \"[case_key]\", but a template can ask for it")
+
 #endif

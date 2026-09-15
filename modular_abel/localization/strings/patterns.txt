@@ -1,0 +1,233 @@
+# Сообщения с подстановкой. Пробуются по порядку, только если точного
+# совпадения в fragments.txt не нашлось, — первый сработавший выигрывает.
+#
+# Формат:  регулярка = шаблон
+#
+# Разделитель — первое вхождение " = " (с пробелами). В регулярках пробелов
+# вокруг "=" не бывает: (?=...) и (?<=...) пишутся слитно, так что это безопасно.
+#
+# Экранировать ничего не нужно: \d, \. и кавычки пишутся как есть.
+#
+# В шаблоне:
+#   $1, $2 ...  — захваты регулярки
+#   $2|acc      — захват, склонённый в падеж: ищется сначала в nouns.txt,
+#                 затем в склонениях персонажа; если нигде нет — остаётся как есть
+#   падежи: nom gen dat acc ins pre
+#
+# Регулярка применяется к ОДНОЙ текстовой ноде, уже без краевых пробелов.
+# Поэтому имя, обёрнутое в <b>, в захват не попадает — см. "dodges" ниже.
+#
+# ПОРЯДОК — ЧАСТНОЕ ПЕРЕД ОБЩИМ. "^(.+?) slashed (.+?)!$" радостно поймает
+# "I'm slashed by X!" и выдаст "I'm рубит by X!", если стоит выше.
+
+# --- удары по себе и получение удара (строго выше общих!) ---
+^I'm (?:slashed|stabbed|cut|clawed|struck|punched|chopped|bashed|whacked|smashed|sliced|whipped|slapped|kicked|bit) by (.+?)!$ = $1 наносит мне удар!
+^(.+?) (?:slashed|stabbed|cut|clawed|struck|punched|chopped|bashed|whacked|smashed|sliced|whipped|slapped|kicked|bit) themself!$ = $1 ранит себя!
+^I (?:slash|stab|cut|claw|strike|punch|chop|bash|smash|kick|bite) myself!$ = Я раню себя!
+
+# --- удары: первое лицо (выше третьего лица: "I cut X!" иначе поймает
+# "^(.+?) cut (.+?)!$", у которого настоящее и прошедшее время совпадают) ---
+^I slash (.+?)!$ = Я рублю $1|acc!
+^I stab (.+?)!$ = Я пронзаю $1|acc!
+^I cut (.+?)!$ = Я режу $1|acc!
+^I claw (.+?)!$ = Я раздираю $1|acc!
+^I strike (.+?)!$ = Я бью $1|acc!
+^I punch (.+?)!$ = Я бью кулаком $1|acc!
+^I chop (.+?)!$ = Я рублю $1|acc!
+^I bash (.+?)!$ = Я дубасю $1|acc!
+^I smash (.+?)!$ = Я крушу $1|acc!
+^I kick (.+?)!$ = Я пинаю $1|acc!
+^I bite (.+?)!$ = Я кусаю $1|acc!
+
+# --- удары: третье лицо ---
+^(.+?) slashed (.+?)!$ = $1 рубит $2|acc!
+^(.+?) stabbed (.+?)!$ = $1 пронзает $2|acc!
+^(.+?) cut (.+?)!$ = $1 режет $2|acc!
+^(.+?) clawed (.+?)!$ = $1 раздирает $2|acc!
+^(.+?) struck (.+?)!$ = $1 бьёт $2|acc!
+^(.+?) punched (.+?)!$ = $1 бьёт кулаком $2|acc!
+^(.+?) chopped (.+?)!$ = $1 рубит $2|acc!
+^(.+?) bashed (.+?)!$ = $1 дубасит $2|acc!
+^(.+?) whacked (.+?)!$ = $1 лупит $2|acc!
+^(.+?) smashed (.+?)!$ = $1 крушит $2|acc!
+^(.+?) sliced (.+?)!$ = $1 вспарывает $2|acc!
+^(.+?) whipped (.+?)!$ = $1 хлещет $2|acc!
+^(.+?) slapped (.+?)!$ = $1 шлёпает $2|acc!
+^(.+?) kicked (.+?)!$ = $1 пинает $2|acc!
+^(.+?) bit (.+?)!$ = $1 кусает $2|acc!
+
+# --- защита ---
+# У "dodges" субъект приходит отдельной нодой: сообщение собрано как
+# "<b>[src]</b> dodges [user]'s attack!", поэтому имени в начале строки нет.
+^(.+?) blocks (.+?)'s attack!$ = $1 блокирует атаку $2|gen!
+^dodges (.+?)'s attack!$ = уклоняется от атаки $1|gen!
+^easily dodges (.+?)'s attack!$ = легко уклоняется от атаки $1|gen!
+^(.+?) blocks (.+?) with (.+?)!$ = $1 блокирует $2|acc с помощью $3|gen!
+
+# --- захваты, борьба, части тела ---
+^(.+?) twists (.+?)'s (.+?)!$ = $1 выкручивает $3|acc $2|gen!
+^(.+?) headbutts (.+?)'s (.+?)!$ = $1 бьёт головой в $3|acc $2|gen!
+^(.+?) bites (.+?)'s (.+?)!$ = $1 кусает $3|acc $2|gen!
+^(.+?) drinks from (.+?)'s (.+?)!$ = $1 пьёт из $3|gen $2|gen!
+^(.+?) smashes (.+?)'s (.+?) into (.+?)!$ = $1 впечатывает $3|acc $2|gen в $4|acc!
+^(.+?) drives a knee into (.+?)'s midsection!$ = $1 бьёт коленом в живот $2|gen!
+^(.+?) grabs (.+?)\.$ = $1 хватает $2|acc.
+^(.+?) shoves (.+?)!$ = $1 толкает $2|acc!
+^I shove (.+?)!$ = Я толкаю $1|acc!
+^I'm shoved by (.+?)!$ = $1 толкает меня!
+^(.+?) pushes (.+?)\.$ = $1 отталкивает $2|acc.
+^(.+?) disarms me of (.+?)!$ = $1 выбивает у меня $2|acc!
+^(.+?) disarms (.+?) of (.+?)!$ = $1 выбивает $3|acc из рук $2|gen!
+^(.+?) disarms (.+?)!$ = $1 обезоруживает $2|acc!
+^(.+?) struggles to disarm (.+?)!$ = $1 силится обезоружить $2|acc!
+^(.+?) charges into (.+?)!$ = $1 врезается в $2|acc с разбегу!
+^(.+?) crashes into (.+?)!$ = $1 врезается в $2|acc!
+^(.+?) smashes into (.+?)!$ = $1 влетает в $2|acc!
+^(.+?) runs into (.+?)!$ = $1 налетает на $2|acc!
+^I run into (.+?)!$ = Я налетаю на $1|acc!
+^(.+?) bounces off (.+?)!$ = $1 отскакивает от $2|gen!
+^(.+?) smashes through (.+?)!$ = $1 проламывает $2|acc!
+^(.+?) crushes (.+?) underfoot\.$ = $1 давит $2|acc ногой.
+^(.+?) stomps (.+?)!$ = $1 топчет $2|acc!
+^(.+?) kicks (.+?)!$ = $1 пинает $2|acc!
+^(.+?) starts to rip apart (.+?)!$ = $1 начинает разрывать $2|acc!
+^(.+?) consumes (.+?)!$ = $1 поглощает $2|acc!
+^Your fangs inject venom into (.+?)!$ = Мои клыки впрыскивают яд в $1|acc!
+
+# --- раны с подстановкой части тела ---
+^The (.+?) is dislocated!$ = Вывихнуло $1|acc!
+^The (.+?) jolts painfully!$ = $1|acc пронзает болью!
+^The (.+?) is twisted out of place!$ = Вывернуло $1|acc из сустава!
+^The (.+?) is wrenched out of its socket!$ = Вырвало $1|acc из сустава!
+^The (.+?) is mauled!$ = Изувечило $1|acc!
+^The (.+?) is thoroughly disfigured!$ = Изуродовало $1|acc до неузнаваемости!
+^Blood sprays from (.+?)'s (.+?)!$ = Из $2|gen $1|gen хлещет кровь!
+^Blood rushes from (.+?)'s (.+?)!$ = Из $2|gen $1|gen потоком идёт кровь!
+^Blood bursts from (.+?)'s (.+?) with a great force!$ = Из $2|gen $1|gen кровь бьёт с огромной силой!
+^Blood runs from (.+?)'s nose\.$ = Из носа $1|gen течёт кровь.
+^(.+?) spills (?:their|his|her|its) organs!$ = $1 вываливает свои внутренности!
+^(.+?) spills (?:their|his|her|its) entrails!$ = $1 вываливает свои кишки!
+^(.+?) coughs up blood!$ = $1 кашляет кровью!
+^(.+?) clutches at (?:their|his|her|its) chest!$ = $1 хватается за грудь!
+^(.+?) suddenly collapses!$ = $1 внезапно оседает!
+^(.+?) catches fire!$ = $1 загорается!
+^(.+?) is burned by holy light!$ = Священный свет обжигает $1|acc!
+^(.+?) is dead already\.\.\.$ = Жизнь уже покинула $1|acc...
+^(.+?) isn't responding to my resuscitation\.\.\.$ = $1 не откликается на мои попытки откачать...
+^I can no longer move my (.+?)!$ = Я больше не могу двигать $1|ins!
+^I can no longer feel my (.+?)\.$ = Я больше не чувствую $1|acc.
+^You lose control of your (.+?)!$ = Я теряю власть над $1|ins!
+^I fall on my (.+?)!$ = Я падаю на $1|acc!
+
+# --- предметы и инвентарь ---
+^(.+?) picks up (.+?)\.$ = $1 подбирает $2|acc.
+^(.+?) draws (.+?)!$ = $1 достаёт $2|acc!
+^(.+?) adds (.+?) to (.+?)\.$ = $1 добавляет $2|acc в $3|acc.
+^(.+?) finds (.+?) in (.+?)\.$ = $1 находит $2|acc в $3|pre.
+^(.+?) places (.+?) onto (.+?)\.$ = $1 кладёт $2|acc на $3|acc.
+^You place (.+?) on (.+?)\.$ = Я кладу $1|acc на $2|acc.
+^(.+?) searches through (.+?)\.$ = $1 роется в $2|pre.
+^(.+?) snuffs (.+?)\.$ = $1 гасит $2|acc.
+^(.+?) sets (.+?) on fire!$ = $1 поджигает $2|acc!
+^(.+?) puts out the fire on (.+?)\.$ = $1 сбивает огонь с $2|gen.
+^(.+?) repairs (.+?)!$ = $1 чинит $2|acc!
+^(.+?) shatters into a million pieces!$ = $1 разлетается на тысячу осколков!
+^(.+?) is already lit!$ = $1 уже горит!
+^(.+?) is too hot to touch\.$ = Слишком горячо, чтобы взять $1|acc.
+^(.+?) is full!?$ = В $1|pre нет места!
+^(.+?) is empty!$ = В $1|pre пусто!
+^(.+?) is full, make some space!$ = В $1|pre нет места, освободи!
+^(.+?) won't fit in (.+?), make some space!$ = $1 не влезает в $2|acc, освободи место!
+^(.+?) is too big for (.+?)!$ = $1 не помещается в $2|acc!
+^(.+?) cannot hold (.+?)!$ = В $1|acc не влезает $2|nom!
+^(.+?) seems to be locked!$ = $1, похоже, на замке!
+^(.+?) is in the way!$ = $1 мешает!
+^(.+?) is in combat!$ = $1 в бою!
+^(.+?) is indisposed!$ = $1 сейчас не может!
+^I don't want to harm (.+?)!$ = Я не хочу навредить $1|dat!
+^I have no idea how to use (.+?)!$ = Я понятия не имею, как пользоваться $1|ins!
+^There is nothing to further repair on (.+?)\.$ = В $1|pre больше нечего чинить.
+^Put (.+?) on a table before working it!$ = Положи $1|acc на стол, прежде чем работать!
+^(.+?) is currently being worked on!$ = Над $1|ins уже работают!
+^(.+?)'s mind is too powerful to sway!$ = Разум $1|gen слишком силён, чтобы его пошатнуть!
+^(.+?) needs to be restrained or buckled first!$ = Сначала нужно связать или пристегнуть $1|acc!
+
+# --- хирургия ---
+# Частные формулировки идут выше общих "begins to ... in X's Y".
+^(.+?) successfully relocates the bone in (.+?)'s (.+?)!$ = $1 успешно вправляет кость в $3|pre $2|gen!
+^(.+?) begins to relocate the bone in (.+?)'s (.+?)\.$ = $1 начинает вправлять кость в $3|pre $2|gen.
+^(.+?) successfully sets the bone in (.+?)'s (.+?)\.$ = $1 успешно сращивает кость в $3|pre $2|gen.
+^(.+?) fails to set the bone in (.+?)'s (.+?)!$ = $1 не может срастить кость в $3|pre $2|gen!
+^(.+?) begins to set the bones in (.+?)'s (.+?)\.$ = $1 начинает сращивать кости в $3|pre $2|gen.
+^(.+?) begins to make an incision in (.+?)'s (.+?)\.$ = $1 начинает делать надрез в $3|pre $2|gen.
+^(.+?) begins to mend the incision in (.+?)'s (.+?)\.$ = $1 начинает зашивать надрез в $3|pre $2|gen.
+^(.+?) begins to retract the skin in (.+?)'s (.+?)\.$ = $1 начинает разводить кожу в $3|pre $2|gen.
+^(.+?) begins to clamp bleeders in (.+?)'s (.+?)\.$ = $1 начинает зажимать сосуды в $3|pre $2|gen.
+^(.+?) begins to saw through the bone in (.+?)'s (.+?)\.$ = $1 начинает пилить кость в $3|pre $2|gen.
+^Blood pools around the incision in (.+?)'s (.+?)\.$ = Вокруг надреза в $2|pre $1|gen набирается кровь.
+^Blood pools around the cut on (.+?)'s (.+?)\.$ = Вокруг пореза на $2|pre $1|gen набирается кровь.
+^(.+?) saws (.+?)'s (.+?) open!$ = $1 распиливает $3|acc $2|gen!
+^(.+?) fails to saw (.+?)'s (.+?) open!$ = $1 не может распилить $3|acc $2|gen!
+^(.+?) removes a tooth from (.+?)'s mouth!$ = $1 вырывает зуб изо рта $2|gen!
+^(.+?) begins to work (.+?) into (.+?)'s heart\.$ = $1 начинает вживлять $2|acc в сердце $3|gen.
+^(.+?) begins to scrape lux from (.+?)'s heart\.$ = $1 начинает соскабливать люкс с сердца $2|gen.
+^(.+?) works something into (.+?)'s innards\.$ = $1 что-то вживляет во внутренности $2|gen.
+^(.+?) extracts something from (.+?)'s innards\.$ = $1 что-то извлекает из внутренностей $2|gen.
+^(.+?) begins to saw through (.+?)'s bones\.$ = $1 начинает пилить кости $2|gen.
+^(.+?) attempts to patch some of (.+?)'s (.+?)\.$ = $1 пытается залатать $3|acc $2|gen.
+^(.+?) finishes the operation on (.+?)'s face\.$ = $1 заканчивает операцию на лице $2|gen.
+^(.+?) begins to make an incision in (.+?)\.$ = $1 начинает делать надрез в $2|pre.
+^(.+?) begins to mend the incision in (.+?)\.$ = $1 начинает зашивать надрез в $2|pre.
+^(.+?) saws (.+?) open!$ = $1 распиливает $2|acc!
+^(.+?) begins to operate on (.+?)\.$ = $1 начинает оперировать $2|acc.
+^(.+?) finishes\.$ = $1 заканчивает.
+^(.+?) screws up!$ = $1 всё портит!
+^(.+?) is missing their (.+?)!$ = У $1|gen нет $2|gen!
+
+# --- ремёсла и работа с предметами ---
+# "You need to put the X ..." отдельной строкой не нужен: общий паттерн
+# захватит "the X", а артикль движок снимет сам при поиске склонения.
+^You need to put (.+?) on a table to work on it\.$ = Чтобы работать, положи $1|acc на стол.
+^Flattening (.+?)\.\.\.$ = Раскатываю $1|acc...
+^Rolling (.+?) into flatdough\.$ = Раскатываю $1|acc в лепёшку.
+^Scoring lines into (.+?)\.\.\.$ = Надрезаю $1|acc...
+^Pressing a divot into (.+?)\.\.\.$ = Продавливаю ямку в $1|pre...
+^Breaking up (.+?)\.\.\.$ = Разламываю $1|acc...
+^Scooping out the (.+?)\.\.\.$ = Вычерпываю $1|acc...
+^(.+?) threshes the stalks!$ = $1 обмолачивает стебли!
+^(.+?) churns butter\.\.\.$ = $1 сбивает масло...
+^(.+?) strains fresh cheese\.\.\.$ = $1 отцеживает свежий сыр...
+^(.+?) hammers the contraption\.$ = $1 стучит молотом по механизму.
+^(.+?) is fully emptied of (.+?)\.$ = $1 полностью освобождён от $2|gen.
+^(.+?) is too dry to clean with!$ = $1 слишком сухо, чтобы этим мыть!
+^You remove (.+?) from (.+?)\.$ = Я вынимаю $1|acc из $2|gen.
+^There is already something wrapped in (.+?)\.$ = В $1|acc уже что-то завёрнуто.
+^You wrap (.+?) in the ration wrapper\.$ = Я заворачиваю $1|acc в паёк.
+^You unwrap (.+?) from the ration wrapper\.$ = Я разворачиваю $1|acc из пайка.
+^Recipe selected: (.+?)$ = Выбран рецепт: $1
+^Selected: (.+?)$ = Выбрано: $1
+
+# --- магия: эффекты по цели ---
+^(.+?) fizzles on contact with (.+?)!$ = $1 гаснет, коснувшись $2|gen!
+^The storm dissipates on contact with (.+?)!$ = Буря рассеивается, коснувшись $1|gen!
+^(.+?) shatters harmlessly against (.+?)!$ = $1 безвредно разбивается о $2|acc!
+^A purple haze shrouds (.+?)!$ = Лиловая дымка окутывает $1|acc!
+^(.+?) glows with a sickly light!$ = $1 светится болезненным светом!
+^(.+?) is stuck to your hand!$ = $1 прилип к моей руке!
+^(.+?)'s skin starts to shift\.$ = Кожа $1|gen начинает меняться.
+^(.+?) recoils as their flesh is burned by blood!$ = $1 отшатывается — кровь жжёт плоть!
+^I poison (.+?)\.$ = Я отравляю $1|acc.
+^(.+?) eats from (.+?)\.$ = $1 ест из $2|gen.
+^I swallow a gulp of (.+?)\.$ = Я делаю глоток $1|gen.
+^(.+?) is hit by (.+?)!$ = $1 получает удар $2|ins!
+^I'm hit by (.+?)!$ = Меня бьёт $1|ins!
+
+# --- перемещение и падения ---
+^I climb onto (.+?)\.$ = Я забираюсь на $1|acc.
+^I fail to climb onto (.+?)\.$ = Мне не удаётся забраться на $1|acc.
+^(.+?) climbs onto (.+?)\.$ = $1 забирается на $2|acc.
+^(.+?) falls off of (.+?)!$ = $1 сваливается с $2|gen!
+^I fall off of (.+?)!$ = Я сваливаюсь с $1|gen!
+^You fall to the ground, bringing (.+?) with you!$ = Я валюсь на землю, увлекая за собой $1|acc!
+^(.+?) topples off of (.+?) as they both fall to the ground!$ = $1 сваливается с $2|gen, и оба летят на землю!
+^You see (.+?) and freeze in terror!$ = Я вижу $1|acc и цепенею от ужаса!

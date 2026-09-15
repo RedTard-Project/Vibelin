@@ -1,0 +1,73 @@
+# Хирургия, органы, болезни и увечья. Формат тот же: English = Русский.
+# Грузится в общую таблицу точных совпадений.
+
+# --- ход операции ---
+You feel a dull, numb sensation as your body is surgically operated on. = Я чувствую тупое онемение, пока меня оперируют.
+You feel more confident with an experienced eye watching over you. = Под опытным взглядом я чувствую себя увереннее.
+I botch the extraction, causing severe damage! = Я запарываю извлечение и наношу тяжёлые повреждения!
+That humor is already placed. = Эта гумора уже установлена.
+One humor was rejected, and the stitches come loose. = Одна гумора отторглась, и швы разошлись.
+There's something CUT on this HEART. = На этом СЕРДЦЕ что-то НАДРЕЗАНО.
+This heart has been transformed. = Это сердце преображено.
+The chimeric organ has failed. = Химерный орган отказал.
+They can only receive tainted lux! = Им можно передать только осквернённый люкс!
+I hear flesh sizzle. = Слышно, как шипит плоть.
+
+# --- состояние органов ---
+This one seems particularly lifeless. Perhaps it will regain some of its luster later. = Этот выглядит особенно безжизненным. Возможно, позже он вернёт часть блеска.
+It's started turning slightly grey. They must not have been able to handle the stress of it all. = Он начал сереть. Видимо, не выдержал всего этого напряжения.
+It's lifeless and severely damaged. = Он безжизненный и сильно повреждён.
+I can feel the small spark of life still left in this one. = Я чувствую, что в этом ещё теплится искра жизни.
+This one is completely devoid of life. = В этом нет ни капли жизни.
+
+# --- отсутствующие части ---
+The left eye is missing. = Левого глаза нет.
+The right eye is missing. = Правого глаза нет.
+The ears are missing. = Ушей нет.
+
+# --- зрение ---
+Distant objects become somewhat less tangible. = Далёкие предметы становятся менее отчётливыми.
+Everything starts to look a lot less clear. = Всё вокруг заметно расплывается.
+Darkness envelops me, as my eyes goes blind! = Тьма окутывает меня — я слепну!
+Color and shapes are once again perceivable. = Цвета и формы снова различимы.
+My vision functions passably once more. = Зрение снова работает сносно.
+My vision is cleared of any ailment. = Зрение полностью исцелено.
+
+# --- слух ---
+My ears begin to resonate with an internal ring sometimes. = В ушах временами начинает звенеть.
+I am unable to hear at all! = Я совсем ничего не слышу!
+Noise slowly begins filling my ears once more. = Звуки постепенно возвращаются.
+The ringing in my ears has died down. = Звон в ушах утих.
+
+# --- сердце и лёгкие ---
+Prickles of pain appear then die out from within my chest... = В груди покалывает и отпускает...
+Something inside my chest hurts, and the pain isn't subsiding. I am breathing far faster than before. = Внутри груди болит, и боль не утихает. Я дышу намного чаще прежнего.
+My heart begins to beat again. = Сердце снова забилось.
+The pain in my chest has died down, and my breathing becomes more relaxed. = Боль в груди утихла, дыхание выровнялось.
+I feel some sort of constriction around my chest as my breathing becomes shallow and rapid. = Грудь будто сдавливает, дыхание становится частым и поверхностным.
+My lungs seem to once again be able to hold air. = Лёгкие снова держат воздух.
+The constriction around my chest loosens as my breathing calms down. = Сдавленность в груди отпускает, дыхание успокаивается.
+
+# --- голова и рассудок ---
+A migraine headache begins to build. = Начинается мигрень.
+A severe migraine strikes! Your vision blurs and your head pounds! = Накатывает жестокая мигрень! В глазах плывёт, голову раскалывает!
+The flickering flames make your migraine worse! = Мерцающее пламя усиливает мигрень!
+The weather makes your arthritis act up. = От погоды разыгрался артрит.
+I feel lightheaded. = Голова кружится.
+I feel less in control of my thoughts. = Я хуже владею своими мыслями.
+I can feel my mind flickering on and off... = Сознание то гаснет, то возвращается...
+
+# --- боль ---
+I feel a sharp pain in my back! = В спину бьёт резкая боль!
+An explosion of pain erupts in my lower right abdomen! = В правом низу живота взрывается боль!
+The pain in my abdomen has subsided. = Боль в животе утихла.
+
+# --- полёт ---
+I will try to fly upwards if possible. = Я попробую взлететь, если получится.
+I beat my wings and begin to hover... = Я бью крыльями и зависаю в воздухе...
+My wings give out, and I suddenly stop flying! = Крылья отказывают, и я резко перестаю лететь!
+The damage knocks you out of the air! = От удара меня сбивает с воздуха!
+I glide down to a more manageable height! = Я планирую вниз, на высоту поудобнее!
+
+# --- кровь ---
+You feel something inside you change fundamentally. Your body now stores the essence of blood... = Внутри что-то меняется в самой основе. Тело теперь хранит сущность крови...

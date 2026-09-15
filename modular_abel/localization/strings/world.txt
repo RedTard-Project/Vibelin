@@ -1,0 +1,95 @@
+# Готовка, фермерство, ремёсла и магия. Формат тот же: English = Русский.
+# Грузится в общую таблицу точных совпадений.
+
+# --- фермерство ---
+There is nothing to harvest! = Собирать нечего!
+I begin collecting the produce... = Я начинаю собирать урожай...
+I begin to uproot the crop... = Я начинаю выдёргивать посев...
+I uproot the crop. = Я выдёргиваю посев.
+I begin to remove the dead crop... = Я начинаю убирать погибший посев...
+I remove the crop. = Я убираю посев.
+I begin to till the soil... = Я начинаю вспахивать почву...
+I till the soil. = Я вспахиваю почву.
+I flatten the soil. = Я разравниваю почву.
+I water the soil. = Я поливаю почву.
+The soil is already wet! = Почва и так мокрая!
+The soil is thirsty. = Почва просит воды.
+The soil is moist. = Почва влажная.
+The soil is wet. = Почва мокрая.
+I fertilize the soil with manure. = Я удобряю почву навозом.
+I begin ripping out the weeds with my hands... = Я начинаю выдирать сорняки руками...
+I rip out the weeds. = Я выдираю сорняки.
+I ruin the produce... = Я порчу урожай...
+It's dead! = Оно погибло!
+It's dying! = Оно погибает!
+It's brown and unhealthy... = Оно побурело и нездорово...
+It's far from fully grown. = До зрелости ещё далеко.
+It's fully grown but perhaps not yet ripe. = Выросло, но, пожалуй, ещё не поспело.
+It's ready for harvest. = Готово к сбору.
+
+# --- готовка ---
+Tossing up a salad... = Мешаю салат...
+Congealing the sugar... = Загущаю сахар...
+Cutting the dough into strips and making a prezzel... = Режу тесто полосками и кручу крендель...
+Needs more sugar to work it. = Нужно больше сахара, чтобы вымесить.
+Not enough salted milk. = Солёного молока не хватает.
+Gelatine is much too strange for you. = Желатин для меня — штука слишком мудрёная.
+The cheese is maturing! = Сыр созревает!
+You start rubbing the steak with black pepper. = Я натираю стейк чёрным перцем.
+You start rubbing the bird roast with black pepper. = Я натираю птицу чёрным перцем.
+You remove a chip from the pile. = Я беру ломтик из кучки.
+I start oiling myself up. = Я начинаю намазываться маслом.
+I need to use a table. = Нужен стол.
+This bowl is filthy... absolutely disgusting. = Миска грязная... просто омерзительная.
+This bowl was cleaned recently! = Миску недавно мыли!
+This bowl looks clean enough. = Миска выглядит достаточно чистой.
+The cork appears to be off. = Пробка, похоже, вынута.
+
+# --- вкус ---
+I love this taste! = Обожаю этот вкус!
+Ah, food fit for my title. = Вот еда, достойная моего титула.
+That didn't taste very good... = Не очень-то вкусно...
+What the hell was that thing?! = Что это вообще было?!
+It feels as if someone just conjured fireball in my stomach! = Как будто у меня в животе наколдовали огненный шар!
+
+# --- ремёсла ---
+No recipe selected. Click with empty hand to select a recipe. = Рецепт не выбран. Щёлкни пустой рукой, чтобы выбрать.
+You must select a recipe first. = Сначала нужно выбрать рецепт.
+Auto-repeat is enabled. The cauldron will automatically brew when essences are available. = Автоповтор включён. Котёл начнёт варить, как только появятся эссенции.
+Auto-repeat is disabled. Alt-click to enable automatic brewing. = Автоповтор выключен. Alt-клик включает автоварку.
+Auto-repeat disabled. = Автоповтор выключен.
+The cauldron cannot hold any more essence types. = Котёл больше не вместит новых видов эссенции.
+
+# --- магия: отказы ---
+There is nothing to enchant! = Зачаровывать нечего!
+I have no bound weapon to release! = У меня нет связанного оружия, чтобы его отпустить!
+I need an instrument in hand to perform! = Чтобы выступать, нужен инструмент в руках!
+I don't have any usable hands! = У меня нет ни одной пригодной руки!
+There is no way to revive the living! = Живого не воскресить!
+There isn't enough space to conjure a shelter here! = Здесь не хватает места, чтобы сотворить укрытие!
+They're too big to enlarge! = Они слишком велики, чтобы их увеличивать!
+It cannot be, Nothing happens. = Не может быть. Ничего не происходит.
+No Gods answer these prayers. = Ни один бог не отвечает на эти молитвы.
+My funeral rites were undone! = Мой погребальный обряд разрушен!
+Cold shoots through my spine. Something laughs at me for trying. = По спине пробегает холод. Что-то смеётся над моей попыткой.
+The weakling still pulses with life! Graggar demands you finish them off first! = В слабаке ещё бьётся жизнь! Граггар требует сперва добить его!
+Unable to find an unobstructed space, you find yourself ripped back to where you started. = Свободного места не нашлось, и меня отбрасывает туда, откуда я начал.
+The Moon Prince has turned his divine wrath upon me! I cannot wield the moonlight! = Лунный Принц обратил на меня божественный гнев! Мне не совладать с лунным светом!
+I cannot wield moonlight during the day! = Днём мне не совладать с лунным светом!
+These fools are trying to cure me with religion!! = Эти глупцы пытаются лечить меня верой!!
+
+# --- магия: эффекты ---
+I mutter the incantation and a dim pulse of light radiates out from me. = Я бормочу заклинание, и от меня расходится тусклая волна света.
+Magickal resilience floods my body - I will not fall so easily! = Тело наполняет магическая стойкость — так просто я не паду!
+My defense snaps back into place. = Моя защита встаёт на место.
+I glimpse the moments ahead, and ready myself for the next move. = Я вижу мгновения впереди и готовлюсь к следующему движению.
+I glimpse the moments ahead, but there is nothing left to hasten. = Я вижу мгновения впереди, но торопить уже нечего.
+I feel taller than usual, and like I could run through a door! = Я будто выше обычного и мог бы пройти сквозь дверь!
+I feel smaller all of a sudden. = Я вдруг становлюсь меньше.
+I can easily walk through rough terrain. = Я легко иду по пересечённой местности.
+I feel incredibly drunk... = Меня жутко развезло...
+The Undermaiden's grasp lets slip. = Хватка Подземной Девы слабеет.
+I feel the weight of my wealth tearing at my soul! = Тяжесть моего богатства рвёт мне душу!
+I hear a fluid spill... = Слышно, как разливается жидкость...
+The messenger bird flies away! = Птица-вестник улетает!
+The duel begins! Combat ends at unconsciousness or when a fighter yields (RMB on Combat Mode button). = Поединок начался! Бой заканчивается потерей сознания или сдачей (ПКМ по кнопке боевого режима).
