@@ -4,6 +4,8 @@
 #include "localization/_localization.dm"
 #include "erp/_erp.dm"
 #include "character_setup/_character_setup.dm"
+#include "map_pool/_map_pool.dm"
+#include "map_vote/_map_vote.dm"
 #include "dun_world/_dun_world.dm"
 #include "races/_races.dm"
 #include "gear/_gear.dm"

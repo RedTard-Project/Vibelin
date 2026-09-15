@@ -14,15 +14,17 @@ Format:
 endmap
 
 map minimal_test
-	default
+	disabled
 endmap
 
 map vanderlin
+	default
 	votable
 endmap
 
 map dun_world
 	votable
+	voteweight 1
 endmap
 
 map rosewood

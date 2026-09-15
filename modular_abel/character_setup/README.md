@@ -81,3 +81,50 @@ telemetry module also chains one — which BYOND resolves by running them in inc
 outermost last.
 
 Rebuild the bundle after touching any `.scss`: `bun run tgui:build` from `tgui/`.
+
+## The preview map controls (the black rectangle, and the doll sitting on top of the UI)
+
+The three previews are real BYOND **map controls** parented to the tgui window, not images:
+`character_setup_ensure_view()` creates three `/atom/movable/screen/map_view`s, and the
+interface asks BYOND to create a child control over each box. A child control is a native
+window drawn *over* the browser, so wherever it is placed, it wins.
+
+`tgui-core`'s `ByondUi` measures its box **once, on mount**, and after that only re-places
+the control on a `window resize` event — its effect's dependency array is empty, so a
+changed `zoom` never re-places it either. Mount happens while the window is still laying
+out (a `PreferencesMenu` payload is 130-140 KB and the tgui assets are still arriving), so
+the rectangle it reads is the pre-layout one: the control lands at roughly `0,0` at close
+to half the window's width and never moves, because nothing resizes the window afterwards.
+That is both reports — "a black square covers about half the tgui window" (the control's
+`background-color` is `#0d0d0d`) and "everything piles onto the doll" (the same control
+covering the nav column and the Looking Glass).
+
+The 2026-09-15 round log has both the healthy and the broken geometry:
+`[GEOMETRY] main=486x593 ... front=0x0 side=0x0` immediately after open, and
+`[CTRL] ... MAP id=character_setup_main_..._map ... pos=399,192; size=607x740` once it had
+settled.
+
+`PreferencesMenu.tsx` used to paper over this by dispatching synthetic `resize` events at
+200 ms, 600 ms and 1500 ms. If the layout settled after the last one, the control stayed
+wrong for the life of the window.
+
+`interfaces/_common/ByondMapView.tsx` replaces `ByondUi` for all three. It:
+
+- re-places on a `ResizeObserver` over both its own box and `document.body`, on `resize`,
+  on capture-phase `scroll`, on `load` and on `visibilitychange`, plus a retry ladder out
+  to 3.2 s for the asset-load window;
+- re-places when `params` change (so a new `zoom` actually arrives) without tearing the
+  control down — control creation and destruction are keyed on the control id alone, in a
+  separate effect, so a zoom change never unparents and recreates the map;
+- keeps the control `is-visible=false` until the same non-zero rectangle has been read
+  twice in a row. A control that has never had a real rectangle is never shown, which is
+  what stops the stray black rectangle from being painted at all.
+
+The synthetic-resize effect is gone. The `previewBoxPx` measurement effect stays — it is
+what feeds `previewZoom`, and is a different concern.
+
+The Looking Glass column is `basis="260px"` (it was `520px`). The doll box inside it is
+still `82%` wide at a `0.82/1` aspect ratio, so halving the column halves the doll on both
+axes as asked.
+
+Rebuild the bundle after touching any of this: `bun run tgui:build` from `tgui/`.

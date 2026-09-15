@@ -22108,7 +22108,7 @@
 /turf/open/floor/tile,
 /area/rogue/under/town/basement/keep)
 "dZx" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/metal/barograte,
 /area/rogue/under/underdark/south)
 "dZC" = (
@@ -24505,7 +24505,7 @@
 /turf/open/floor/concrete,
 /area/rogue/indoors/town/physician)
 "ewd" = (
-/obj/structure/fluff/statue{
+/obj/structure/fluff/statue/necra{
 	name = "The Veiled Lady"
 	},
 /turf/open/floor/cobble/mossy/dun_world,
@@ -32495,7 +32495,7 @@
 /turf/open/floor/dirt/road,
 /area/rogue/outdoors/mountains/decap)
 "fRS" = (
-/obj/structure/fluff/statue{
+/obj/structure/fluff/statue/necra{
 	name = "The Veiled Lady"
 	},
 /obj/machinery/light/fueled/wallfire/candle/blue/dun_world,
@@ -40172,7 +40172,7 @@
 /turf/open/floor/ruinedwood/spiral,
 /area/rogue/indoors/town/church/chapel)
 "hlQ" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/cobble/dun_world,
 /area/rogue/outdoors/mountains)
 "hlR" = (
@@ -41439,7 +41439,7 @@
 /turf/open/floor/rooftop/green,
 /area/rogue/outdoors/town/roofs)
 "hyY" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle,
 /turf/open/floor/dirt,
 /area/rogue/outdoors/mountains)
@@ -42153,7 +42153,7 @@
 /turf/open/floor/grass,
 /area/rogue/outdoors/rtfield/eora)
 "hFS" = (
-/obj/structure/fluff/statue{
+/obj/structure/fluff/statue/necra{
 	desc = "Dead stone designed to compel living minds. The engravement reads. 'Here rests the body of Brandon. Known for his love of ale and life. May he know nothing but peace beyond our realm.'"
 	},
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle,
@@ -46824,7 +46824,7 @@
 	dir = 8;
 	pixel_x = -1
 	},
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/dirt,
 /area/rogue/under/cave/scarymaze)
 "iuK" = (
@@ -49653,7 +49653,7 @@
 /turf/open/floor/dirt/road,
 /area/rogue/under/cave/dukecourt)
 "iWm" = (
-/obj/structure/fluff/statue{
+/obj/structure/fluff/statue/necra{
 	desc = "Dead stone designed to compel living minds. The engraving is faded and unable to be read properly, there is however an Astratan cross roughly carved into the base of the statue."
 	},
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle/alt,
@@ -57077,7 +57077,7 @@
 /turf/open/floor/hay,
 /area/rogue/under/cave/taricheamanor)
 "kjO" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/concrete,
 /area/rogue/under/town/sewer)
 "kjR" = (
@@ -58009,7 +58009,7 @@
 /turf/open/floor/grass,
 /area/rogue/outdoors/exposed/church)
 "ktE" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle/alt,
 /turf/open/floor/dirt,
 /area/rogue/outdoors/mountains)
@@ -61177,7 +61177,7 @@
 /turf/open/floor/carpet/royalblack,
 /area/rogue/indoors/town)
 "kWH" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/churchbrick,
 /area/rogue/under/cave/scarymaze)
 "kWI" = (
@@ -68645,7 +68645,7 @@
 /turf/open/floor/ruinedwood/turned,
 /area/rogue/indoors/shelter)
 "mjp" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/closed/wall/mineral/decostone/cand,
 /area/rogue/indoors/shelter)
 "mjq" = (
@@ -70850,7 +70850,7 @@
 /turf/open/floor/grass,
 /area/rogue/outdoors/town)
 "mEq" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/concrete,
 /area/rogue/indoors/shelter/mountains/decap)
 "mEr" = (
@@ -78327,7 +78327,7 @@
 /turf/open/floor/concrete,
 /area/rogue/under/town/basement)
 "nZA" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/cobblerock/dun_world,
 /area/rogue/outdoors/bog/north)
 "nZD" = (
@@ -79084,7 +79084,7 @@
 /area/rogue/under/cave/his_vault/four)
 "ogp" = (
 /obj/machinery/light/fueled/wallfire/candle/blue/r/dun_world,
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/cobble/dun_world,
 /area/rogue/indoors/town/church/basement)
 "ogr" = (
@@ -82769,7 +82769,7 @@
 /turf/open/floor/ruinedwood/chevron,
 /area/rogue/indoors)
 "oLX" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/hexstone/dun_world,
 /area/rogue/under/cave/fishmandungeon)
 "oMa" = (
@@ -87748,7 +87748,7 @@
 /turf/open/openspace,
 /area/rogue/outdoors/mountains)
 "pEr" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle,
 /turf/open/floor/dirt,
 /area/rogue/under/cave/scarymaze)
@@ -97051,7 +97051,7 @@
 /area/rogue/indoors/town/magician)
 "rmg" = (
 /obj/machinery/light/fueled/wallfire/candle/blue/l/dun_world,
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/cobble/dun_world,
 /area/rogue/indoors/town/church/basement)
 "rmh" = (
@@ -97329,7 +97329,7 @@
 /turf/open/floor/concrete,
 /area/rogue/indoors/town)
 "roF" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle,
 /turf/open/floor/dirt/road,
 /area/rogue/outdoors/woods/north)
@@ -113503,7 +113503,7 @@
 /turf/open/floor/ruinedwood/spiral,
 /area/rogue/outdoors/beach)
 "uhV" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /turf/open/floor/dirt,
 /area/rogue/under/cave/scarymaze)
 "uhY" = (
@@ -120621,7 +120621,7 @@
 /turf/open/floor/hexstone/dun_world,
 /area/rogue/indoors/town/magician)
 "vws" = (
-/obj/structure/fluff/statue,
+/obj/structure/fluff/statue/necra,
 /obj/effect/decal/cleanable/blood,
 /obj/structure/lever/wall{
 	pixel_y = 4;
@@ -126418,7 +126418,7 @@
 /turf/closed/wall/mineral/stonebrick,
 /area/rogue/outdoors/mountains/decap/gunduzirak)
 "wzS" = (
-/obj/structure/fluff/statue{
+/obj/structure/fluff/statue/necra{
 	desc = "Dead stone designed to compel living minds. The engraving reads: 'Here rests the body of Jon known to us as Big Jon the cobblers son. May his body fynd rest and may his lux know Necras peace.'"
 	},
 /obj/machinery/light/fueled/wallfire/candle/dun_world/floorcandle/alt,

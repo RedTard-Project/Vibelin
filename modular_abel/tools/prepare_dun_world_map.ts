@@ -3,6 +3,8 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 type MapSourceConfig = {
+  world_name?: string;
+  upstream_world_name?: string;
   repository?: string;
   ref?: string;
   path?: string;
@@ -18,6 +20,7 @@ type ExtraMapConfig = {
 };
 
 type DunWorldMapConfig = {
+  rebrand?: Record<string, string>;
   source: MapSourceConfig;
   output?: {
     path?: string;
@@ -31,6 +34,15 @@ export const DUN_WORLD_GENERATED_MAP =
 
 const CONFIG_PATH = 'modular_abel/dun_world/config/map.json';
 const DOWNLOAD_TIMEOUT_MS = 120000;
+
+// REBRAND: this world ships as Twilight Axis. "Azure Peak" is only the name of
+// the upstream project the .dmm is still fetched from - every name this script
+// prints, and every name a player can see, is Twilight Axis. Do not reintroduce
+// the old name into output, logs or map metadata; if the fetch ever moves to
+// the rebranded repo (Twilight-Fortress-SS13/Twilight-Axis) the only thing that
+// changes is source.url in map.json.
+const WORLD_NAME = 'Twilight Axis';
+const UPSTREAM_PROJECT_NAME = 'Azure Peak';
 
 const REMOVED_VAR_PATTERNS = [
   /^(?:broadcaster_tag|gid|keycontrol|location_tag|mailtag|scom_tag|specific_location)\s*=\s*".*"$/,
@@ -46,7 +58,7 @@ const CLOSED_TURF_REMOVED_PATHS = [
   '/obj/structure/window',
 ];
 
-// CLASS FIX: Azure's dun_world bakes roaming hostile creatures (foxes, draggers, wolves,
+// CLASS FIX: the Twilight Axis dun_world bakes roaming hostile creatures (foxes, draggers, wolves,
 // trolls, haunts, ...) across the whole map. Loaded as Vanderlin's live map they wander out
 // and swarm the town/surface for no apparent reason. Vanderlin's surface danger is meant to
 // come from the runtime ambush/event systems, not baked-in mobs. So during generation, drop
@@ -62,8 +74,11 @@ export async function prepareDunWorldMap() {
   const config = readConfig();
   const replacements = config.replacements || {};
   validateReplacementTargets(replacements);
+  console.log(
+    `modular_abel: preparing ${WORLD_NAME} (rebrand of upstream ${UPSTREAM_PROJECT_NAME}; the source URL still carries the old project name).`,
+  );
   await generateMap({
-    name: 'Twilight Axis',
+    name: WORLD_NAME,
     source: config.source,
     outputPath: config.output?.path || DUN_WORLD_GENERATED_MAP,
     replacements,
@@ -145,7 +160,9 @@ async function loadSourceText(
   source: MapSourceConfig,
   mapName: string,
 ): Promise<string> {
-  console.log(`modular_abel: downloading ${mapName} source map from ${source.url}.`);
+  console.log(
+    `modular_abel: downloading the ${mapName} source map (upstream project: ${source.repository || UPSTREAM_PROJECT_NAME}).`,
+  );
   return downloadText(source.url);
 }
 
@@ -395,7 +412,7 @@ function applySourcePathStructuralAdjustments(sourceText: string): string {
 }
 
 // Vanderlin's required_map_items unit test demands one each of the economy
-// stockpile structures on every non-exempt map; Azure's source map has no
+// stockpile structures on every non-exempt map; the Twilight Axis source map has no
 // equivalent, so place them on the (unique, station-level) titan tile.
 function injectRequiredMapItems(text: string): string {
   const requiredItems = [
@@ -581,7 +598,7 @@ function adjustPopEntries(entries: PopEntry[]): PopEntry[] {
     }
 
     // rotation_contraption/Initialize() stacks same-type pieces sharing a tile,
-    // qdel'ing the extras before their Initialize runs; Azure stacks many per
+    // qdel'ing the extras before their Initialize runs; Twilight Axis stacks many per
     // tile, which trips the create_and_destroy unit test. The stack merges to a
     // single sprite anyway, so keep one of each exact type per tile.
     if (entry.path.startsWith('/obj/item/rotation_contraption')) {

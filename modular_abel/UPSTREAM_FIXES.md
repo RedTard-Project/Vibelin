@@ -18,6 +18,36 @@ That is why some of these guard around `..()` instead of simply calling it.
 | `/datum/outfit/skeleton/pre_equip` | Same bug in a runtime roll rather than a static var: the headgear switch has the bare abstract helmet on roll 9 of 9. Patched after the parent runs, so the switch itself is left alone. | as above |
 | `/datum/mind/Destroy` | `/datum/mind/New` sets `soulOwner = src` and `Destroy` never clears it, so every mind hard-deletes. The override nulls the self-reference. | upstream clears it |
 
+## `map_pool/` and `map_vote/`
+
+Overrides that live in their own modules rather than in `upstream_fixes.dm`, because each
+is part of a feature rather than a bug fix. Full reasoning in
+`modular_abel/map_pool/README.md` and `modular_abel/map_vote/README.md`.
+
+| Override | What it does to upstream | Re-sync obligation |
+| --- | --- | --- |
+| `/datum/controller/subsystem/ticker/checkreqroles()` | **Full-body override, does not call `..()`.** Drops the `JOB_MONARCH` requirement entirely (every map can start without a Duke/King) and adds the empty-server gate upstream never had. `start_immediately` short-circuits both, which is what keeps unit tests and admin "Start Now" working. | If upstream changes what `checkreqroles()` is responsible for — anything beyond the ruler check and `job_change_locked` — mirror it here, because none of the upstream body runs. |
+| `/datum/controller/subsystem/job/SetupOccupations()` | Chains `..()`, then zeroes positions and clears `JOB_NEW_PLAYER_JOINABLE` on jobs claimed by a *different* map's `map_adjustment.exclusive_jobs`. Must stay after `..()`: upstream's last act is `map_adjustment.job_change()`, which is what gives the active map's jobs their slots. | none while upstream keeps calling `job_change()` from `SetupOccupations` |
+| `/datum/map_config/LoadConfig()` | Chains `..()`, then re-reads the same JSON for `category` and `blurb`. Costs one extra `file2text` per map per boot; the alternative is editing upstream's parser. | if upstream starts parsing `category` itself, delete the override |
+| `/datum/controller/subsystem/vote/initiate_vote()`, `reset()`, `interface()` | All chain `..()`. `interface()` is the only behavioural change: for `mode == "map"` it drops the client from `SSvote.voting`, closes the legacy `vote` browser window and opens the tgui panel instead, so a map vote does not show two UIs. Every other vote type takes the upstream path untouched. | none |
+
+`SSvote`'s `norulervote` mode, and the `/datum/controller/subsystem/vote/result()` override
+above that clears `SSticker.voting` after it, are now **dead code**: `checkreqroles()` no
+longer initiates that vote. Both are left in place deliberately — an admin can still start
+it by hand, and removing the `result()` override would silently strand `SSticker.voting` if
+they did.
+
+## `erp/.../genitals.dm`
+
+`/datum/sprite_accessory/testicles/is_visible()` dereferenced `owner` bare
+(`owner.getorganslot(ORGAN_SLOT_PENIS)`) while every sibling override in the file guards
+with `istype(H)` and hands a null owner to `is_human_part_visible()`, which null-checks.
+The overlay pipeline calls `is_visible()` with a null owner during organ removal —
+`Organ/Remove` -> `update_body_parts` -> `get_limb_icon` -> `get_bodypart_overlay` ->
+`get_appearance` -> `is_visible` — so every species change in the character preview threw
+`Cannot execute null.getorganslot()` and abandoned that overlay pass midway. Now `owner?.`.
+Seen five times in the 2026-09-15 round log, all from the character-setup dummy.
+
 The file also holds the modular additions to the upstream unit-test exclusion lists — see the
 `upstream_fixes.dm` section of `modular_abel/README.md`.
 

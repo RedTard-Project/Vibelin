@@ -8,7 +8,13 @@ Twilight Axis support files.
 Layout:
 
 - `_module.dm` — single entry point: includes `erp/_erp.dm` (ERP system),
-  `dun_world/_dun_world.dm` (the Twilight Axis map import), and `upstream_fixes.dm`.
+  `dun_world/_dun_world.dm` (the Twilight Axis map import), `map_pool/_map_pool.dm`,
+  `map_vote/_map_vote.dm`, and `upstream_fixes.dm`.
+- `map_pool/` — map categories read from each map's JSON, the roundstart gate (no map
+  needs a ruler; no round on an empty server) and map-exclusive job scoping. See
+  `map_pool/README.md`.
+- `map_vote/` — the map vote and the map pool browser as their own tgui panel
+  (`MapVote`), in front of the existing `SSvote`. See `map_vote/README.md`.
 - `dun_world/` — everything for the Twilight Axis import in one place: the support
   `.dm` files (`areas`, `compat`, `food`, `furniture`, `items`, `jobs`, `keys`,
   `machines`, `mapgen`, `mobs`, `structures`, `map_adjustment`), plus
@@ -87,9 +93,12 @@ are unaffected; only `_maps/dun_world.json` sets `"abyssor_cult": true`. See
 `modular_abel/dun_world/abyssor/README.md` for what is ported, what was adapted, and the
 two subsystems still outstanding.
 
-Twilight Axis (`dun_world`) is hardcoded as the boot map by the modular
-`dun_world/force_load.dm` mapping override. It remains listed as a votable map
-in `config/maps.txt` alongside the stock maps.
+Twilight Axis (`dun_world`) is an ordinary member of the map pool: votable in
+`config/maps.txt` alongside the stock maps, and filed under the
+`Old Maps - Beta test` category via `"category"` in `_maps/dun_world.json`. It used to be
+force-loaded on every boot by `dun_world/force_load.dm`; that override is gone — see
+`modular_abel/map_pool/README.md`, which also covers the two `config/maps.txt` changes
+that came with it (`vanderlin` is now the default map, `minimal_test` is disabled).
 `modular_abel/dun_world/config/maps_fragment.txt` is also appended to
 the generated runtime config overlay for launch paths that rely on
 `config-directory=tmp/modular_abel/config`. Targets `dm`, `build`, and `server`
@@ -137,10 +146,10 @@ table can target faithful types instead of broad parents (sprites under
 - `dun_world_compat.dm` — fueled-light variants (lit floor candles, wall
   fireplace with our warmth mechanics).
 
-The modular `SSmapping/PreInit()` override in `dun_world/force_load.dm`
-force-loads Twilight Axis from `_maps/dun_world.json`. Unit tests and random world
-generation retain their own map selection paths. The override is also disabled
-for `LOWMEMORYMODE`, `NO_DUNGEON`, and `ABSOLUTE_MINIMUM_MODE` builds.
+Twilight Axis is selected like any other map — by `config/maps.txt`, the map vote or map
+rotation — and its settings still come from `_maps/dun_world.json`. `dun_world/world_presize.dm`
+grows the world only when `config.map_path` is the dun_world one, so it is already correct for
+a rotating pool.
 
 `modular_abel/upstream_fixes.dm` also carries the modular additions to the upstream unit-test
 exclusion lists, hoisted into `GLOB.modular_craftable_clothes_exclusions` and
