@@ -1,5 +1,7 @@
 {
 	"map_name": "Twilight Axis",
+	"category": "Old Maps - Beta test",
+	"blurb": "The Azure Peak world map, ported and rebranded as Twilight Axis. Beta - expect rough edges.",
 	"map_path": "map_files/dun_world",
 	"map_file": [
 		"dun_world_new.dmm"

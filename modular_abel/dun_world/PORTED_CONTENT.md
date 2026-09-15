@@ -1,12 +1,20 @@
-# dun_world — Azure content ported for the Twilight Axis map
+# dun_world — content ported for the Twilight Axis map
 
-The Twilight Axis `.dmm` is downloaded from Azure-Peak at build time and rewritten
-through `config/map.json`. Whenever Azure places an object Vanderlin has no type for,
-the build prints a `missing from the compile` warning and that content silently does
-not spawn.
+> **Rebrand.** This world ships as **Twilight Axis**. "Azure Peak" is the name of the
+> upstream project the `.dmm` is still fetched from, and it survives below only where a
+> sentence is about that upstream — provenance, not branding. Nothing a player or an
+> operator sees carries the old name: the map name, the map category, the generator's
+> log lines and the map JSON all say Twilight Axis. The rebranded upstream lives at
+> `Twilight-Fortress-SS13/Twilight-Axis`; pointing the port at it is a one-line change
+> to `source.url` in `config/map.json` and nothing else. See the `rebrand` block there.
+
+The Twilight Axis `.dmm` is downloaded from the upstream repository at build time and
+rewritten through `config/map.json`. Whenever the source map places an object Vanderlin
+has no type for, the build prints a `missing from the compile` warning and that content
+silently does not spawn.
 
 This file records the 2026-09-14 pass that cleared that warning list down from 15
-paths to 1. Source for every port is the local Azure checkout
+paths to 1. Source for every port is the local upstream checkout
 (`Azure-Peak/Azure-Peak`, `main`).
 
 ## Retargeted, not ported

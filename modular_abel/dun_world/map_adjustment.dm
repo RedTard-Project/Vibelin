@@ -6,6 +6,26 @@
 	advclass_blacklist = list(
 		/datum/job/advclass/royalknight/steam,
 	)
+	exclusive_jobs = list(
+		/datum/job/merchant/dun_world_guildmaster,
+		/datum/job/artificer/dun_world_guildsman,
+		/datum/job/innkeep/dun_world_bathmaster,
+		/datum/job/servant/dun_world_keeper,
+		/datum/job/merchant/dun_world_trader,
+		/datum/job/monk/dun_world_druid,
+		/datum/job/monk/dun_world_martyr,
+		/datum/job/vagrant/dun_world_lunatic,
+		/datum/job/vagrant/dun_world_vagabond,
+		/datum/job/mercenary/dun_world_veteran,
+		/datum/job/dungeoneer/dun_world_warden,
+		/datum/job/steward/dun_world_seneschal,
+		/datum/job/minor_noble/dun_world_councillor,
+		/datum/job/archivist/dun_world_clerk,
+		/datum/job/minor_noble/dun_world_suitor,
+		/datum/job/servant/dun_world_bathhouse_attendant,
+		/datum/job/wretch,
+		/datum/job/painter,
+	)
 	slot_adjust = list(
 		/datum/job/merchant/dun_world_guildmaster = 1,
 		/datum/job/artificer/dun_world_guildsman = 4,

@@ -139,7 +139,7 @@
 	var/mob/living/carbon/human/H = owner
 	if(istype(H) && smallclothes_groin_covered(H))
 		return FALSE
-	var/obj/item/organ/penis/pp = owner.getorganslot(ORGAN_SLOT_PENIS)
+	var/obj/item/organ/penis/pp = owner?.getorganslot(ORGAN_SLOT_PENIS)
 	if(pp && pp.sheath_type == SHEATH_TYPE_SLIT)
 		return FALSE
 	if(istype(H) && H.taur_groin_covered())

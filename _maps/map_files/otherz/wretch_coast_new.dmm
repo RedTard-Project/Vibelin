@@ -11108,7 +11108,7 @@
 /turf/open/floor/cobble/dun_world,
 /area/rogue/outdoors/woods/vampire_lair)
 "SN" = (
-/obj/structure/fluff/statue{
+/obj/structure/fluff/statue/necra{
 	name = "The Veiled Lady"
 	},
 /turf/open/floor/naturalstone,

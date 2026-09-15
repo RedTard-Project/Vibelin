@@ -2,7 +2,6 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import {
   Box,
   Button,
-  ByondUi,
   Dropdown,
   Icon,
   Input,
@@ -15,6 +14,7 @@ import {
 import { useBackend } from '../backend';
 import type { Lang } from '../i18n';
 import { Window } from '../layouts';
+import { ByondMapView } from './_common/ByondMapView';
 import { usePrefsTp } from './PreferencesMenu.strings';
 
 type Booleanish = boolean | number;
@@ -561,13 +561,6 @@ export const PreferencesMenu = () => {
   useEffect(() => {
     setPreviewFaithId(data.selected_faith_id || null);
   }, [data.open_sequence, data.selected_faith_id]);
-
-  useEffect(() => {
-    const timers = [200, 600, 1500].map((delay) =>
-      setTimeout(() => window.dispatchEvent(new Event('resize')), delay),
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [data.preview_map, data.preview_map_front, data.preview_map_side, menuScale, data.preferences_fullscreen, data.tgui_theme]);
 
   const [previewBoxPx, setPreviewBoxPx] = useState({
     main: 0,
@@ -2204,11 +2197,10 @@ export const PreferencesMenu = () => {
                               }}
                             >
                               {previewMiniZoom > 0 ? (
-                                <ByondUi
+                                <ByondMapView
                                   key={data.preview_map_front}
-                                  phonehome={false}
-                                  width="100%"
-                                  height="100%"
+                                  style={{ width: '100%', height: '100%' }}
+                                  deps={[menuScale, data.preferences_fullscreen]}
                                   params={{
                                     id: data.preview_map_front,
                                     type: 'map',
@@ -2239,11 +2231,10 @@ export const PreferencesMenu = () => {
                               }}
                             >
                               {previewMiniZoom > 0 ? (
-                                <ByondUi
+                                <ByondMapView
                                   key={data.preview_map_side}
-                                  phonehome={false}
-                                  width="100%"
-                                  height="100%"
+                                  style={{ width: '100%', height: '100%' }}
+                                  deps={[menuScale, data.preferences_fullscreen]}
                                   params={{
                                     id: data.preview_map_side,
                                     type: 'map',
@@ -2269,7 +2260,7 @@ export const PreferencesMenu = () => {
                   </Stack>
                 </Stack.Item>
 
-                <Stack.Item basis="520px">
+                <Stack.Item basis="260px">
                   <Section fill title={tp('Looking Glass')}>
                     <Stack vertical fill>
                       <Stack.Item grow>
@@ -2293,11 +2284,10 @@ export const PreferencesMenu = () => {
                           }}
                         >
                         {data.preview_map && previewZoom > 0 ? (
-                          <ByondUi
+                          <ByondMapView
                             key={data.preview_map}
-                            phonehome={false}
-                            width="100%"
-                            height="100%"
+                            style={{ width: '100%', height: '100%' }}
+                            deps={[menuScale, data.preferences_fullscreen]}
                             params={{
                               id: data.preview_map,
                               type: 'map',
