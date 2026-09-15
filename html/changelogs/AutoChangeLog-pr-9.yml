@@ -1,0 +1,5 @@
+author: "trueroguan"
+delete-after: True
+changes:
+  - bugfix: "The map is no longer forced to Twilight Axis - map rotation and map voting work again."
+  - code_imp: "Removed the FORCE_MAP injection from the modular build wrapper."
