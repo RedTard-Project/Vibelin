@@ -1,0 +1,9 @@
+author: "trueroguan"
+delete-after: True
+changes:
+  - rscadd: "The donation shop is stocked: garments, full sets, court uniforms and weapons"
+  - rscadd: "Round announcement cards in Discord for server start, story start and end, and votes"
+  - qol: "Looking Glass zoom 1-3x in the character menu, plus font size and line spacing settings"
+  - rscdel: "Removed the PQ threshold on custom emotes"
+  - bugfix: "Fixed the garbled text in the declensions menu and the size of the input window"
+  - code_imp: "Added a pre-flight checker for modular content"
