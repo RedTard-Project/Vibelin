@@ -1417,6 +1417,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		))
 
 	data["real_name"] = cspref_real_name() || "Unnamed"
+	data["declensions"] = read_declensions()
 	data["initial_tab"] = character_setup_preferences_initial_tab
 	data["open_sequence"] = character_setup_preferences_open_sequence
 	data["tgui_theme"] = sanitize_tgui_theme(character_setup_tgui_theme)
@@ -1662,6 +1663,16 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			return TRUE
 		if("name")
 			return character_setup_link_pref(user, "real_name")
+		if("declension_genitive")
+			return character_setup_link_pref(user, "declension_genitive")
+		if("declension_dative")
+			return character_setup_link_pref(user, "declension_dative")
+		if("declension_accusative")
+			return character_setup_link_pref(user, "declension_accusative")
+		if("declension_instrumental")
+			return character_setup_link_pref(user, "declension_instrumental")
+		if("declension_prepositional")
+			return character_setup_link_pref(user, "declension_prepositional")
 		if("voice")
 			return character_setup_link_pref(user, "voice_color")
 		if("voicetype")

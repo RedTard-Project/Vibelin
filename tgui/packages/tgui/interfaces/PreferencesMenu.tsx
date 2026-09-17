@@ -119,6 +119,7 @@ type FeatureEntry = {
 type PrefsData = {
   lang?: Lang;
   real_name: string;
+  declensions?: Record<string, string>;
   initial_tab: string;
   tgui_theme: string;
   tgui_themes: { value: string; label: string }[];
@@ -305,6 +306,18 @@ type PrefRowProps = {
   swatch?: string;
   tooltip?: string;
 };
+
+/**
+ * The cases the chat panel can decline a character's name into. Leaving one
+ * blank is fine: chat falls back to the nominative for that case.
+ */
+const DECLENSION_CASES = [
+  { key: 'declension_genitive', case: 'gen', label: 'Родительный', tooltip: 'Кого? Чего? — Ивана Петрова' },
+  { key: 'declension_dative', case: 'dat', label: 'Дательный', tooltip: 'Кому? Чему? — Ивану Петрову' },
+  { key: 'declension_accusative', case: 'acc', label: 'Винительный', tooltip: 'Кого? Что? — Ивана Петрова' },
+  { key: 'declension_instrumental', case: 'ins', label: 'Творительный', tooltip: 'Кем? Чем? — Иваном Петровым' },
+  { key: 'declension_prepositional', case: 'pre', label: 'Предложный', tooltip: 'О ком? О чём? — Иване Петрове' },
+] as const;
 
 const PrefRow = (props: PrefRowProps) => {
   const { icon, label, value, onClick, disabled, selected, swatch, tooltip } =
@@ -1409,6 +1422,23 @@ export const PreferencesMenu = () => {
             <InfoRow icon="award" label="Player Quality" value={data.player_quality} valueColor={data.player_quality_color || undefined} />
           </Panel>
         </Stack.Item>
+
+        {data.lang !== 'en' ? (
+          <Stack.Item grow basis={0}>
+            <Panel title="Склонения" icon="spell-check">
+              {DECLENSION_CASES.map((entry) => (
+                <PrefRow
+                  key={entry.key}
+                  icon="signature"
+                  label={entry.label}
+                  tooltip={entry.tooltip}
+                  value={data.declensions?.[entry.case] || '—'}
+                  onClick={() => doPref(entry.key, 'input')}
+                />
+              ))}
+            </Panel>
+          </Stack.Item>
+        ) : null}
       </Stack>
 
       {renderSelectionPanel()}

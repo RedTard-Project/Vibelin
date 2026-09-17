@@ -41,4 +41,15 @@
 	prefs.write_preference(/datum/preference/choiced/language, new_lang)
 	prefs.save_preferences()
 	SStgui.update_uis(prefs)
+	push_chat_language()
 	to_chat(src, span_notice("Язык интерфейса: [new_lang] / Interface language: [new_lang]"))
+
+#include "code/chat/chat_asset.dm"
+#include "code/chat/declension_prefs.dm"
+#include "code/chat/descriptions.dm"
+#include "code/chat/description_composites.dm"
+#include "code/chat/trait_sheet.dm"
+#include "code/chat/declension_registry.dm"
+#include "code/chat/panel_hooks.dm"
+#include "code/dreams/_dreams.dm"
+#include "code/dreams/dream_content.dm"

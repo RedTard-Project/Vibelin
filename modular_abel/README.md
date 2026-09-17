@@ -44,6 +44,10 @@ Layout:
   Azure-Peak after PR #5. See `sundries/README.md`.
 - `loadout_panel/` — the donator loadout window and the **Azure Content** tab that
   collects the Azure-Peak wearables. See `loadout_panel/README.md`.
+- `localization/` — the RU/EN interface language toggle, and the Russian translation
+  layer for tgui chat: a dictionary shipped as a browser asset (CDN webroot when one
+  is configured, BYOND otherwise) and applied client-side to rendered chat text, plus
+  the per-character case declensions that feed it. See `localization/README.md`.
 - `telemetry/` — temporary instrumentation for the tgui optimisation pass: the topic census
   and the tgui census, with live toggles and two dedicated log files. See
   `telemetry/README.md`. Remove once the optimisation pass is done.
