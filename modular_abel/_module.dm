@@ -29,5 +29,6 @@
 #include "map_advclass_blacklist.dm"
 #include "cyrillic_say_fix.dm"
 #include "ear_flick.dm"
+#include "round_announce/_round_announce.dm"
 #include "upstream_fixes.dm"
 #include "tests/_tests.dm"

@@ -15,6 +15,10 @@ Layout:
   `map_pool/README.md`.
 - `map_vote/` — the map vote and the map pool browser as their own tgui panel
   (`MapVote`), in front of the existing `SSvote`. See `map_vote/README.md`.
+- `round_announce/` — Discord embeds for the round lifecycle (lobby, round start,
+  round-end vote, vote passed, reboot), sent through the same `send2chat` the base
+  uses for its three plain lines. Pings a role on the one message that matters.
+  See `round_announce/README.md`.
 - `dun_world/` — everything for the Twilight Axis import in one place: the support
   `.dm` files (`areas`, `compat`, `food`, `furniture`, `items`, `jobs`, `keys`,
   `machines`, `mapgen`, `mobs`, `structures`, `map_adjustment`), plus
