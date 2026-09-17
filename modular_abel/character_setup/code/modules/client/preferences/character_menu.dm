@@ -4,6 +4,7 @@
 /datum/preferences/var/character_setup_preferences_fullscreen = TRUE
 /datum/preferences/var/character_setup_preferences_scale = 1
 /datum/preferences/var/character_setup_preferences_scale_version = 3
+/datum/preferences/var/character_setup_preview_scale = 1
 /datum/preferences/var/character_setup_preview_underwear = TRUE
 /datum/preferences/var/character_setup_preview_clothes = TRUE
 /datum/preferences/var/character_setup_preview_dir = SOUTH
@@ -296,6 +297,13 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		return 0.85
 	return clamp(round(value * 20) / 20, 0.8, 1.25)
 
+/datum/preferences/proc/character_setup_sanitize_preview_scale(value)
+	if(!isnum(value))
+		value = text2num("[value]")
+	if(!isnum(value))
+		return 1
+	return clamp(round(value, 1), 1, 3)
+
 /datum/preferences/load_preferences()
 	. = ..()
 	if(!. || !path || !fexists(path))
@@ -309,6 +317,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	S["character_setup_tgui_line_height"] >> character_setup_tgui_line_height
 	S["character_setup_preferences_fullscreen"] >> character_setup_preferences_fullscreen
 	S["character_setup_preferences_scale"] >> character_setup_preferences_scale
+	S["character_setup_preview_scale"] >> character_setup_preview_scale
 	var/loaded_scale_version
 	S["character_setup_preferences_scale_version"] >> loaded_scale_version
 	if(!isnull(character_setup_tgui_theme))
@@ -319,6 +328,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	if(!isnum(loaded_scale_version) || loaded_scale_version < character_setup_preferences_scale_version)
 		character_setup_preferences_scale = initial(character_setup_preferences_scale)
 	character_setup_preferences_scale = character_setup_sanitize_preferences_scale(character_setup_preferences_scale)
+	character_setup_preview_scale = character_setup_sanitize_preview_scale(character_setup_preview_scale)
 
 /datum/preferences/save_preferences()
 	. = ..()
@@ -333,6 +343,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	WRITE_FILE(S["character_setup_tgui_line_height"], character_setup_tgui_line_height)
 	WRITE_FILE(S["character_setup_preferences_fullscreen"], character_setup_preferences_fullscreen)
 	WRITE_FILE(S["character_setup_preferences_scale"], character_setup_preferences_scale)
+	WRITE_FILE(S["character_setup_preview_scale"], character_setup_preview_scale)
 	WRITE_FILE(S["character_setup_preferences_scale_version"], character_setup_preferences_scale_version)
 
 /datum/preferences/ui_state(mob/user)
@@ -1433,6 +1444,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	data["tgui_themes"] = tgui_theme_options()
 	data["preferences_fullscreen"] = !!character_setup_preferences_fullscreen
 	data["preferences_scale"] = character_setup_preferences_scale
+	data["preview_scale"] = character_setup_preview_scale
 	data["species_name"] = pref_species ? pref_species.name : "Human"
 	data["species_id"] = pref_species ? pref_species.id : SPEC_ID_HUMEN
 	data["gender"] = gender_name
@@ -1731,6 +1743,11 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		if("character_setup_preferences_scale")
 			character_setup_preferences_scale = character_setup_sanitize_preferences_scale(href_list["scale"])
 			character_setup_log("WINDOW", "menu_scale=[character_setup_preferences_scale]")
+			save_preferences()
+			return TRUE
+		if("character_setup_preview_scale")
+			character_setup_preview_scale = character_setup_sanitize_preview_scale(href_list["scale"])
+			character_setup_log("WINDOW", "preview_scale=[character_setup_preview_scale]")
 			save_preferences()
 			return TRUE
 		if("character_setup_report_geometry")

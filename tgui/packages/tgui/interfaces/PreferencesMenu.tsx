@@ -137,6 +137,7 @@ type PrefsData = {
   open_sequence: number;
   preferences_fullscreen: Booleanish;
   preferences_scale: number;
+  preview_scale: number;
   species_id: string;
   species_name: string;
   species_options: SpeciesEntry[];
@@ -255,6 +256,14 @@ const swatchColor = (value: string) => {
     return '#888888';
   }
   return text.startsWith('#') ? text : `#${text}`;
+};
+
+const clampPreviewScale = (value: unknown) => {
+  const scale = Math.round(Number(value));
+  if (!Number.isFinite(scale)) {
+    return 1;
+  }
+  return Math.max(1, Math.min(3, scale));
 };
 
 const clampMenuScale = (value: unknown) => {
@@ -542,6 +551,9 @@ export const PreferencesMenu = () => {
   const [menuScale, setMenuScaleState] = useState(
     clampMenuScale(data.preferences_scale),
   );
+  const [previewScale, setPreviewScaleState] = useState(
+    clampPreviewScale(data.preview_scale),
+  );
   const isFullscreen = asBool(data.preferences_fullscreen);
   const windowWidth = isFullscreen ? 7680 : 1180;
   const windowHeight = isFullscreen ? 4320 : 760;
@@ -641,7 +653,7 @@ export const PreferencesMenu = () => {
       window.removeEventListener('resize', measure);
       observer?.disconnect();
     };
-  }, [data.preview_map, menuScale, data.preferences_fullscreen, data.tgui_theme]);
+  }, [data.preview_map, menuScale, previewScale, data.preferences_fullscreen, data.tgui_theme]);
 
   const previewBboxW = Math.max(16, Number(data.preview_bbox_w) || 0);
   const previewBboxH = Math.max(16, Number(data.preview_bbox_h) || 0);
@@ -681,7 +693,7 @@ export const PreferencesMenu = () => {
     };
     const t = setTimeout(report, 250);
     return () => clearTimeout(t);
-  }, [data.preview_map, menuScale, data.preferences_fullscreen, previewZoom, previewMiniZoom, data.tgui_theme]);
+  }, [data.preview_map, menuScale, previewScale, data.preferences_fullscreen, previewZoom, previewMiniZoom, data.tgui_theme]);
 
   const [localRoundSeconds, setLocalRoundSeconds] = useState<number>(-1);
 
@@ -729,6 +741,14 @@ export const PreferencesMenu = () => {
     }
     doPref('character_setup_send_ooc', undefined, { message });
     setOocMessage('');
+  };
+
+  const setPreviewScale = (scale: number) => {
+    const clamped = clampPreviewScale(scale);
+    setPreviewScaleState(clamped); // resize now, let the savefile catch up
+    doPref('character_setup_preview_scale', undefined, {
+      scale: clamped,
+    });
   };
 
   const setMenuScale = (scale: number) => {
@@ -2391,7 +2411,7 @@ export const PreferencesMenu = () => {
                   </Stack>
                 </Stack.Item>
 
-                <Stack.Item basis="174px">
+                <Stack.Item basis={`${174 * previewScale}px`}>
                   <Section title={tp('Looking Glass')}>
                     <Stack vertical>
                       <Stack.Item>
@@ -2418,7 +2438,7 @@ export const PreferencesMenu = () => {
                           <ByondMapView
                             key={data.preview_map}
                             style={{ width: '100%', height: '100%' }}
-                            deps={[menuScale, data.preferences_fullscreen]}
+                            deps={[menuScale, previewScale, data.preferences_fullscreen]}
                             params={{
                               id: data.preview_map,
                               type: 'map',
@@ -2497,6 +2517,33 @@ export const PreferencesMenu = () => {
                       >
                         {tp('Randomise Appearance')}
                       </Button>
+                      <Stack mt={0.5}>
+                        <Stack.Item>
+                          <Button
+                            icon="arrow-left"
+                            disabled={previewScale <= 1}
+                            tooltip={tp('Zoom out')}
+                            onClick={() => setPreviewScale(previewScale - 1)}
+                          />
+                        </Stack.Item>
+                        <Stack.Item grow>
+                          <Box
+                            color="label"
+                            textAlign="center"
+                            style={{ lineHeight: '24px' }}
+                          >
+                            {tp('Zoom')} {previewScale}x
+                          </Box>
+                        </Stack.Item>
+                        <Stack.Item>
+                          <Button
+                            icon="arrow-right"
+                            disabled={previewScale >= 3}
+                            tooltip={tp('Zoom in')}
+                            onClick={() => setPreviewScale(previewScale + 1)}
+                          />
+                        </Stack.Item>
+                      </Stack>
                     </Stack.Item>
                   </Stack>
                 </Section>
