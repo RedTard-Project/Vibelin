@@ -55,10 +55,16 @@ what puts the file in the client's cache in the first place.
   sleep, which would race the window being up.
 - `strings/nouns.txt` — closed-set nouns (the body parts `parse_zone()` can
   return), declined up front.
-- `strings/items.txt` — item and scenery names, same format, merged into the same
+- `strings/items.txt` — item and creature names, same format, merged into the same
   table. Entries carry **no** article: the panel strips a leading `a`/`an`/`the`
   before looking a capture up, because DM writes items both bare and through
-  `\a` / `\the`.
+  `\a` / `\the`. Most of the file is **generated** (see Scope); the hand-written
+  block at the top of the file wins any collision.
+- `strings/traits.txt` — the character sheet, **keyed by code identity and
+  resolved server-side** like `descriptions.txt`, not shipped to the panel. See
+  below.
+- `code/chat/trait_sheet.dm` — loads that file and overrides the sheet's
+  right-click branch for Russian players.
 - `strings/fragments.txt` — whole text nodes matched exactly: combat, status,
   refusals, items, the wound crit messages.
 - `strings/speech.txt` — speech verbs and emotes, merged into the same exact-match
@@ -225,8 +231,9 @@ noun there renders in the nominative.
 
 ## Scope
 
-`strings/` currently holds 1356 chat fragments, 275 patterns, 152 nouns,
-54 honorifics and 3242 type-keyed descriptions, mined out of
+`strings/` currently holds 1682 chat fragments, 497 patterns, 2822 names and body
+parts, 54 honorifics, 3242 type-keyed descriptions and 198 character-sheet
+entries, mined out of
 the source with the highest-traffic lines first: the speech verbs and the emote
 list (the most frequent text in the game), the wound crit messages (which fire on
 every critical hit), attack and defence lines, wrestling, status effects, refusals
@@ -241,14 +248,46 @@ song quote, and two descs the game keeps no var to rebuild. Re-check after an
 upstream sync — a new type is a new key, and nothing fails until someone examines
 it.
 
-**Item names are the remaining gap.** The source carries roughly 5000; `items.txt`
-covers about 120, chosen for how often they appear in chat rather than for
-coverage. A name with no entry renders in English inside an otherwise Russian
-sentence; that is ugly but harmless, and it is the honest failure mode rather than
-a machine-translated guess at a fantasy proper noun. Note that names are a chat
-concern, not an examine one — the examine header's name comes from `get_examine_name()`
-and is not routed through this module at all, so a translated desc under an English
-name is expected.
+**Item and creature names are generated.** 2752 of the 3459 names on `/obj/item`
+and `/mob` (80%) are covered. A name is `<modifiers> <head noun>` and Russian
+makes every modifier agree with the head, so writing thousands of them by hand is
+a guarantee of a silent disagreement somewhere in the middle. Instead:
+
+- `morph.py` derives the six cases from a nominative plus a gender/animacy tag.
+  It has its own self-test, and it **raises** on a paradigm it does not handle
+  rather than guessing.
+- `gen_names.py` holds a head-noun table (Russian nominative, gender, animacy,
+  and explicit forms for plural-only nouns like `сапоги`) and a modifier table
+  (one Russian adjective each). A name whose head or any modifier is unknown is
+  **skipped**, not approximated, and reported so the tables can grow.
+- A head can be qualified by type path, because English is ambiguous where
+  Russian is not: `plate` is a dish under `/obj/item/plate` and armour under
+  `/obj/item/clothing/armor/plate`.
+
+The generator grew four shapes beyond "modifier + head" as the tail got flatter:
+
+- **`X of Y`** — Russian says it with the genitive and no preposition, so the
+  tail is declined once and rides along fixed: `amulet of Dendor` →
+  `амулет Дендора`.
+- **roman numerals and dice notation** (`Tier II`, `d20`) pass through every case
+  untouched, because they are not words.
+- **a trailing parenthetical** of any length (`Book (Apocrypha & Grimoires)`) is
+  a label, translated once and kept in place.
+- **whole-phrase names** — a book title is a sentence, not a phrase with a head,
+  so those are entered outright.
+
+The fork's invented nouns **are** translated, by transliteration: that is the
+community's own treatment (the wiki writes даэ, Псайдон, Грензельхофт), so it
+follows a convention rather than inventing one.
+
+What is left in English is deliberate and is the same rule as the abstract
+descriptions: names that exist to tell a coder something is wrong — `???`,
+`placeholder`, `coders`, `mappers`, `(null_reference_exception)`, `base`,
+`template`. A bug report has to stay legible to whoever reads it.
+
+Names are a chat concern, not an examine one: the examine header's name comes from
+`get_examine_name()` and is not routed through this module, so a translated desc
+under an English name is expected.
 
 **A chat fragment's key must match the source byte for byte**, or the entry is dead
 and nothing complains. `modular_chat_localization` catches a fragment that maps to
@@ -323,6 +362,86 @@ leaves no trace but an overlay). Both would need an upstream edit to fix.
 Abstract parents and mapper/coder error markers — `You shouldn't be seeing this`,
 `yell at coderbus`, the merge-conflict marker — are deliberately left English so a
 bug report stays legible to whoever reads it.
+
+### Gender you cannot know at write time
+
+A pattern that captures a body part cannot use an adjective or a past-tense verb,
+because Russian makes both agree with a gender the template author never sees:
+`$1|nom сломан` reads correctly for `нос` and wrong for `левая рука`, and nothing
+in the dictionary can tell which arrives. Two phrasings sidestep it entirely and
+are used throughout the limb and organ lines:
+
+- an **impersonal verb** with the part in the accusative — `Вывихнуло $1|acc.`
+  works for `нос`, `левую руку` and `ухо` alike;
+- the **present tense, third person**, which does not inflect for gender at all —
+  `Не слушается $1|nom.`, `$1|nom не чувствует прикосновений.`
+
+`translate.test.ts` pins this with a feminine and a neuter part through the same
+pattern, so a future rewrite into an adjective fails instead of reading wrong on
+one part in twenty.
+
+### Terminology
+
+The fork's invented words are not translated from scratch: the Russian-speaking
+community around the Vanderlin-derived forks has settled renderings, and the
+wiki at `wiki.twilight-fortress-axis.ru` is where they are written down. Two of
+them were corrections to what was here, not preferences:
+
+- **`arcyne` is `аркана` as a noun and `арканный` as an adjective.** `аркановый`
+  was a coinage of mine that nobody else says. 64 lines changed.
+- **`dwarf` and `gnome` are different races and the codebase has both.**
+  Rendering each as `гном` collapsed them; the established split is Дворфы and
+  Гномы. 29 description entries were repointed to `дворф*` — each one checked
+  against its own English desc first, so the four that genuinely say *gnome*
+  (the homunculus, the silver statue, the growth vat, the alchemy book) stayed.
+
+Also aligned: `аасимар` (not `ассимар`), `венардин` for the venard.
+
+Also switched to the wiki's spelling where it has one: **даэ** for `dae`
+(indeclinable, and used that way on four wiki pages), **Ксайликс** for Xylix,
+**Грензельхофт** for Grenzelhoft.
+
+`nite` keeps **нощь**: the wiki has no spelling for it — neither `нощь` nor
+`найт` returns a hit — and the source is using an archaic spelling of an ordinary
+word, which the archaism mirrors. Revisit if the community settles on one.
+
+**The wiki is the reference for the fork's invented words.** Do not coin a new
+Russian term for one without checking there first; two of the three corrections
+above were terms invented here that nobody else says.
+
+### The character sheet
+
+The sheet's right-click block is built by one upstream branch that interpolates
+the English straight into the message:
+
+```dm
+to_chat(L, "[X] - <span class='info'>[GLOB.roguetraits[X]]</span>")
+```
+
+Keying that by text would need two independent keys per trait — `Webwalker -` for
+the name and `I can move freely between webs.` for the description — and reword
+either one upstream and the translation silently stops matching. So the sheet
+follows the same rule as the descriptions: **the key is what the thing is, not
+what it says.**
+
+`strings/traits.txt` carries three key shapes, all resolved server-side:
+
+```
+Webwalker            = Паутинник | Я свободно хожу по паутине.
+/datum/quirk/vice/mute = Я совсем не могу говорить...
+/datum/language/elvish = Эльфийский
+```
+
+A trait's name is what its `TRAIT_*` define expands to, which is its identity in
+code the same way a type path is an atom's; quirks and languages are real datums
+and get real paths. `modular_trait_sheet` resolves every key — a trait name has to
+be in `GLOB.roguetraits`, a path has to be a quirk or a language — so a rename
+fails the test instead of going quiet.
+
+`/atom/movable/screen/skills/Click()` is overridden to reproduce that one branch
+in Russian and defers to `..()` for every other click and for English players.
+Only the block's frame (`I have no special traits.`, the encumbrance words) stays
+in the client dictionary, because it belongs to no trait and has nothing to key on.
 
 ### The examine screens
 

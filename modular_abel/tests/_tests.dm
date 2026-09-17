@@ -349,6 +349,36 @@
 	if(length(GLOB.examine_descriptions) != length(seen))
 		TEST_FAIL("loaded [length(GLOB.examine_descriptions)] descriptions but [length(seen)] keys resolved; some were dropped at load")
 
+/datum/unit_test/modular_trait_sheet/Run()
+	var/datum/asset/json/chat_localization/asset = get_asset_datum(/datum/asset/json/chat_localization)
+	if(!asset)
+		TEST_FAIL("the localization asset is missing, so the sheet cannot be loaded")
+		return
+
+	var/list/pairs = asset.read_pairs("traits.txt")
+	if(!length(pairs))
+		TEST_FAIL("traits.txt produced no entries; the file is missing or every line was skipped")
+		return
+
+	for(var/list/pair as anything in pairs)
+		var/key = pair[1]
+		if(copytext(key, 1, 2) == "/")
+			var/path = text2path(key)
+			if(!ispath(path))
+				TEST_FAIL("\"[key]\" is not a type; the entry is dead and the sheet keeps its English")
+			else if(!ispath(path, /datum/quirk) && !ispath(path, /datum/language))
+				TEST_FAIL("[path] is neither a quirk nor a language, so the sheet never looks it up")
+			continue
+		if(!(key in GLOB.roguetraits))
+			TEST_FAIL("\"[key]\" is not a trait the character sheet prints; the entry is dead")
+			continue
+		if(!findtext(pair[2], " | "))
+			TEST_FAIL("trait \"[key]\" has no \" | \" between its name and description")
+
+	load_trait_sheet()
+	if(!length(GLOB.sheet_traits))
+		TEST_FAIL("no traits loaded, so every sheet line falls back to English")
+
 /datum/unit_test/modular_description_composites/Run()
 	for(var/obj/item/spellbook/path as anything in subtypesof(/obj/item/spellbook))
 		var/form = initial(path.themed_form)

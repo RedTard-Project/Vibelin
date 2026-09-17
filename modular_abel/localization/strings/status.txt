@@ -71,7 +71,7 @@ I am magically resilient. = Я магически стоек.
 I am magically astute. = Я магически прозорлив.
 I feel reinforced by magick. = Магия укрепляет меня.
 I am somewhat protected against falling from heights. = Я отчасти защищён от падения с высоты.
-Bits of arcyne iron and steel surround my armor, any attacks against me are blunted. = Мою броню окружают крупицы арканового железа и стали — удары по мне притупляются.
+Bits of arcyne iron and steel surround my armor, any attacks against me are blunted. = Мою броню окружают крупицы арканного железа и стали — удары по мне притупляются.
 Divine intervention relieves me of my ailments. = Божественное вмешательство избавляет меня от недугов.
 My strength is being sapped by the Blood Curse! = Кровавое проклятие вытягивает мои силы!
 
@@ -104,3 +104,15 @@ A cup made from fired clay. = Чашка из обожжённой глины.
 A bowl safely housing an open flame. = Чаша, надёжно хранящая открытый огонь.
 Some grass. = Немного травы.
 A bush, a den for critters and treasures. = Куст — логово для зверья и тайников.
+
+
+# --- обрамление листа персонажа ---
+# Эти строки не привязаны ни к какой черте, поэтому остаются
+# в клиентском словаре как обычные фрагменты.
+I have no special traits. = Особых черт у меня нет.
+I don't know any languages. = Я не знаю ни одного языка.
+EXTRA-HEAVY!! = НЕПОДЪЁМНО!!
+Heavy! = Тяжело!
+Medium. = Средне.
+Light. = Легко.
+None. = Пусто.

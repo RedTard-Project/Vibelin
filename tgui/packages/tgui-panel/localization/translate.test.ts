@@ -62,6 +62,10 @@ const DICTIONARY = {
     { re: '^(.+?) draws (.+?)!$', ru: '$1 достаёт $2|acc!' },
     { re: '^It weighs around (.+?)kg\\.$', ru: 'Вес около $1 кг.' },
     { re: '^It weighs around (.+?)g\\.$', ru: 'Вес около $1 г.' },
+    // a body part's gender is unknown when the template is written, so these
+    // use an impersonal verb and the present tense, which do not inflect for it
+    { re: '^(.+?) is dislocated\\.$', ru: 'Вывихнуло $1|acc.' },
+    { re: '^(.+?) is limp\\.$', ru: 'Не слушается $1|nom.' },
     { re: '^BROKEN(', ru: 'never' },
   ],
 };
@@ -239,6 +243,17 @@ describe('chat translation', () => {
     expect(translateText('Sir Aldric slashed Sir Bran!')).toBe(
       'Sir Aldric рубит сира Bran!',
     );
+  });
+
+  it('phrases limb states so any gender reads correctly', () => {
+    // feminine, then neuter: an adjective or a past-tense verb would disagree
+    // with one of them and there is no way to know which at write time
+    expect(translateText('left arm is dislocated.')).toBe(
+      'Вывихнуло левую руку.',
+    );
+    expect(translateText('throat is dislocated.')).toBe('Вывихнуло горло.');
+    expect(translateText('left arm is limp.')).toBe('Не слушается левая рука.');
+    expect(translateText('throat is limp.')).toBe('Не слушается горло.');
   });
 
   it('never splits a capture on anything but a title', () => {

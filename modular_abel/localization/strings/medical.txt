@@ -705,3 +705,32 @@ pus-ridden = гноится
 pair of = 2 ×
 several = 3-5 ×
 ton of = 6+ ×
+
+# --- осмотр себя: раны, бледность, состояние ---
+# При осмотре себя m1 всегда "I am", поэтому это точные строки.
+I am a little wounded. = Я слегка ранен.
+I am wounded. = Я ранен.
+I am severely wounded. = Я тяжело ранен.
+I am gravely wounded. = Я изранен тяжелейшим образом.
+I am a little pale. = Я слегка бледен.
+I am pale. = Я бледен.
+I am very pale. = Я очень бледен.
+I am extremely pale and sickly. = Я мертвенно бледен и болезнен на вид.
+I am soaked. = Я вымок.
+I am covered in something flammable. = Я облит чем-то горючим.
+
+# --- последние строки экзамайна ---
+# Значения подставляемых переменных подставлены готовыми сочетаниями: сами
+# по себе "Quick", "bleeding a lot" и "ankle deep." нодами не приходят.
+It looks ankle deep. = Глубиной по щиколотку.
+It looks about waist high. = Глубиной примерно по пояс.
+It looks rather deep. = Довольно глубоко.
+Drain On Release: = Расход при отпускании:
+Drain On Miss: = Расход при промахе:
+Recovery Time: = Время восстановления:
+Quick = Быстро
+Slow = Медленно
+I am bleeding! = У меня идёт кровь!
+I am bleeding slightly! = У меня слегка идёт кровь!
+I am bleeding a lot! = У меня сильно идёт кровь!
+I am bleeding profusely! = Из меня хлещет кровь!

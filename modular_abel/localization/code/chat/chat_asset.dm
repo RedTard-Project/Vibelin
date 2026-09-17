@@ -21,6 +21,9 @@ GLOBAL_LIST_INIT(chat_noun_cases, list("nom", "gen", "dat", "acc", "ins", "pre")
 	var/list/fragments = load_pairs("fragments.txt")
 	// descriptions.txt is deliberately absent: it is keyed by type and resolved
 	// server-side in get_examine_desc(), so the panel never needs it.
+	// traits.txt is deliberately absent for the same reason descriptions.txt is:
+	// it is keyed by what a trait IS, not by its English text, and resolves
+	// server-side in load_trait_sheet().
 	for(var/filename in list("speech.txt", "medical.txt", "world.txt", "status.txt"))
 		fragments |= load_pairs(filename)
 
