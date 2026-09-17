@@ -5,6 +5,7 @@
 	mob_overlay_icon = 'modular_abel/azure_wardrobe/icons/azure_wardrobe_onmob64.dmi'
 	icon_state = "bighat"
 	detail_tag = "_detail"
+	detail_color = CLOTHING_GOLD
 	sellprice = 60
 
 /obj/item/clothing/face/birdmask
@@ -102,6 +103,7 @@
 	sleeved = 'modular_abel/azure_wardrobe/icons/azure_wardrobe_sleeves.dmi'
 	icon_state = "dgreatcoat"
 	detail_tag = "_detail"
+	detail_color = CLOTHING_WHITE
 	sellprice = 75
 
 /obj/item/clothing/shirt/doublet
@@ -134,6 +136,7 @@
 /obj/item/clothing/neck/psycross/gold/divine
 	abstract_type = /obj/item/clothing/neck/psycross/gold/divine
 	name = "golden amulet of the ten"
+	icon_state = "psycross_g"
 	desc = "The Ten eternal, strength in unity. Stalwart for centuries against the darkness."
 	icon = 'modular_abel/azure_wardrobe/icons/azure_wardrobe_world.dmi'
 	mob_overlay_icon = 'modular_abel/azure_wardrobe/icons/azure_wardrobe_onmob.dmi'

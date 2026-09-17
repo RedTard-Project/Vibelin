@@ -4,6 +4,7 @@
 	desc = "A veil of fine silk, worn across the lower face."
 	icon = 'modular_abel/desert_wardrobe/icons/desert_wardrobe_world.dmi'
 	mob_overlay_icon = 'modular_abel/desert_wardrobe/icons/desert_wardrobe_onmob.dmi'
+	icon_state = "exoticsilkmaskg"
 
 /obj/item/clothing/head/tagelmust
 	name = "tagelmust"

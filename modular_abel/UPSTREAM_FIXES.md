@@ -20,6 +20,39 @@ That is why some of these guard around `..()` instead of simply calling it.
 | `/datum/browser/build_page` | The page template in `code/datums/browser/_browser.dm` declares `charset=ISO-8859-1`, while every other browse() page in the codebase declares UTF-8. BYOND sends the page as UTF-8, so the embedded browser decodes it as Latin-1 and every non-ASCII string in a browse popup renders as mojibake - the declension prompts (`browser_input_text`, title `СКЛОНЕНИЯ`) came out as `Ð¡ÐºÐ»...`. The override chains through `..()` and rewrites only that one charset token, so the rest of the template stays upstream's and a template change cannot silently break the fix (it degrades to a no-op instead). | upstream declares UTF-8 |
 | `/datum/browser/modal/input_text/New` | Every single-line `browser_input_text()` window is hardcoded to 350x125 (`code/datums/browser/modal/input/input_text.dm`), which fits a short English prompt and nothing else: the declension prompts wrap to three lines, and the 1rem textarea and the button row are crushed into what is left. The override wraps `New()`, lets upstream build the whole window, then resizes it from the prompt's own length - the body of the proc is never copied, so upstream may change the markup freely. | upstream sizes the window from its content |
 
+## Unit-test overrides
+
+Three upstream tests assert things about content, and each one is widened from a modular
+`Run()` rather than by editing the test. All three live in `upstream_fixes.dm`.
+
+`craftable_clothes` demands that every `/obj/item/clothing` subtype have a recipe. Donation
+cosmetics have none by design: they are bought with triumphs, or morphed out of a base item
+with an elixir. The override answers that **semantically instead of by name**:
+
+```
+excluded_paths |= loadout_granted_items()
+excluded_paths |= morph_elixir_results()
+```
+
+`loadout_granted_items()` (`loadout_panel/_loadout_panel.dm`) walks `GLOB.loadout_items` and
+returns every `item_path` the shop or the panel can hand out. `morph_elixir_results()`
+(`morph_elixirs/_morph_elixirs.dm`) instantiates every `/obj/item/enchantingkit` subtype and
+collects every value in its `target_items`, plus `result_item`. It caches into
+`GLOB.morph_elixir_results` on first call rather than filling it with `GLOBAL_LIST_INIT`,
+because a global list initialiser runs before `SSatoms` and would be creating objects during
+world init to answer a question nothing asks until a unit test runs.
+
+This is deliberate, and the reason is maintenance: **a name list would have to be edited on
+every port, and would silently keep excluding an item after it left the shop.** With the rule
+stated this way, selling an item exempts it and un-selling it makes the test demand a recipe
+again — nobody has to remember. The two GLOB name lists above it
+(`modular_craftable_clothes_exclusions`, `..._subtree_exclusions`) stay for the older modular
+content that is genuinely mapped-in, spawner-only or antag-only.
+
+`turf_coverage` gets moonstone added; `item_detail_sanity` and `missing_clothing_sprites` are
+not overridden at all — content is fixed to satisfy them, which is what
+`tools/check_modular_content.py` checks before a push.
+
 ## `map_pool/` and `map_vote/`
 
 Overrides that live in their own modules rather than in `upstream_fixes.dm`, because each

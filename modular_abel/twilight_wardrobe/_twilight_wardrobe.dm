@@ -1,6 +1,7 @@
 /obj/item/clothing/head/helmkleinod
 	abstract_type = /obj/item/clothing/head/helmkleinod
 	name = "helmkleinod"
+	icon_state = "d_basic"
 	desc = "A crest made to sit on top of a helmet."
 	icon = 'modular_abel/twilight_wardrobe/icons/twilight_wardrobe_world.dmi'
 	mob_overlay_icon = 'modular_abel/twilight_wardrobe/icons/twilight_wardrobe_onmob48.dmi'

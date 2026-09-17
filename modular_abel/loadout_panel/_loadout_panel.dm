@@ -142,6 +142,13 @@
 		list("tier" = ACCESS_NUKIE_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER5),
 	)
 
+/proc/loadout_granted_items()
+	. = list()
+	for(var/path in GLOB.loadout_items)
+		var/datum/loadout_item/item = GLOB.loadout_items[path]
+		if(item.item_path)
+			. |= item.item_path
+
 /datum/loadout_panel/proc/build_categories(client/user_client)
 	var/list/every_entry = list()
 	var/list/by_category = list()

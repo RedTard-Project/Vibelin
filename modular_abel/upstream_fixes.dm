@@ -294,6 +294,8 @@ GLOBAL_LIST_INIT(modular_craftable_clothes_subtree_exclusions, list(
 /datum/unit_test/craftable_clothes/Run()
 	excluded_paths += GLOB.modular_craftable_clothes_exclusions
 	excluded_paths_with_their_subtypes += GLOB.modular_craftable_clothes_subtree_exclusions
+	excluded_paths |= loadout_granted_items()
+	excluded_paths |= morph_elixir_results()
 	return ..()
 #endif
 

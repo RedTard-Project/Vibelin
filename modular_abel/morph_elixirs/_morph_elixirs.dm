@@ -1,3 +1,19 @@
+GLOBAL_LIST_EMPTY(morph_elixir_results)
+
+/proc/morph_elixir_results()
+	if(length(GLOB.morph_elixir_results))
+		return GLOB.morph_elixir_results
+	for(var/kit_type as anything in subtypesof(/obj/item/enchantingkit))
+		if(IS_ABSTRACT(kit_type))
+			continue
+		var/obj/item/enchantingkit/kit = new kit_type()
+		for(var/target in kit.target_items)
+			GLOB.morph_elixir_results |= kit.target_items[target]
+		if(kit.result_item)
+			GLOB.morph_elixir_results |= kit.result_item
+		qdel(kit)
+	return GLOB.morph_elixir_results
+
 /obj/item/clothing/armor/plate/cataphract
 	name = "cataphract half-plate"
 	desc = "Steel half-plate in the eastern cataphract pattern, scaled at the shoulder and banded down the flank."
