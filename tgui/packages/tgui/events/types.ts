@@ -22,6 +22,9 @@ type TguiWindow = {
   theme: string;
   scale: BinaryIO;
   size: [number, number];
+  /** Player overrides; absent means "whatever the theme says". */
+  font_size?: number;
+  line_height?: number;
 };
 
 type User = {

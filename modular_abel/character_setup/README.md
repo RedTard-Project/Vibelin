@@ -82,6 +82,41 @@ outermost last.
 
 Rebuild the bundle after touching any `.scss`: `bun run tgui:build` from `tgui/`.
 
+## Text size and spacing
+
+The same `Interface Theme` panel carries two per-player readability knobs, font size and line
+spacing, stored as `character_setup_tgui_font_size` / `character_setup_tgui_line_height` on
+`/datum/preferences` and clamped by `sanitize_tgui_font_size()` / `sanitize_tgui_line_height()`
+in `tgui_theme.dm`.
+
+Both are **null until the player picks something**, exactly like the theme var, and null means
+"whatever the theme says". The `get_payload` override only adds `font_size` / `line_height` to
+the window config block when they are set, `Layout.tsx` only writes them onto
+`document.documentElement` when they arrive and *removes* them otherwise - so a player who never
+touches the control sees the same CSS as before the feature existed. The reset button sends the
+action with no value at all, which the sanitizers read back as null.
+
+The two knobs reach the document by different routes, because the stylesheets are not symmetric:
+
+- **font size** is written as the `--font-size` custom property, because `reset.scss` already
+  reads `font-size: var(--font-size, 12px)` for `html, body`. An inline custom property on
+  `documentElement` outranks the `.theme-x:root` declaration, so the player's value wins over
+  the theme's `14px`.
+- **line spacing** is written as a real `line-height` property, because **nothing in the bundle
+  reads `--line-height`** - both themes declare it and no rule consumes it. Wiring that dead
+  variable up instead would have switched every window to `170%` for everyone, which is not what
+  the interface looks like today. `TGUI_LINE_HEIGHT_DEFAULT` is therefore `120`, the browser's
+  own `normal`, and it is only the stepper's starting point - it is never applied on its own.
+
+`TGUI_FONT_SIZE_DEFAULT` (14) mirrors `--font-size` in `vibelin.scss` / `grim.scss` and is also
+only a starting point; if a theme ever changes its font size, change it here too or the first
+click will jump. The bounds are sent to the frontend by `tgui_text_bounds()` rather than
+duplicated in `PreferencesMenu.tsx`, for the same reason the loadout slot tiers are sent: the
+numbers live in the defines only.
+
+Because the payload override runs for **every** tgui window and not just the character menu,
+these two settings apply to the whole interface, exactly like the theme does.
+
 ## The preview map controls (the black rectangle, and the doll sitting on top of the UI)
 
 The three previews are real BYOND **map controls** parented to the tgui window, not images:

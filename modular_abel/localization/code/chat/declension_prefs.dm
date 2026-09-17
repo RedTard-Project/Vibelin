@@ -5,6 +5,8 @@
 	savefile_identifier = PREF_CHARACTER
 	category = "character"
 	can_randomize = FALSE
+	should_apply = FALSE
+	should_update_preview = FALSE
 	should_strip_html = TRUE
 	maximum_value_length = MAX_DECLENSION_LEN
 	/// Key this case is published under in the declension payload.

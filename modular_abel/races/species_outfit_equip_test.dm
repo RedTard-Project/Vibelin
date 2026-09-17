@@ -46,6 +46,7 @@
 
 #define KNOWN_JOB_OUTFIT_MISMATCHES list(\
 	/obj/item/clothing/cloak/half,\
+	/obj/item/clothing/cloak/half/colored/blood,\
 	/obj/item/clothing/cloak/half/duelcape,\
 	/obj/item/clothing/cloak/half/shadowcloak,\
 	/obj/item/clothing/cloak/half/vet,\

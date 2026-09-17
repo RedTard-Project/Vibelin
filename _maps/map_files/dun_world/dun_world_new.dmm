@@ -90984,7 +90984,7 @@
 /turf/open/floor/cobble/dun_world,
 /area/rogue/under/cave/his_vault)
 "qhq" = (
-/obj/item/scrying,
+/obj/item/scrying/orb,
 /obj/structure/closet/crate/chest/neu_iron{
 	lockids = list("mage");
 	lock = /datum/lock/key/locked

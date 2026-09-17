@@ -150,6 +150,10 @@ const RU: Record<string, string> = {
   'Message OOC...': 'Сообщение OOC...',
   'Search species...': 'Поиск расы...',
 
+  'Zoom': 'Зум',
+  'Zoom in': 'Приблизить',
+  'Zoom out': 'Отдалить',
+
   'Rotate': 'Поворот',
   'Rotate left': 'Повернуть влево',
   'Rotate right': 'Повернуть вправо',

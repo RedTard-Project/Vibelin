@@ -1,6 +1,10 @@
 #define LOADOUT_PANEL_CATEGORY_ALL "Всё"
 #define LOADOUT_PANEL_CATEGORY_DONATOR "Донат"
 #define LOADOUT_PANEL_CATEGORY_AZURE "Azure Content"
+#define LOADOUT_PANEL_CATEGORY_TWILIGHT "Twilight Content"
+#define LOADOUT_PANEL_CATEGORY_RMH "Rivermist Content"
+#define LOADOUT_PANEL_CATEGORY_DESERT "Desert Content"
+#define LOADOUT_PANEL_CATEGORY_NEWKEEP "Newkeep Court"
 
 #define LOADOUT_PANEL_SLOTS_BASE 3
 #define LOADOUT_PANEL_SLOTS_TIER1 7
@@ -137,6 +141,13 @@
 		list("tier" = ACCESS_TRAITOR_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER4),
 		list("tier" = ACCESS_NUKIE_RANK, "slots" = LOADOUT_PANEL_SLOTS_TIER5),
 	)
+
+/proc/loadout_granted_items()
+	. = list()
+	for(var/path in GLOB.loadout_items)
+		var/datum/loadout_item/item = GLOB.loadout_items[path]
+		if(item.item_path)
+			. |= item.item_path
 
 /datum/loadout_panel/proc/build_categories(client/user_client)
 	var/list/every_entry = list()

@@ -15,6 +15,10 @@ Layout:
   `map_pool/README.md`.
 - `map_vote/` — the map vote and the map pool browser as their own tgui panel
   (`MapVote`), in front of the existing `SSvote`. See `map_vote/README.md`.
+- `round_announce/` — Discord embeds for the round lifecycle (lobby, round start,
+  round-end vote, vote passed, reboot), sent through the same `send2chat` the base
+  uses for its three plain lines. Pings a role on the one message that matters.
+  See `round_announce/README.md`.
 - `dun_world/` — everything for the Twilight Axis import in one place: the support
   `.dm` files (`areas`, `compat`, `food`, `furniture`, `items`, `jobs`, `keys`,
   `machines`, `mapgen`, `mobs`, `structures`, `map_adjustment`), plus
@@ -173,10 +177,32 @@ Map QA helpers (run from the repo root with `tools/bootstrap/python`):
 
 - `modular_abel/tools/check_map_paths.py <map.dmm>...` verifies every typepath
   in the generated maps resolves against `code/` + `modular_abel/` declarations
-  (bad paths compile fine but crash the runtime maploader).
+  (bad paths compile fine but crash the runtime maploader), and that none of
+  them is an `abstract_type` - a path that resolves but is abstract compiles
+  and loads, then stack-traces on every instance at mapload. Upstream turning a
+  concrete type abstract is the usual cause, so run it after an upstream merge
+  as well as after a regeneration.
 - `modular_abel/tools/run_maplint.py` runs the `tools/maplint` lints over the
   generated maps (works around Windows BOM/locale issues in the upstream
   runner).
+- `modular_abel/tools/port_clothing.py --donor <checkout> --types <list>` reads a
+  donor fork's clothing types, resolves the sheets they actually inherit, guesses the
+  local parent (through `dun_world/config/map.json`'s replacement table) and prints a
+  `dmi_merge.py` spec plus a DM draft. Read-only. It is the front half of the
+  `azure_wardrobe` / `twilight_wardrobe` ports; the candidate lists themselves come from
+  `compare_sprites.py` in the ai-skills repo.
+- `modular_abel/tools/check_modular_content.py [--module NAME] [-v]` is the
+  pre-flight for content: it reproduces `missing_clothing_sprites`,
+  `item_detail_sanity`, `craftable_clothes`, `modular_loadout_panel` and
+  `modular_morphing_elixir` by reading the DM as text, plus one check no test
+  performs - that every SCREAMING_CASE constant pasted in from a donor fork is
+  actually `#define`d here - so a bad port is caught in seconds instead of a
+  build. It reproduces each test's own escape hatches too
+  (the exclusion lists, `CRAFTING_TEST_EXCLUDE`, the by-text list, loot tables,
+  supply packs, and the world-icon short circuit the sprite test does before it
+  ever looks at the worn sheet), because a check that reports things CI is happy
+  with stops being read. Every rule in it comes from a failure that reached CI
+  first. Run it after any port.
 - `modular_abel/tools/dmi_states.py a.dmi [b.dmi]` prints DMI icon states, or
   with two files shows the states present only in the second one.
 

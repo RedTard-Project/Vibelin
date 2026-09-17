@@ -123,9 +123,21 @@ type PrefsData = {
   initial_tab: string;
   tgui_theme: string;
   tgui_themes: { value: string; label: string }[];
+  tgui_font_size: number | null;
+  tgui_line_height: number | null;
+  tgui_text_bounds: {
+    font_min: number;
+    font_max: number;
+    font_default: number;
+    line_min: number;
+    line_max: number;
+    line_step: number;
+    line_default: number;
+  };
   open_sequence: number;
   preferences_fullscreen: Booleanish;
   preferences_scale: number;
+  preview_scale: number;
   species_id: string;
   species_name: string;
   species_options: SpeciesEntry[];
@@ -244,6 +256,14 @@ const swatchColor = (value: string) => {
     return '#888888';
   }
   return text.startsWith('#') ? text : `#${text}`;
+};
+
+const clampPreviewScale = (value: unknown) => {
+  const scale = Math.round(Number(value));
+  if (!Number.isFinite(scale)) {
+    return 1;
+  }
+  return Math.max(1, Math.min(3, scale));
 };
 
 const clampMenuScale = (value: unknown) => {
@@ -531,6 +551,9 @@ export const PreferencesMenu = () => {
   const [menuScale, setMenuScaleState] = useState(
     clampMenuScale(data.preferences_scale),
   );
+  const [previewScale, setPreviewScaleState] = useState(
+    clampPreviewScale(data.preview_scale),
+  );
   const isFullscreen = asBool(data.preferences_fullscreen);
   const windowWidth = isFullscreen ? 7680 : 1180;
   const windowHeight = isFullscreen ? 4320 : 760;
@@ -630,7 +653,7 @@ export const PreferencesMenu = () => {
       window.removeEventListener('resize', measure);
       observer?.disconnect();
     };
-  }, [data.preview_map, menuScale, data.preferences_fullscreen, data.tgui_theme]);
+  }, [data.preview_map, menuScale, previewScale, data.preferences_fullscreen, data.tgui_theme]);
 
   const previewBboxW = Math.max(16, Number(data.preview_bbox_w) || 0);
   const previewBboxH = Math.max(16, Number(data.preview_bbox_h) || 0);
@@ -670,7 +693,7 @@ export const PreferencesMenu = () => {
     };
     const t = setTimeout(report, 250);
     return () => clearTimeout(t);
-  }, [data.preview_map, menuScale, data.preferences_fullscreen, previewZoom, previewMiniZoom, data.tgui_theme]);
+  }, [data.preview_map, menuScale, previewScale, data.preferences_fullscreen, previewZoom, previewMiniZoom, data.tgui_theme]);
 
   const [localRoundSeconds, setLocalRoundSeconds] = useState<number>(-1);
 
@@ -718,6 +741,14 @@ export const PreferencesMenu = () => {
     }
     doPref('character_setup_send_ooc', undefined, { message });
     setOocMessage('');
+  };
+
+  const setPreviewScale = (scale: number) => {
+    const clamped = clampPreviewScale(scale);
+    setPreviewScaleState(clamped); // resize now, let the savefile catch up
+    doPref('character_setup_preview_scale', undefined, {
+      scale: clamped,
+    });
   };
 
   const setMenuScale = (scale: number) => {
@@ -1980,6 +2011,70 @@ export const PreferencesMenu = () => {
     );
   };
 
+  const bounds = data.tgui_text_bounds ?? {
+    font_min: 10,
+    font_max: 20,
+    font_default: 14,
+    line_min: 100,
+    line_max: 220,
+    line_step: 5,
+    line_default: 120,
+  };
+
+  // Null means "whatever the theme says", so the button shows Theme and clicking
+  // it sends no value at all, which is what the backend reads back as null.
+  const textStepper = (props: {
+    icon: string;
+    label: string;
+    value: number | null;
+    fallback: number;
+    min: number;
+    max: number;
+    step: number;
+    unit: string;
+    send: (value: number) => void;
+    reset: () => void;
+  }) => {
+    const current = props.value ?? props.fallback;
+    return (
+      <Stack align="center" mt={0.5}>
+        <Stack.Item>
+          <Icon name={props.icon} />
+        </Stack.Item>
+        <Stack.Item grow>
+          <Box color="label">{tp(props.label)}</Box>
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            compact
+            icon="minus"
+            disabled={current <= props.min}
+            onClick={() => props.send(current - props.step)}
+          />
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            compact
+            tooltip={tp('Back to the theme default')}
+            onClick={props.reset}
+          >
+            {props.value === null
+              ? tp('Theme')
+              : `${props.value}${props.unit}`}
+          </Button>
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            compact
+            icon="plus"
+            disabled={current >= props.max}
+            onClick={() => props.send(current + props.step)}
+          />
+        </Stack.Item>
+      </Stack>
+    );
+  };
+
   const renderSettings = () => {
     const game = data.game_prefs || ({} as PrefsData['game_prefs']);
     const toggle = (preference: string) => doPref(preference);
@@ -2009,6 +2104,32 @@ export const PreferencesMenu = () => {
               </Button>
             ))}
           </Box>
+          {textStepper({
+            icon: 'text-height',
+            label: 'Font Size',
+            value: data.tgui_font_size,
+            fallback: bounds.font_default,
+            min: bounds.font_min,
+            max: bounds.font_max,
+            step: 1,
+            unit: 'px',
+            send: (size) =>
+              doPref('character_setup_tgui_font_size', undefined, { size }),
+            reset: () => doPref('character_setup_tgui_font_size'),
+          })}
+          {textStepper({
+            icon: 'align-justify',
+            label: 'Line Spacing',
+            value: data.tgui_line_height,
+            fallback: bounds.line_default,
+            min: bounds.line_min,
+            max: bounds.line_max,
+            step: bounds.line_step,
+            unit: '%',
+            send: (height) =>
+              doPref('character_setup_tgui_line_height', undefined, { height }),
+            reset: () => doPref('character_setup_tgui_line_height'),
+          })}
         </Panel>
 
         <Panel title="Display" icon="eye">
@@ -2290,10 +2411,10 @@ export const PreferencesMenu = () => {
                   </Stack>
                 </Stack.Item>
 
-                <Stack.Item basis="260px">
-                  <Section fill title={tp('Looking Glass')}>
-                    <Stack vertical fill>
-                      <Stack.Item grow>
+                <Stack.Item basis={`${174 * previewScale}px`}>
+                  <Section title={tp('Looking Glass')}>
+                    <Stack vertical>
+                      <Stack.Item>
                         <Box
                           style={{
                             display: 'flex',
@@ -2317,7 +2438,7 @@ export const PreferencesMenu = () => {
                           <ByondMapView
                             key={data.preview_map}
                             style={{ width: '100%', height: '100%' }}
-                            deps={[menuScale, data.preferences_fullscreen]}
+                            deps={[menuScale, previewScale, data.preferences_fullscreen]}
                             params={{
                               id: data.preview_map,
                               type: 'map',
@@ -2396,6 +2517,33 @@ export const PreferencesMenu = () => {
                       >
                         {tp('Randomise Appearance')}
                       </Button>
+                      <Stack mt={0.5}>
+                        <Stack.Item>
+                          <Button
+                            icon="arrow-left"
+                            disabled={previewScale <= 1}
+                            tooltip={tp('Zoom out')}
+                            onClick={() => setPreviewScale(previewScale - 1)}
+                          />
+                        </Stack.Item>
+                        <Stack.Item grow>
+                          <Box
+                            color="label"
+                            textAlign="center"
+                            style={{ lineHeight: '24px' }}
+                          >
+                            {tp('Zoom')} {previewScale}x
+                          </Box>
+                        </Stack.Item>
+                        <Stack.Item>
+                          <Button
+                            icon="arrow-right"
+                            disabled={previewScale >= 3}
+                            tooltip={tp('Zoom in')}
+                            onClick={() => setPreviewScale(previewScale + 1)}
+                          />
+                        </Stack.Item>
+                      </Stack>
                     </Stack.Item>
                   </Stack>
                 </Section>

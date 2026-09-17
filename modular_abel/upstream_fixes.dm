@@ -80,6 +80,29 @@
 		return list()
 	return ..()
 
+/datum/browser/build_page()
+	return replacetext(..(), "charset=ISO-8859-1", "charset=UTF-8")
+
+#define BROWSER_INPUT_WIDTH 480
+#define BROWSER_INPUT_CHARS_PER_LINE 52
+#define BROWSER_INPUT_LINE_HEIGHT 22
+#define BROWSER_INPUT_BASE_HEIGHT 190
+#define BROWSER_INPUT_MULTILINE_HEIGHT 380
+
+/datum/browser/modal/input_text/New(mob/user, message, title, default, max_length, multiline, encode, timeout)
+	. = ..()
+	if(!user)
+		return
+	var/lines = CEILING(length_char("[message]") / BROWSER_INPUT_CHARS_PER_LINE, 1)
+	src.width = BROWSER_INPUT_WIDTH
+	src.height = (multiline ? BROWSER_INPUT_MULTILINE_HEIGHT : BROWSER_INPUT_BASE_HEIGHT) + max(0, lines - 1) * BROWSER_INPUT_LINE_HEIGHT
+
+#undef BROWSER_INPUT_WIDTH
+#undef BROWSER_INPUT_CHARS_PER_LINE
+#undef BROWSER_INPUT_LINE_HEIGHT
+#undef BROWSER_INPUT_BASE_HEIGHT
+#undef BROWSER_INPUT_MULTILINE_HEIGHT
+
 #if defined(UNIT_TESTS) || defined(SPACEMAN_DMM)
 /datum/unit_test/turf_coverage/Run()
 	var/list/all_turfs = subtypesof(/turf)
@@ -119,6 +142,7 @@
 		/turf/template_noop,
 		/turf/open/rebound,
 		/turf/closed/wall/mineral/underbrick/fake_world,
+		/turf/closed/wall/mineral/underbrick/moonstone,
 		/turf/closed/wall/mineral,
 		/turf/closed/wall/mineral/stonebrick/reddish,
 		/turf/closed/wall/mineral/decostone/cand/reddish,
@@ -270,6 +294,8 @@ GLOBAL_LIST_INIT(modular_craftable_clothes_subtree_exclusions, list(
 /datum/unit_test/craftable_clothes/Run()
 	excluded_paths += GLOB.modular_craftable_clothes_exclusions
 	excluded_paths_with_their_subtypes += GLOB.modular_craftable_clothes_subtree_exclusions
+	excluded_paths |= loadout_granted_items()
+	excluded_paths |= morph_elixir_results()
 	return ..()
 #endif
 
