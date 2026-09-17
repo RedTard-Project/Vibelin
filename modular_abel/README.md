@@ -186,7 +186,7 @@ Map QA helpers (run from the repo root with `tools/bootstrap/python`):
   local parent (through `dun_world/config/map.json`'s replacement table) and prints a
   `dmi_merge.py` spec plus a DM draft. Read-only. It is the front half of the
   `azure_wardrobe` / `twilight_wardrobe` ports; the candidate lists themselves come from
-  `compare_clothing_sprites.py` in the ai-skills repo.
+  `compare_sprites.py` in the ai-skills repo.
 - `modular_abel/tools/dmi_states.py a.dmi [b.dmi]` prints DMI icon states, or
   with two files shows the states present only in the second one.
 

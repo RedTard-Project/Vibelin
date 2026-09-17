@@ -23,6 +23,8 @@
 #include "twilight_wardrobe/_twilight_wardrobe.dm"
 #include "morph_elixirs/_morph_elixirs.dm"
 #include "rmh_wardrobe/_rmh_wardrobe.dm"
+#include "desert_wardrobe/_desert_wardrobe.dm"
+#include "newkeep_court/_newkeep_court.dm"
 #include "job_starting_coins.dm"
 #include "map_advclass_blacklist.dm"
 #include "cyrillic_say_fix.dm"

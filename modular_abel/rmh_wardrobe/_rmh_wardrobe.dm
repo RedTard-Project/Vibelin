@@ -12,14 +12,6 @@
 	icon_state = "chokere"
 	sellprice = 70
 
-/obj/item/clothing/head/duchess_hood
-	name = "duchess' veil"
-	desc = "A veiled headdress of the sort worn to funerals one is glad to be attending."
-	icon = 'modular_abel/rmh_wardrobe/icons/rmh_wardrobe_world.dmi'
-	mob_overlay_icon = 'modular_abel/rmh_wardrobe/icons/rmh_wardrobe_onmob.dmi'
-	icon_state = "duchess_hood"
-	sellprice = 65
-
 /obj/item/clothing/head/nun_hat
 	name = "nun's coif"
 	desc = "A starched white coif and wimple. It covers the hair completely, which is the entire idea."
@@ -67,11 +59,6 @@
 	name = "Emerald Choker"
 	item_path = /obj/item/clothing/neck/choker/emerald
 	triumph_cost_permanent = 125
-
-/datum/loadout_item/rmh_wardrobe/duchess_hood
-	name = "Duchess' Veil"
-	item_path = /obj/item/clothing/head/duchess_hood
-	triumph_cost_permanent = 100
 
 /datum/loadout_item/rmh_wardrobe/nun_hat
 	name = "Nun's Coif"

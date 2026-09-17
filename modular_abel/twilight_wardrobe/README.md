@@ -7,7 +7,7 @@ their own panel tab, `LOADOUT_PANEL_CATEGORY_TWILIGHT` ("Twilight Content"), def
 the Azure one in `loadout_panel/_loadout_panel.dm`; `build_categories()` pins All, Донат and
 Azure and then emits every other `ui_category` on its own, so a new tab needed no panel code.
 
-Selected the same way: `C:\Axis\ai-skills\scripts\compare_clothing_sprites.py` against that
+Selected the same way: `C:\Axis\ai-skills\scripts\compare_sprites.py` against that
 checkout, keeping `wired` candidates that carry a worn sheet and live in the fork's own
 modular overlay rather than in inherited upstream art.
 

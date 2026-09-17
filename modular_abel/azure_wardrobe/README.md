@@ -5,7 +5,7 @@
 The tgui side is the shared loadout panel and the triumph shop; both read
 `GLOB.loadout_items`, so one entry fills both windows.
 
-Selected with `C:\Axis\ai-skills\scripts\compare_clothing_sprites.py`, which listed every
+Selected with `C:\Axis\ai-skills\scripts\compare_sprites.py`, which listed every
 clothing state Azure has and Vibelin does not, with a verdict per state. Only `wired`
 candidates (a DM type in the donor declares the state) that also carry a worn sheet were
 considered.
@@ -127,3 +127,14 @@ of this batch merges; adding it would have meant a fourth source for one garment
 picking up whenever someone does another cloak pass.
 
 Sheets: 81 world, 250 worn, 3 at 64x64, 165 sleeve cells.
+
+## Credit where the donor named someone
+
+Two of these were named donator rewards on Azure's side, and the handles are kept here for the
+same reason `modular_abel/morph_elixirs/README.md` keeps its table: the sprite exists because
+somebody paid for it and somebody drew it.
+
+| Piece | Named for |
+| --- | --- |
+| Encrusted Tiara | `eekasqueak` |
+| Ornate Coronet | `drd` |
