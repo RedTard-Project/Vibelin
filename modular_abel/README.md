@@ -173,7 +173,11 @@ Map QA helpers (run from the repo root with `tools/bootstrap/python`):
 
 - `modular_abel/tools/check_map_paths.py <map.dmm>...` verifies every typepath
   in the generated maps resolves against `code/` + `modular_abel/` declarations
-  (bad paths compile fine but crash the runtime maploader).
+  (bad paths compile fine but crash the runtime maploader), and that none of
+  them is an `abstract_type` - a path that resolves but is abstract compiles
+  and loads, then stack-traces on every instance at mapload. Upstream turning a
+  concrete type abstract is the usual cause, so run it after an upstream merge
+  as well as after a regeneration.
 - `modular_abel/tools/run_maplint.py` runs the `tools/maplint` lints over the
   generated maps (works around Windows BOM/locale issues in the upstream
   runner).
