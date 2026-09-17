@@ -1,0 +1,8 @@
+author: "trueroguan"
+delete-after: True
+changes:
+  - rscadd: "Translation for examine text, item and creature names, combat\nmessages, injuries and the character sheet"
+  - bugfix: "nine item descriptions threw a runtime when examined"
+  - bugfix: "unarmed attacks with the \"jabs\"/\"clocks\" verbs were described as stabs"
+  - spellcheck: "terminology aligned with the community wiki (арканный, дворф/гном, даэ)"
+  - code_imp: "names and injury stages are generated from a declension table instead of\nbeing written out by hand"
