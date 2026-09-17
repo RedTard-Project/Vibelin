@@ -12,6 +12,9 @@
 # --- бой: броня, блок, уклонение ---
 Armor stops the damage. = Броня поглощает урон.
 Armor stops the damage! = Броня поглощает урон!
+My armor absorbs the blow! = Моя броня поглощает удар!
+My armor softens the blow! = Моя броня смягчает удар!
+My armor was penetrated! = Мою броню пробило!
 SNEAK ATTACK! = АТАКА ИСПОДТИШКА!
 DOUBLE STRIKE! ARCYNE SURGE! = ДВОЙНОЙ УДАР! АРКАНОВЫЙ ВСПЛЕСК!
 The enemy defeated my parry! = Враг пробил мой блок!
@@ -310,3 +313,11 @@ I cannot send IC messages (muted). = Я не могу писать в IC (заг
 I cannot use OOC (muted). = Я не могу писать в OOC (заглушен).
 I have OOC muted. = OOC у меня отключён.
 Speech is currently admin-disabled. = Речь сейчас отключена администрацией.
+
+# --- подвал экзамайна ---
+# <b>SPECIAL:</b> приходит своей текстовой нодой, имя приёма — соседней,
+# поэтому переводится только подпись.
+SPECIAL: = ОСОБОЕ:
+Max Range: = Макс. дальность:
+Stamina Drain: = Расход выносливости:
+This ability can be used by right clicking while in STRONG stance. = Этот приём применяется правой кнопкой в стойке СИЛЫ.

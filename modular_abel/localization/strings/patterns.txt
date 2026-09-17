@@ -56,6 +56,63 @@
 ^(.+?) kicked (.+?)!$ = $1 пинает $2|acc!
 ^(.+?) bit (.+?)!$ = $1 кусает $2|acc!
 
+# --- удар с указанием части тела ---
+# Самая частая строка боя. Собирается в двух местах:
+#   species.dm      "[user] [verb] me in the [zone]!"
+#   item_attack.dm  "[user] [verb] me in the [zone] with [item]!"
+# Глагол берётся из used_intent.attack_verb, поэтому он в настоящем времени —
+# с прошедшим временем блока выше пересечений нет.
+#
+# Вариант с оружием ОБЯЗАН стоять выше безоружного: иначе "(.+?)" сожрёт
+# "chest with the sword" целиком и падеж уйдёт в пустоту.
+#
+# "chops at" выше "chops" (и так же "hacks at", "viciously bites"): альтернация
+# в регулярке берёт первое подошедшее, короткий вариант оставил бы висеть " at".
+^(.+?) (?:slashes|clean-slashes|chops at|chops|hacks at|hacks|cleaves|slices) (.+?) in the (.+?) with (.+?)!$ = $1 рубит $2|dat $3|acc $4|ins!
+^(.+?) (?:slashes|clean-slashes|chops at|chops|hacks at|hacks|cleaves|slices) (.+?) in the (.+?)!$ = $1 рубит $2|dat $3|acc!
+^(.+?) (?:precision-cuts|cuts|lacerates) (.+?) in the (.+?) with (.+?)!$ = $1 режет $2|dat $3|acc $4|ins!
+^(.+?) (?:precision-cuts|cuts|lacerates) (.+?) in the (.+?)!$ = $1 режет $2|dat $3|acc!
+^(.+?) (?:stabs|thrusts|jabs|skewers|impales|picks) (.+?) in the (.+?) with (.+?)!$ = $1 пронзает $2|dat $3|acc $4|ins!
+^(.+?) (?:stabs|thrusts|jabs|skewers|impales|picks) (.+?) in the (.+?)!$ = $1 пронзает $2|dat $3|acc!
+^(.+?) (?:claws|scratches|rends|tears|mauls|eviscerates) (.+?) in the (.+?) with (.+?)!$ = $1 раздирает $2|dat $3|acc $4|ins!
+^(.+?) (?:claws|scratches|rends|tears|mauls|eviscerates) (.+?) in the (.+?)!$ = $1 раздирает $2|dat $3|acc!
+^(.+?) (?:drills|augers) (.+?) in the (.+?) with (.+?)!$ = $1 сверлит $2|dat $3|acc $4|ins!
+^(.+?) (?:drills|augers) (.+?) in the (.+?)!$ = $1 сверлит $2|dat $3|acc!
+^(.+?) punches (.+?) in the (.+?) with (.+?)!$ = $1 бьёт $2|acc кулаком в $3|acc $4|ins!
+^(.+?) punches (.+?) in the (.+?)!$ = $1 бьёт $2|acc кулаком в $3|acc!
+^(.+?) headbutts (.+?) in the (.+?) with (.+?)!$ = $1 бьёт $2|acc головой в $3|acc $4|ins!
+^(.+?) headbutts (.+?) in the (.+?)!$ = $1 бьёт $2|acc головой в $3|acc!
+^(.+?) (?:strikes|hits|hit) (.+?) in the (.+?) with (.+?)!$ = $1 бьёт $2|acc в $3|acc $4|ins!
+^(.+?) (?:strikes|hits|hit) (.+?) in the (.+?)!$ = $1 бьёт $2|acc в $3|acc!
+^(.+?) (?:bashes|smashes|clubs|canes|clocks|cracks) (.+?) in the (.+?) with (.+?)!$ = $1 дубасит $2|acc в $3|acc $4|ins!
+^(.+?) (?:bashes|smashes|clubs|canes|clocks|cracks) (.+?) in the (.+?)!$ = $1 дубасит $2|acc в $3|acc!
+^(.+?) (?:whips|lashes) (.+?) in the (.+?) with (.+?)!$ = $1 хлещет $2|acc по $3|dat $4|ins!
+^(.+?) (?:whips|lashes) (.+?) in the (.+?)!$ = $1 хлещет $2|acc по $3|dat!
+^(.+?) kicks (.+?) in the (.+?) with (.+?)!$ = $1 пинает $2|acc в $3|acc $4|ins!
+^(.+?) kicks (.+?) in the (.+?)!$ = $1 пинает $2|acc в $3|acc!
+^(.+?) (?:viciously bites|bites|gnashes) (.+?) in the (.+?) with (.+?)!$ = $1 кусает $2|acc за $3|acc $4|ins!
+^(.+?) (?:viciously bites|bites|gnashes) (.+?) in the (.+?)!$ = $1 кусает $2|acc за $3|acc!
+^(.+?) pecks (.+?) in the (.+?) with (.+?)!$ = $1 клюёт $2|acc в $3|acc $4|ins!
+^(.+?) pecks (.+?) in the (.+?)!$ = $1 клюёт $2|acc в $3|acc!
+^(.+?) rams (.+?) in the (.+?) with (.+?)!$ = $1 таранит $2|acc в $3|acc $4|ins!
+^(.+?) rams (.+?) in the (.+?)!$ = $1 таранит $2|acc в $3|acc!
+^(.+?) (?:grabs|grasps|touches|taps) (.+?) in the (.+?) with (.+?)!$ = $1 хватает $2|acc за $3|acc $4|ins!
+^(.+?) (?:grabs|grasps|touches|taps) (.+?) in the (.+?)!$ = $1 хватает $2|acc за $3|acc!
+^(.+?) sweeps (.+?) in the (.+?) with (.+?)!$ = $1 подсекает $2|acc под $3|acc $4|ins!
+^(.+?) sweeps (.+?) in the (.+?)!$ = $1 подсекает $2|acc под $3|acc!
+^(.+?) lunges (.+?) in the (.+?) with (.+?)!$ = $1 делает выпад $2|dat в $3|acc $4|ins!
+^(.+?) lunges (.+?) in the (.+?)!$ = $1 делает выпад $2|dat в $3|acc!
+^(.+?) shoves (.+?) in the (.+?) with (.+?)!$ = $1 толкает $2|acc в $3|acc $4|ins!
+^(.+?) shoves (.+?) in the (.+?)!$ = $1 толкает $2|acc в $3|acc!
+^(.+?) dazes (.+?) in the (.+?) with (.+?)!$ = $1 оглушает $2|acc ударом в $3|acc $4|ins!
+^(.+?) dazes (.+?) in the (.+?)!$ = $1 оглушает $2|acc ударом в $3|acc!
+^(.+?) stings (.+?) in the (.+?) with (.+?)!$ = $1 жалит $2|acc в $3|acc $4|ins!
+^(.+?) stings (.+?) in the (.+?)!$ = $1 жалит $2|acc в $3|acc!
+^(.+?) arcs (.+?) in the (.+?) with (.+?)!$ = $1 бьёт $2|acc разрядом в $3|acc $4|ins!
+^(.+?) arcs (.+?) in the (.+?)!$ = $1 бьёт $2|acc разрядом в $3|acc!
+^(.+?) attacked (.+?) in the (.+?) with (.+?)!$ = $1 бьёт $2|acc в $3|acc $4|ins!
+^(.+?) attacked (.+?) in the (.+?)!$ = $1 бьёт $2|acc в $3|acc!
+
 # --- защита ---
 # У "dodges" субъект приходит отдельной нодой: сообщение собрано как
 # "<b>[src]</b> dodges [user]'s attack!", поэтому имени в начале строки нет.
@@ -94,6 +151,40 @@
 ^(.+?) consumes (.+?)!$ = $1 поглощает $2|acc!
 ^Your fangs inject venom into (.+?)!$ = Мои клыки впрыскивают яд в $1|acc!
 
+# --- тот же удар, но без части тела (hit_area пуст) ---
+# Те же глаголы в настоящем времени, поэтому блок обязан стоять ниже варианта
+# с "in the ...", иначе "(.+?)" проглотит всю часть тела как имя цели.
+^(.+?) (?:slashes|clean-slashes|chops at|chops|hacks at|hacks|cleaves|slices) (.+?) with (.+?)!$ = $1 рубит $2|acc $3|ins!
+^(.+?) (?:slashes|clean-slashes|chops at|chops|hacks at|hacks|cleaves|slices) (.+?)!$ = $1 рубит $2|acc!
+^(.+?) (?:precision-cuts|cuts|lacerates) (.+?) with (.+?)!$ = $1 режет $2|acc $3|ins!
+^(.+?) (?:precision-cuts|cuts|lacerates) (.+?)!$ = $1 режет $2|acc!
+^(.+?) (?:stabs|thrusts|jabs|skewers|impales|picks) (.+?) with (.+?)!$ = $1 пронзает $2|acc $3|ins!
+^(.+?) (?:stabs|thrusts|jabs|skewers|impales|picks) (.+?)!$ = $1 пронзает $2|acc!
+^(.+?) (?:claws|scratches|rends|tears|mauls|eviscerates) (.+?) with (.+?)!$ = $1 раздирает $2|acc $3|ins!
+^(.+?) (?:claws|scratches|rends|tears|mauls|eviscerates) (.+?)!$ = $1 раздирает $2|acc!
+^(.+?) (?:drills|augers) (.+?) with (.+?)!$ = $1 сверлит $2|acc $3|ins!
+^(.+?) (?:drills|augers) (.+?)!$ = $1 сверлит $2|acc!
+^(.+?) punches (.+?)!$ = $1 бьёт $2|acc кулаком!
+^(.+?) headbutts (.+?)!$ = $1 бьёт $2|acc головой!
+^(.+?) (?:strikes|hits|hit) (.+?) with (.+?)!$ = $1 бьёт $2|acc $3|ins!
+^(.+?) (?:strikes|hits|hit) (.+?)!$ = $1 бьёт $2|acc!
+^(.+?) (?:bashes|smashes|clubs|canes|clocks|cracks) (.+?) with (.+?)!$ = $1 дубасит $2|acc $3|ins!
+^(.+?) (?:bashes|smashes|clubs|canes|clocks|cracks) (.+?)!$ = $1 дубасит $2|acc!
+^(.+?) (?:whips|lashes) (.+?) with (.+?)!$ = $1 хлещет $2|acc $3|ins!
+^(.+?) (?:whips|lashes) (.+?)!$ = $1 хлещет $2|acc!
+^(.+?) (?:viciously bites|bites|gnashes) (.+?)!$ = $1 кусает $2|acc!
+^(.+?) pecks (.+?)!$ = $1 клюёт $2|acc!
+^(.+?) rams (.+?)!$ = $1 таранит $2|acc!
+^(.+?) (?:grasps|touches|taps) (.+?)!$ = $1 хватает $2|acc!
+^(.+?) sweeps (.+?)!$ = $1 подсекает $2|acc!
+^(.+?) lunges (.+?) with (.+?)!$ = $1 делает выпад в сторону $2|gen $3|ins!
+^(.+?) lunges (.+?)!$ = $1 делает выпад в сторону $2|gen!
+^(.+?) dazes (.+?)!$ = $1 оглушает $2|acc!
+^(.+?) stings (.+?)!$ = $1 жалит $2|acc!
+^(.+?) arcs (.+?)!$ = $1 бьёт $2|acc разрядом!
+^(.+?) attacked (.+?) with (.+?)!$ = $1 бьёт $2|acc $3|ins!
+^(.+?) attacked (.+?)!$ = $1 бьёт $2|acc!
+
 # --- раны с подстановкой части тела ---
 ^The (.+?) is dislocated!$ = Вывихнуло $1|acc!
 ^The (.+?) jolts painfully!$ = $1|acc пронзает болью!
@@ -121,6 +212,10 @@
 
 # --- предметы и инвентарь ---
 ^(.+?) picks up (.+?)\.$ = $1 подбирает $2|acc.
+# "draws X from Y" строго выше "draws X": иначе второй заберёт себе
+# "the rapier from the scabbard" целиком одним захватом.
+^You draw (.+?) from (.+?)\.$ = Я достаю $1|acc из $2|gen.
+^(.+?) draws (.+?) from (.+?)!$ = $1 достаёт $2|acc из $3|gen!
 ^(.+?) draws (.+?)!$ = $1 достаёт $2|acc!
 ^(.+?) adds (.+?) to (.+?)\.$ = $1 добавляет $2|acc в $3|acc.
 ^(.+?) finds (.+?) in (.+?)\.$ = $1 находит $2|acc в $3|pre.
@@ -231,3 +326,12 @@
 ^You fall to the ground, bringing (.+?) with you!$ = Я валюсь на землю, увлекая за собой $1|acc!
 ^(.+?) topples off of (.+?) as they both fall to the ground!$ = $1 сваливается с $2|gen, и оба летят на землю!
 ^You see (.+?) and freeze in terror!$ = Я вижу $1|acc и цепенею от ужаса!
+
+# --- подвал экзамайна ---
+# "kg" обязан идти выше "g": иначе "(.+?)g\." поймает "700kg." и оставит "700k".
+^It weighs around (.+?)kg\.$ = Вес около $1 кг.
+^It weighs around (.+?)g\.$ = Вес около $1 г.
+^Value: (.+?) mammon$ = Цена: $1 маммон
+^(.+?) is worth around (.+?) mammons\.$ = $1 стоит около $2 маммон.
+^(.+?) is worth around (.+?) mammon\.$ = $1 стоит около $2 маммон.
+^It should be inserted in the (.+?)\.$ = Вставляется в $1|acc.

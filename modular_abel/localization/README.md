@@ -149,6 +149,31 @@ placed first happily matches `I'm slashed by Sir Aldric!` and renders
 `I'm рубит by Sir Aldric!`. The reflexive and passive forms are therefore grouped
 at the top of `patterns.txt`, above the per-verb block.
 
+The attack line has four shapes, built in `species.dm` (unarmed) and
+`item_attack.dm` (weapon), and their order in the file is not negotiable:
+
+1. `[user] [verb] [target] in the [zone] with [item]!`
+2. `[user] [verb] [target] in the [zone]!`
+3. `[user] [verb] [target] with [item]!`
+4. `[user] [verb] [target]!`
+
+Each later shape is a prefix of the earlier one, so a lazy `(.+?)` in shape 4 will
+happily swallow `Ivan in the chest with the sword` as the target name. Shapes 3
+and 4 also have to sit **below** the possessive wrestling patterns
+(`X bites Y's throat!`, `X smashes Y's head into the wall!`) for the same reason —
+`test3.mjs` caught exactly that regression when they were first written too high.
+
+`me` is declined in `nouns.txt` alongside the body parts. It is not a noun, but it
+lands in the same `$2|acc` / `$2|dat` slot as a target's name, which is much
+cheaper than a second pattern per verb for the first-person copy of every line.
+
+The verb itself cannot be a capture: the template language interpolates captures
+verbatim and has no verb table, so each Russian verb needs its own pattern with an
+alternation of the English verbs that map onto it. That is why the block is long.
+The alternations put multi-word verbs first — `chops at` before `chops`,
+`viciously bites` before `bites` — because regex alternation takes the first
+branch that matches and the short one would leave ` at` dangling in the output.
+
 ## Declensions
 
 Russian needs cases that a rendered English string cannot supply: `[user] bites
@@ -171,7 +196,7 @@ noun there renders in the nominative.
 
 ## Scope
 
-`strings/` currently holds 606 chat fragments, 184 patterns, 134 nouns and 3251
+`strings/` currently holds 613 chat fragments, 266 patterns, 152 nouns and 3242
 type-keyed descriptions, mined out of
 the source with the highest-traffic lines first: the speech verbs and the emote
 list (the most frequent text in the game), the wound crit messages (which fire on
@@ -237,6 +262,14 @@ A desc written across several source lines with a trailing `\` is still a plain
 type-level desc and lives in `descriptions.txt` like any other; the file itself has
 no line-continuation syntax, so the whole sentence goes on one line and `\n` (the
 format's only escape) is used where upstream had one.
+
+**A commented-out type looks exactly like a declared one to a line-based parser.**
+Nine keys got into the file this way — the seven `psycross/gronn*` talismans, a
+book template and a garlic that all sit inside `/* */` blocks — and each one
+printed a `stack_trace` on first examine. `modular_examine_descriptions` is what
+catches this, because `text2path()` returns null for a type that was never
+compiled; any offline mining or checking script must strip block comments before
+it believes a `/type/path` line.
 
 ### Descriptions the game builds at runtime
 
@@ -345,7 +378,16 @@ Everything else lives in this module.
   dictionary (every section non-empty, no template referencing a capture its
   pattern does not have, no unknown case keys) and `modular_declension_prefs`
   checks the preferences cover each case exactly once.
+  `modular_examine_descriptions` resolves every description key through
+  `text2path()`; this is the only thing that catches a type that exists in the
+  source but only inside a `/* */` block.
+  `modular_description_composites` covers the runtime-composed descriptions: a
+  themed spellbook form with no Russian flavour line, or a tier missing from
+  `descriptions.txt`, fails here rather than examining as half-English.
 - `tgui/packages/tgui-panel/localization/translate.test.ts` — engine behaviour:
   exact hits, padding, declension, fallback for an unknown name, passthrough, the
   English path, a malformed pattern, and cache invalidation when declensions
-  arrive late.
+  arrive late. It also pins the attack-shape ordering — the with-weapon form
+  beating the bare one, the hit location staying out of the target capture,
+  `chops at` beating `chops`, `draws X from Y` beating `draws X`, `kg` beating
+  `g` — and the possessive wrestling patterns surviving underneath them.

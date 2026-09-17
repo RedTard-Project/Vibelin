@@ -14,11 +14,16 @@ const DICTIONARY = {
   nouns: {
     'throat': { nom: 'горло', gen: 'горла', acc: 'горло' },
     'left arm': { nom: 'левая рука', gen: 'левой руки', acc: 'левую руку' },
-    'sword': { nom: 'меч', gen: 'меча', acc: 'меч' },
+    'sword': { nom: 'меч', gen: 'меча', acc: 'меч', ins: 'мечом' },
+    'chest': { nom: 'грудь', gen: 'груди', acc: 'грудь' },
+    // not a noun: it lands in the same slot as a target's name, so it is
+    // declined by the same mechanism instead of doubling every pattern
+    'me': { nom: 'я', gen: 'меня', dat: 'мне', acc: 'меня' },
   },
   fragments: {
     'Armor stops the damage.': 'Броня поглощает урон.',
     'SNEAK ATTACK!': 'АТАКА ИСПОДТИШКА!',
+    'My armor absorbs the blow!': 'Моя броня поглощает удар!',
   },
   patterns: [
     // specific before generic, exactly as strings/patterns.txt orders them
@@ -28,13 +33,31 @@ const DICTIONARY = {
     { re: '^I slash (.+?)!$', ru: 'Я рублю $1|acc!' },
     { re: "^(.+?) bites (.+?)'s (.+?)!$", ru: '$1 кусает $3|acc $2|gen!' },
     { re: "^dodges (.+?)'s attack!$", ru: 'уклоняется от атаки $1|gen!' },
+    // the four attack shapes, longest first: each later one is a prefix of the
+    // one above it, so a lazy (.+?) in the short form would eat the rest
+    {
+      re: '^(.+?) (?:slashes|chops at|chops) (.+?) in the (.+?) with (.+?)!$',
+      ru: '$1 рубит $2|dat $3|acc $4|ins!',
+    },
+    {
+      re: '^(.+?) (?:slashes|chops at|chops) (.+?) in the (.+?)!$',
+      ru: '$1 рубит $2|dat $3|acc!',
+    },
+    {
+      re: '^(.+?) (?:slashes|chops at|chops) (.+?) with (.+?)!$',
+      ru: '$1 рубит $2|acc $3|ins!',
+    },
+    { re: '^You draw (.+?) from (.+?)\\.$', ru: 'Я достаю $1|acc из $2|gen.' },
+    { re: '^(.+?) draws (.+?) from (.+?)!$', ru: '$1 достаёт $2|acc из $3|gen!' },
     { re: '^(.+?) draws (.+?)!$', ru: '$1 достаёт $2|acc!' },
+    { re: '^It weighs around (.+?)kg\\.$', ru: 'Вес около $1 кг.' },
+    { re: '^It weighs around (.+?)g\\.$', ru: 'Вес около $1 г.' },
     { re: '^BROKEN(', ru: 'never' },
   ],
 };
 
 const ALDRIC = { gen: 'сира Альдрика', acc: 'сира Альдрика' };
-const IVAN = { gen: 'Ивана', acc: 'Ивана' };
+const IVAN = { gen: 'Ивана', dat: 'Ивану', acc: 'Ивана' };
 
 describe('chat translation', () => {
   beforeEach(() => {
@@ -138,5 +161,52 @@ describe('chat translation', () => {
     expect(translateText('Sir Aldric slashed Bran!')).toBe(
       'Sir Aldric рубит Брана!',
     );
+  });
+
+  it('declines "me" so the first-person copy needs no pattern of its own', () => {
+    expect(translateText('Sir Aldric slashes me in the chest!')).toBe(
+      'Sir Aldric рубит мне грудь!',
+    );
+  });
+
+  it('keeps the hit location out of the target capture', () => {
+    expect(translateText('Sir Aldric slashes Ivan in the left arm!')).toBe(
+      'Sir Aldric рубит Ивану левую руку!',
+    );
+  });
+
+  it('lets the with-weapon shape win over the bare one', () => {
+    expect(
+      translateText('Sir Aldric slashes Ivan in the chest with the sword!'),
+    ).toBe('Sir Aldric рубит Ивану грудь мечом!');
+    expect(translateText('Sir Aldric slashes Ivan with the sword!')).toBe(
+      'Sir Aldric рубит Ивана мечом!',
+    );
+  });
+
+  it('takes the longest branch of a multi-word verb alternation', () => {
+    expect(translateText('Sir Aldric chops at Ivan in the chest!')).toBe(
+      'Sir Aldric рубит Ивану грудь!',
+    );
+  });
+
+  it('does not let the new attack shapes shadow the possessive form', () => {
+    expect(translateText("Sir Aldric bites Ivan's throat!")).toBe(
+      'Sir Aldric кусает горло Ивана!',
+    );
+  });
+
+  it('prefers "draws X from Y" over the bare "draws X"', () => {
+    expect(translateText('Sir Aldric draws the sword from the scabbard!')).toBe(
+      'Sir Aldric достаёт меч из the scabbard!',
+    );
+    expect(translateText('Sir Aldric draws the sword!')).toBe(
+      'Sir Aldric достаёт меч!',
+    );
+  });
+
+  it('matches kg before g in the examine footer', () => {
+    expect(translateText('It weighs around 2.5kg.')).toBe('Вес около 2.5 кг.');
+    expect(translateText('It weighs around 700g.')).toBe('Вес около 700 г.');
   });
 });
