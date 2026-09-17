@@ -226,6 +226,21 @@ only ASCII, so it strips Cyrillic to nothing. `handle_link` uses
 `browser_input_text(..., encode = FALSE)`; the base text preference already strips
 HTML on deserialize.
 
+The five fields are `PREF_CHARACTER` preferences that carry **`should_apply = FALSE`** and
+`should_update_preview = FALSE`. Both matter. `/datum/preferences/apply_prefs_to()` walks every
+`PREF_CHARACTER` preference and calls `apply_to_human()` on it, and the base implementation of
+that proc is a `CRASH("not implemented")` - so without the flag each of the five threw a runtime
+every time a character was applied to a mob (found on a live test, 2026-09-17). A declension is
+chat metadata read by `read_declensions()`; there is nothing to put on the mob, and
+`should_apply` is exactly the "preference we don't natively apply" switch the base provides
+(`selected_accent` uses it for the same reason). The preview flag is the cheaper half: a case
+ending cannot change a sprite, so rebuilding the doll on every keystroke-sized save was pure
+cost.
+
+The input window itself is widened by a modular override in `modular_abel/upstream_fixes.dm` -
+upstream sizes every single-line `browser_input_text` at 350x125, which is enough for a short
+English prompt and not for `Родительный падеж — кого? чего? (например: Ивана Петрова)`.
+
 Items and mob names are **not** covered — they are open-ended, and an undeclined
 noun there renders in the nominative.
 

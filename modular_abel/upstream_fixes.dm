@@ -83,6 +83,26 @@
 /datum/browser/build_page()
 	return replacetext(..(), "charset=ISO-8859-1", "charset=UTF-8")
 
+#define BROWSER_INPUT_WIDTH 480
+#define BROWSER_INPUT_CHARS_PER_LINE 52
+#define BROWSER_INPUT_LINE_HEIGHT 22
+#define BROWSER_INPUT_BASE_HEIGHT 190
+#define BROWSER_INPUT_MULTILINE_HEIGHT 380
+
+/datum/browser/modal/input_text/New(mob/user, message, title, default, max_length, multiline, encode, timeout)
+	. = ..()
+	if(!user)
+		return
+	var/lines = CEILING(length_char("[message]") / BROWSER_INPUT_CHARS_PER_LINE, 1)
+	src.width = BROWSER_INPUT_WIDTH
+	src.height = (multiline ? BROWSER_INPUT_MULTILINE_HEIGHT : BROWSER_INPUT_BASE_HEIGHT) + max(0, lines - 1) * BROWSER_INPUT_LINE_HEIGHT
+
+#undef BROWSER_INPUT_WIDTH
+#undef BROWSER_INPUT_CHARS_PER_LINE
+#undef BROWSER_INPUT_LINE_HEIGHT
+#undef BROWSER_INPUT_BASE_HEIGHT
+#undef BROWSER_INPUT_MULTILINE_HEIGHT
+
 #if defined(UNIT_TESTS) || defined(SPACEMAN_DMM)
 /datum/unit_test/turf_coverage/Run()
 	var/list/all_turfs = subtypesof(/turf)

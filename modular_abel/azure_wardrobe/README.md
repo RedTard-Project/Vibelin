@@ -1,7 +1,7 @@
 # azure_wardrobe — donator cosmetics ported from Azure Peak
 
-15 purely cosmetic garments and 15 loadout entries, sourced from `Azure-Peak/Azure-Peak`
-(`icons/clothing/donor_clothes.dmi` and its `onmob` siblings — that fork's own donor sheet).
+61 purely cosmetic garments and 61 loadout entries, sourced from `Azure-Peak/Azure-Peak`
+(its own donor sheet plus the shared neck, mask, cloak and mercmedal sheets).
 The tgui side is the shared loadout panel and the triumph shop; both read
 `GLOB.loadout_items`, so one entry fills both windows.
 
@@ -65,3 +65,65 @@ until someone draws the item icon.
 Everything here is cosmetic: no `armor_type`, no `prevent_crits`, no coverage. That is the
 module's whole scope — mechanical content belongs in a morphing elixir, the way
 `modular_abel/snouted_helms/README.md` describes, not in a shop garment.
+
+## Batch 2
+
+19 more entries, from Azure's shared sheets rather than its donor sheet.
+
+**The gilded Ten.** Vibelin already ships wooden (`psycross/divine/*`) and silver
+(`psycross/silver/divine/*`) amulets for every god of the pantheon, and a bare
+`psycross/gold`, but no gold per-god set. Azure has one, so all ten are ported under a new
+`psycross/gold/divine` parent that mirrors the silver tree exactly; the descriptions are
+Vibelin's own lines for each god, not Azure's, because the same amulet should read the same
+whatever it is cast in.
+
+They are named **"Gilded Amulet of X"** in the shop, not "Golden", because upstream already
+ships a loadout entry called *Golden Amulet of Xylix* whose own comment says
+`//Pranked! it is wood`. Two shop rows with one name is exactly what
+`modular_loadout_panel` fails on.
+
+**The rest:** porcelain amulet, three mercenary medals (northmanne's idol, guardian's
+seedpouch, laughing volf medal), bronze and iron spectacles, duelist's goggles, the autumneer
+cloak and a dupatta.
+
+**Not ported, deliberately:** Azure's tinted fancy spectacles (`glassesb_dark`) — Vibelin
+already has `/obj/item/clothing/face/spectacles/fancy_dark` — and its gold mask, which is
+`/obj/item/clothing/face/facemask/goldmask` here already.
+
+Batch 2 art comes from `neck.dmi`, `mercmedals.dmi`, `masks.dmi` and `cloaks.dmi` plus their
+`onmob` siblings; the sheets in `icons/` were re-merged from a combined spec, so they now
+carry both batches (45 / 94 / 3 / 69 states).
+
+## Batch 3
+
+22 more entries, in three groups.
+
+**The cleric wardrobe.** Astratan, justice (Ravox) and necran cloaks, the undivided devotee
+tabard and the psyalter's stole — the tabards a cleric of each faith wears in Azure, and
+which Vibelin had no cosmetic equivalent of. All five hang off types this fork already has
+(`cloak/templar`, `cloak/psyaltrist`), so they are subtypes rather than new branches.
+
+**Travelling cloaks and work wear:** ranger cloak and its undyed grey twin, scout cloak,
+blacksmith's leather apron, frilled housekeeper's apron.
+
+**The bronze tier and the rest of the amulets.** Bronze psycross, the reformist psycross,
+bronze and iron inverted psycrosses under `psycross/zizo`, and bronze amulets of Astrata,
+Noc and Malum under a `psycross/bronze/divine` parent built the same way the gilded one was.
+Azure only draws bronze for those three gods, so the bronze tier is deliberately partial
+where the gilded one is complete. Plus steel spectacles, steel duelist's goggles, the
+giltsilk mask, the desert rider's sash and the underdweller's broken compass.
+
+Sheets were re-merged from a spec covering all three batches: 73 world states, 221 worn,
+3 at 64x64 and 153 sleeve cells.
+
+## Batch 4
+
+Five stragglers, and the end of what Azure has left in complete cosmetic form: the bared
+toga, the Hand's cloak and halfmask, the saccharine veil and the helmetless visor.
+
+**The short jupon was cut.** `surcoat_short` has its inventory sprite in `cloaks.dmi` but its
+worn cells in `onmob/detailed/tabards.dmi`, which is a different sheet from the one the rest
+of this batch merges; adding it would have meant a fourth source for one garment. It is worth
+picking up whenever someone does another cloak pass.
+
+Sheets: 81 world, 250 worn, 3 at 64x64, 165 sleeve cells.
