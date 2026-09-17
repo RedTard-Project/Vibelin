@@ -105,8 +105,13 @@ GLOBAL_VAR(round_announce_ping_role)
 	RegisterSignal(src, COMSIG_TICKER_ENTER_PREGAME, PROC_REF(round_announce_lobby))
 	RegisterSignal(src, COMSIG_TICKER_ROUND_STARTING, PROC_REF(round_announce_start))
 
+/datum/controller/subsystem/ticker/var/round_announce_lobby_sent = FALSE
+
 /datum/controller/subsystem/ticker/proc/round_announce_lobby(datum/source)
 	SIGNAL_HANDLER
+	if(round_announce_lobby_sent)
+		return
+	round_announce_lobby_sent = TRUE
 	INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(round_announce_lobby_message))
 
 /datum/controller/subsystem/ticker/proc/round_announce_start(datum/source, start_time)
