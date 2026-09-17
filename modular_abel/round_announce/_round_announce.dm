@@ -19,6 +19,15 @@ GLOBAL_VAR(round_announce_ping_role)
 #define ROUND_ANNOUNCE_ENDING "#8a5fc4"
 #define ROUND_ANNOUNCE_ENDED "#c14444"
 
+/proc/round_announce_period(deciseconds)
+	var/minutes = round(deciseconds / (1 MINUTES))
+	var/seconds = round((deciseconds % (1 MINUTES)) / (1 SECONDS))
+	if(minutes && seconds)
+		return "[minutes] мин [seconds] сек"
+	if(minutes)
+		return "[minutes] мин"
+	return "[seconds] сек"
+
 /proc/round_announce_field(name, value, inline = TRUE)
 	var/datum/tgs_chat_embed/field/field = new("[name]", "[value]")
 	field.is_inline = inline
@@ -77,7 +86,9 @@ GLOBAL_VAR(round_announce_ping_role)
 	round_announce(
 		"История началась!",
 		map ? "Карта: **[map]**" : null,
-		ROUND_ANNOUNCE_STARTED
+		ROUND_ANNOUNCE_STARTED,
+		null,
+		TRUE
 	)
 
 /proc/round_announce_end_message()
@@ -110,7 +121,7 @@ GLOBAL_VAR(round_announce_ping_role)
 		return
 	round_announce(
 		vote_type == "restart" ? "Голосование за рестарт" : "Голосование за конец истории",
-		"Игроки решают, продолжать ли историю. На голосование: [DisplayTimeText(CONFIG_GET(number/vote_period))].",
+		"Игроки решают, продолжать ли историю. На голосование: **[round_announce_period(CONFIG_GET(number/vote_period))]**.",
 		ROUND_ANNOUNCE_VOTE,
 		round_announce_status_fields()
 	)
