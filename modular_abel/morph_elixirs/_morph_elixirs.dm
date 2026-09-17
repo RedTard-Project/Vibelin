@@ -3,7 +3,7 @@ GLOBAL_LIST_EMPTY(morph_elixir_results)
 /proc/morph_elixir_results()
 	if(length(GLOB.morph_elixir_results))
 		return GLOB.morph_elixir_results
-	for(var/kit_type as anything in subtypesof(/obj/item/enchantingkit))
+	for(var/obj/item/enchantingkit/kit_type as anything in subtypesof(/obj/item/enchantingkit))
 		if(IS_ABSTRACT(kit_type))
 			continue
 		var/obj/item/enchantingkit/kit = new kit_type()

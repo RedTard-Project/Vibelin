@@ -11,6 +11,7 @@ What it mirrors, and which test would otherwise catch it:
   sprites      missing_clothing_sprites - the state a type actually inherits has to
                resolve, INCLUDING on abstract parents, which that test does not skip
   details      item_detail_sanity - detail_tag needs detail_color and a `<state><tag>` cell
+  constants    every SCREAMING_CASE value is #defined here, not only on the donor fork
   obtainable   craftable_clothes - craftable, looted, sold, shop-granted or elixir-made
   loadout      modular_loadout_panel - names unique repo-wide, item_path declared
   elixirs      modular_morphing_elixir - a morph result is a direct subtype of its
@@ -44,8 +45,15 @@ ASSIGN_RE = re.compile(r"^\t([\w/]+)\s*=\s*(.+?)\s*$")
 OBJ_RE = re.compile(r"/obj/item/[\w/]+")
 CARRIED = ("icon", "icon_state", "mob_overlay_icon", "sleeved", "detail_tag",
            "detail_color", "abstract_type", "item_path", "name", "misc_flags",
-           "item_flags", "id", "custom_clothes")
+           "item_flags", "id", "custom_clothes", "slot_flags", "armor_type",
+           "body_parts_covered", "resistance_flags", "max_integrity",
+           "armor_class", "item_weight")
 RECIPE_VARS = ("output", "output_item", "created_item", "result_type")
+# vars whose values are pasted over wholesale from a donor fork, so a constant that
+# only exists over there compiles nowhere here: CLOTHING_GOLD cost a build to learn
+CONSTANT_VARS = ("detail_color", "misc_flags", "item_flags", "slot_flags",
+                 "armor_type", "body_parts_covered", "resistance_flags",
+                 "max_integrity", "armor_class", "item_weight")
 # the five kinds the sprite test demands female and per-species worn cells for
 GENDERED_ROOTS = ("/obj/item/clothing/cloak", "/obj/item/clothing/shoes",
                   "/obj/item/clothing/gloves", "/obj/item/clothing/pants",
@@ -146,6 +154,18 @@ def collect_exclusions():
     return exact, subtree, by_text, subtypes_only
 
 
+def collect_defines():
+    """Every #define in the tree, so a pasted-in constant can be checked for existence."""
+    names = set()
+    for path in walk_dm("."):
+        try:
+            text = io.open(path, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        names.update(re.findall(r"^#define\s+(\w+)", text, re.M))
+    return names
+
+
 def collect_handouts():
     """Clothing paths that loot tables and supply packs already put in the world."""
     found = set()
@@ -193,6 +213,7 @@ def main():
         return wanted_files is None or f.startswith(wanted_files)
 
     excluded, excluded_subtrees, excluded_text, excluded_sub_only = collect_exclusions()
+    defines = collect_defines()
 
     def is_excluded(path):
         if path in excluded:
@@ -283,6 +304,17 @@ def main():
                             problems["sprites"].append(
                                 "%s: %s has no %r" % (path, worn.split("/")[-1], want))
 
+        # --- constants that only exist on the donor fork ---------------------
+        for key in CONSTANT_VARS:
+            raw = v.get(key)
+            if not raw:
+                continue
+            bare = re.sub(r"\"[^\"]*\"|'[^']*'", "", raw.split("//")[0])
+            for token in re.findall(r"[A-Z][A-Z0-9_]{2,}", bare):
+                if token not in defines:
+                    problems["constants"].append(
+                        "%s: %s = %s, but %s is not #defined anywhere" % (path, key, raw, token))
+
         # --- detail tag pairing --------------------------------------------
         tag = (v.get("detail_tag") or "").strip('"')
         if tag == "null":
@@ -334,7 +366,7 @@ def main():
     total = sum(len(v) for v in problems.values())
     print("checked %d modular item types in %s"
           % (checked, ", ".join(args.module) if args.module else "every module"))
-    for kind in ("sprites", "details", "obtainable", "loadout", "elixirs"):
+    for kind in ("sprites", "details", "constants", "obtainable", "loadout", "elixirs"):
         found = problems[kind]
         print("  %-11s %s" % (kind, "clean" if not found else "%d problem(s)" % len(found)))
         for line in found if args.verbose or len(found) <= 12 else found[:12]:

@@ -5,7 +5,7 @@
 	mob_overlay_icon = 'modular_abel/azure_wardrobe/icons/azure_wardrobe_onmob64.dmi'
 	icon_state = "bighat"
 	detail_tag = "_detail"
-	detail_color = CLOTHING_GOLD
+	detail_color = CLOTHING_MUSTARD_YELLOW
 	sellprice = 60
 
 /obj/item/clothing/face/birdmask
