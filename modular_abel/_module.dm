@@ -19,6 +19,8 @@
 #include "garments/_garments.dm"
 #include "snouted_helms/_snouted_helms.dm"
 #include "sundries/_sundries.dm"
+#include "azure_wardrobe/_azure_wardrobe.dm"
+#include "twilight_wardrobe/_twilight_wardrobe.dm"
 #include "job_starting_coins.dm"
 #include "map_advclass_blacklist.dm"
 #include "cyrillic_say_fix.dm"

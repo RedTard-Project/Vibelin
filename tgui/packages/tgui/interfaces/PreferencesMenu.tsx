@@ -123,6 +123,17 @@ type PrefsData = {
   initial_tab: string;
   tgui_theme: string;
   tgui_themes: { value: string; label: string }[];
+  tgui_font_size: number | null;
+  tgui_line_height: number | null;
+  tgui_text_bounds: {
+    font_min: number;
+    font_max: number;
+    font_default: number;
+    line_min: number;
+    line_max: number;
+    line_step: number;
+    line_default: number;
+  };
   open_sequence: number;
   preferences_fullscreen: Booleanish;
   preferences_scale: number;
@@ -1980,6 +1991,70 @@ export const PreferencesMenu = () => {
     );
   };
 
+  const bounds = data.tgui_text_bounds ?? {
+    font_min: 10,
+    font_max: 20,
+    font_default: 14,
+    line_min: 100,
+    line_max: 220,
+    line_step: 5,
+    line_default: 120,
+  };
+
+  // Null means "whatever the theme says", so the button shows Theme and clicking
+  // it sends no value at all, which is what the backend reads back as null.
+  const textStepper = (props: {
+    icon: string;
+    label: string;
+    value: number | null;
+    fallback: number;
+    min: number;
+    max: number;
+    step: number;
+    unit: string;
+    send: (value: number) => void;
+    reset: () => void;
+  }) => {
+    const current = props.value ?? props.fallback;
+    return (
+      <Stack align="center" mt={0.5}>
+        <Stack.Item>
+          <Icon name={props.icon} />
+        </Stack.Item>
+        <Stack.Item grow>
+          <Box color="label">{tp(props.label)}</Box>
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            compact
+            icon="minus"
+            disabled={current <= props.min}
+            onClick={() => props.send(current - props.step)}
+          />
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            compact
+            tooltip={tp('Back to the theme default')}
+            onClick={props.reset}
+          >
+            {props.value === null
+              ? tp('Theme')
+              : `${props.value}${props.unit}`}
+          </Button>
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            compact
+            icon="plus"
+            disabled={current >= props.max}
+            onClick={() => props.send(current + props.step)}
+          />
+        </Stack.Item>
+      </Stack>
+    );
+  };
+
   const renderSettings = () => {
     const game = data.game_prefs || ({} as PrefsData['game_prefs']);
     const toggle = (preference: string) => doPref(preference);
@@ -2009,6 +2084,32 @@ export const PreferencesMenu = () => {
               </Button>
             ))}
           </Box>
+          {textStepper({
+            icon: 'text-height',
+            label: 'Font Size',
+            value: data.tgui_font_size,
+            fallback: bounds.font_default,
+            min: bounds.font_min,
+            max: bounds.font_max,
+            step: 1,
+            unit: 'px',
+            send: (size) =>
+              doPref('character_setup_tgui_font_size', undefined, { size }),
+            reset: () => doPref('character_setup_tgui_font_size'),
+          })}
+          {textStepper({
+            icon: 'align-justify',
+            label: 'Line Spacing',
+            value: data.tgui_line_height,
+            fallback: bounds.line_default,
+            min: bounds.line_min,
+            max: bounds.line_max,
+            step: bounds.line_step,
+            unit: '%',
+            send: (height) =>
+              doPref('character_setup_tgui_line_height', undefined, { height }),
+            reset: () => doPref('character_setup_tgui_line_height'),
+          })}
         </Panel>
 
         <Panel title="Display" icon="eye">
@@ -2290,10 +2391,10 @@ export const PreferencesMenu = () => {
                   </Stack>
                 </Stack.Item>
 
-                <Stack.Item basis="260px">
-                  <Section fill title={tp('Looking Glass')}>
-                    <Stack vertical fill>
-                      <Stack.Item grow>
+                <Stack.Item basis="174px">
+                  <Section title={tp('Looking Glass')}>
+                    <Stack vertical>
+                      <Stack.Item>
                         <Box
                           style={{
                             display: 'flex',

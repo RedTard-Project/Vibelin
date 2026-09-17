@@ -110,7 +110,12 @@ export function Window(props: Props) {
       : config.status < UI_INTERACTIVE);
 
   return suspended ? null : (
-    <Layout className="Window" theme={theme}>
+    <Layout
+      className="Window"
+      theme={theme}
+      fontSize={config.window?.font_size}
+      lineHeight={config.window?.line_height}
+    >
       <TitleBar
         title={title || decodeHtmlEntities(config.title)}
         status={config.status}

@@ -181,6 +181,12 @@ Map QA helpers (run from the repo root with `tools/bootstrap/python`):
 - `modular_abel/tools/run_maplint.py` runs the `tools/maplint` lints over the
   generated maps (works around Windows BOM/locale issues in the upstream
   runner).
+- `modular_abel/tools/port_clothing.py --donor <checkout> --types <list>` reads a
+  donor fork's clothing types, resolves the sheets they actually inherit, guesses the
+  local parent (through `dun_world/config/map.json`'s replacement table) and prints a
+  `dmi_merge.py` spec plus a DM draft. Read-only. It is the front half of the
+  `azure_wardrobe` / `twilight_wardrobe` ports; the candidate lists themselves come from
+  `compare_clothing_sprites.py` in the ai-skills repo.
 - `modular_abel/tools/dmi_states.py a.dmi [b.dmi]` prints DMI icon states, or
   with two files shows the states present only in the second one.
 

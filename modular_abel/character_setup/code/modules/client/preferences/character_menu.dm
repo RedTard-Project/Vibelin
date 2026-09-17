@@ -305,12 +305,16 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		return
 	S.cd = "/"
 	S["character_setup_tgui_theme"] >> character_setup_tgui_theme
+	S["character_setup_tgui_font_size"] >> character_setup_tgui_font_size
+	S["character_setup_tgui_line_height"] >> character_setup_tgui_line_height
 	S["character_setup_preferences_fullscreen"] >> character_setup_preferences_fullscreen
 	S["character_setup_preferences_scale"] >> character_setup_preferences_scale
 	var/loaded_scale_version
 	S["character_setup_preferences_scale_version"] >> loaded_scale_version
 	if(!isnull(character_setup_tgui_theme))
 		character_setup_tgui_theme = sanitize_tgui_theme(character_setup_tgui_theme)
+	character_setup_tgui_font_size = sanitize_tgui_font_size(character_setup_tgui_font_size)
+	character_setup_tgui_line_height = sanitize_tgui_line_height(character_setup_tgui_line_height)
 	character_setup_preferences_fullscreen = !!character_setup_preferences_fullscreen
 	if(!isnum(loaded_scale_version) || loaded_scale_version < character_setup_preferences_scale_version)
 		character_setup_preferences_scale = initial(character_setup_preferences_scale)
@@ -325,6 +329,8 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		return
 	S.cd = "/"
 	WRITE_FILE(S["character_setup_tgui_theme"], character_setup_tgui_theme)
+	WRITE_FILE(S["character_setup_tgui_font_size"], character_setup_tgui_font_size)
+	WRITE_FILE(S["character_setup_tgui_line_height"], character_setup_tgui_line_height)
 	WRITE_FILE(S["character_setup_preferences_fullscreen"], character_setup_preferences_fullscreen)
 	WRITE_FILE(S["character_setup_preferences_scale"], character_setup_preferences_scale)
 	WRITE_FILE(S["character_setup_preferences_scale_version"], character_setup_preferences_scale_version)
@@ -1421,6 +1427,9 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	data["initial_tab"] = character_setup_preferences_initial_tab
 	data["open_sequence"] = character_setup_preferences_open_sequence
 	data["tgui_theme"] = sanitize_tgui_theme(character_setup_tgui_theme)
+	data["tgui_font_size"] = character_setup_tgui_font_size
+	data["tgui_line_height"] = character_setup_tgui_line_height
+	data["tgui_text_bounds"] = tgui_text_bounds()
 	data["tgui_themes"] = tgui_theme_options()
 	data["preferences_fullscreen"] = !!character_setup_preferences_fullscreen
 	data["preferences_scale"] = character_setup_preferences_scale
@@ -1827,6 +1836,20 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			var/new_theme = sanitize_tgui_theme(href_list["theme"])
 			if(new_theme != character_setup_tgui_theme)
 				character_setup_tgui_theme = new_theme
+				save_preferences()
+				SStgui.update_uis(src)
+			return TRUE
+		if("character_setup_tgui_font_size")
+			var/new_size = sanitize_tgui_font_size(href_list["size"])
+			if(new_size != character_setup_tgui_font_size)
+				character_setup_tgui_font_size = new_size
+				save_preferences()
+				SStgui.update_uis(src)
+			return TRUE
+		if("character_setup_tgui_line_height")
+			var/new_height = sanitize_tgui_line_height(href_list["height"])
+			if(new_height != character_setup_tgui_line_height)
+				character_setup_tgui_line_height = new_height
 				save_preferences()
 				SStgui.update_uis(src)
 			return TRUE

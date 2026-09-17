@@ -80,6 +80,9 @@
 		return list()
 	return ..()
 
+/datum/browser/build_page()
+	return replacetext(..(), "charset=ISO-8859-1", "charset=UTF-8")
+
 #if defined(UNIT_TESTS) || defined(SPACEMAN_DMM)
 /datum/unit_test/turf_coverage/Run()
 	var/list/all_turfs = subtypesof(/turf)
