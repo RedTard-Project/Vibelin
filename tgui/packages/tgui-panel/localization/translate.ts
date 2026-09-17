@@ -7,6 +7,8 @@ const CACHE_LIMIT = 4000;
 
 let lang: Lang = 'ru';
 let nouns: Record<string, Cases> = {};
+let honorifics: Record<string, Cases> = {};
+let honorificsByLength: string[] = [];
 let fragments: Record<string, string> = {};
 let patterns: CompiledPattern[] = [];
 let declensions: Record<string, Cases> = {};
@@ -29,6 +31,9 @@ export function getLang(): Lang {
 
 export function loadDictionary(data: Dictionary): void {
   nouns = data?.nouns ?? {};
+  honorifics = data?.honorifics ?? {};
+  // longest first, so "Lady Herald" is tried before "Lady"
+  honorificsByLength = Object.keys(honorifics).sort((a, b) => b.length - a.length);
   fragments = data?.fragments ?? {};
   patterns = [];
 
@@ -64,6 +69,32 @@ function lookup(value: string): Cases | undefined {
   return nouns[value] ?? declensions[value];
 }
 
+/**
+ * Splits a leading honorific off a name the server glued together, declines the
+ * title, and declines the rest separately.
+ *
+ * "Lady Herald Vicente" has no entry of its own and never will: the title comes
+ * from the job and the name from the player. Splitting is restricted to the
+ * honorific table so an item whose name happens to start with a dictionary word
+ * is never cut in half. The title is still worth translating when the player set
+ * no declensions, so a missing name entry falls back to the raw name.
+ */
+function declineTitled(value: string, caseKey: CaseKey): string | undefined {
+  for (const title of honorificsByLength) {
+    if (!value.startsWith(title + ' ')) {
+      continue;
+    }
+    const rest = value.slice(title.length + 1);
+    if (!rest) {
+      continue;
+    }
+    const declinedTitle = honorifics[title][caseKey] ?? title;
+    const restEntry = lookup(rest);
+    return declinedTitle + ' ' + (restEntry?.[caseKey] ?? rest);
+  }
+  return undefined;
+}
+
 function decline(value: string, caseKey: CaseKey): string {
   // DM writes items both bare and through \a / \the, so the same sword arrives
   // as "sword", "a sword" or "the sword". Russian has no articles either way.
@@ -79,7 +110,7 @@ function decline(value: string, caseKey: CaseKey): string {
     }
   }
   if (!entry) {
-    return value;
+    return declineTitled(value, caseKey) ?? value;
   }
   return entry[caseKey] ?? value;
 }

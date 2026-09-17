@@ -19,6 +19,12 @@ export type RawPattern = {
 export type Dictionary = {
   version: number;
   nouns: Record<string, Cases>;
+  /**
+   * Titles the server glues onto a name in the same string ("Lady Herald Ivan"),
+   * which is why they need their own table: the engine may split a capture on
+   * these and on nothing else.
+   */
+  honorifics?: Record<string, Cases>;
   fragments: Record<string, string>;
   patterns: RawPattern[];
 };

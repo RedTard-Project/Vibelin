@@ -27,6 +27,10 @@ GLOBAL_LIST_INIT(chat_noun_cases, list("nom", "gen", "dat", "acc", "ins", "pre")
 	return list(
 		"version" = LOCALIZATION_DICT_VERSION,
 		"nouns" = nouns,
+		// Kept apart from nouns on purpose: the panel is allowed to split a
+		// capture on these and only these, so an item whose name happens to
+		// start with a dictionary word is never cut in half.
+		"honorifics" = load_nouns("honorifics.txt"),
 		"fragments" = fragments,
 		"patterns" = load_patterns("patterns.txt"),
 	)

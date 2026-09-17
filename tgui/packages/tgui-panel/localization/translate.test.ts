@@ -20,6 +20,16 @@ const DICTIONARY = {
     // declined by the same mechanism instead of doubling every pattern
     'me': { nom: 'я', gen: 'меня', dat: 'мне', acc: 'меня' },
   },
+  honorifics: {
+    'Sir': { nom: 'сир', gen: 'сира', dat: 'сиру', acc: 'сира' },
+    'Lady': { nom: 'леди', gen: 'леди', dat: 'леди', acc: 'леди' },
+    'Lady Herald': {
+      nom: 'леди-герольд',
+      gen: 'леди-герольд',
+      dat: 'леди-герольд',
+      acc: 'леди-герольд',
+    },
+  },
   fragments: {
     'Armor stops the damage.': 'Броня поглощает урон.',
     'SNEAK ATTACK!': 'АТАКА ИСПОДТИШКА!',
@@ -208,5 +218,37 @@ describe('chat translation', () => {
   it('matches kg before g in the examine footer', () => {
     expect(translateText('It weighs around 2.5kg.')).toBe('Вес около 2.5 кг.');
     expect(translateText('It weighs around 700g.')).toBe('Вес около 700 г.');
+  });
+
+  it('splits a title off a name so the declensions still match', () => {
+    expect(translateText('Sir Aldric slashed Sir Ivan!')).toBe(
+      'Sir Aldric рубит сира Ивана!',
+    );
+  });
+
+  it('prefers the longest title', () => {
+    expect(translateText('Sir Aldric slashed Lady Herald Ivan!')).toBe(
+      'Sir Aldric рубит леди-герольд Ивана!',
+    );
+    expect(translateText('Sir Aldric slashed Lady Ivan!')).toBe(
+      'Sir Aldric рубит леди Ивана!',
+    );
+  });
+
+  it('translates the title even when the name has no declensions', () => {
+    expect(translateText('Sir Aldric slashed Sir Bran!')).toBe(
+      'Sir Aldric рубит сира Bran!',
+    );
+  });
+
+  it('never splits a capture on anything but a title', () => {
+    // "sword" is in the noun table, but "Lady" is the only kind of word the
+    // engine may cut off; an item is translated whole or not at all
+    expect(translateText('Sir Aldric draws the sword!')).toBe(
+      'Sir Aldric достаёт меч!',
+    );
+    expect(translateText('Sir Aldric slashed sword of truth!')).toBe(
+      'Sir Aldric рубит sword of truth!',
+    );
   });
 });

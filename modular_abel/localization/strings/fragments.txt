@@ -318,6 +318,142 @@ Speech is currently admin-disabled. = Речь сейчас отключена �
 # <b>SPECIAL:</b> приходит своей текстовой нодой, имя приёма — соседней,
 # поэтому переводится только подпись.
 SPECIAL: = ОСОБОЕ:
-Max Range: = Макс. дальность:
-Stamina Drain: = Расход выносливости:
 This ability can be used by right clicking while in STRONG stance. = Этот приём применяется правой кнопкой в стойке СИЛЫ.
+
+# --- строки, которые перехватывал бы общий блок ударов ---
+# Фрагменты проверяются до паттернов, поэтому точная строка здесь всегда
+# выигрывает у "^(.+?) stings (.+?)!$" и ему подобных.
+Agony tears through me as my conjured servant is struck down! = Боль пронзает меня — призванного слугу сразили!
+An icy pilum strikes true - the cold seeps into my bones! = Ледяной пилум бьёт точно — холод вползает мне в кости!
+I hit my head on the window frame! = Я ударяюсь головой об оконную раму!
+I hit the ground, all momentum lost! = Я врезаюсь в землю, весь разгон потерян!
+I'm hit by my BANE! = Меня бьёт то, что ГУБИТ меня!
+Sand hits my eyes. I can't see! = Песок попадает мне в глаза. Я ничего не вижу!
+The coal runs too hot, a scorching hit sears your throat! = Уголь раскалился, обжигающая затяжка опаляет горло!
+The frost bites deep - my body burns with cold! = Мороз кусает глубоко — тело горит от холода!
+The ink stings your eyes! = Чернила жгут мне глаза!
+The liquid tears at your very existence! = Жидкость рвёт само моё существо!
+You cannot hit that location! = По этому месту мне не попасть!
+You fall over and hit the ground! = Я заваливаюсь и падаю наземь!
+You have dealt enough face punches to satisfy Graggar! = Я набил достаточно морд, чтобы Граггар был доволен!
+You're hit by a meteor! = В меня бьёт метеор!
+You're magically weighed down and hit the ground! = Магия придавливает меня, и я валюсь наземь!
+Your slash hits nothing! = Мой удар рассекает пустоту!
+the falcon scratches your face! = сокол раздирает мне лицо!
+The pain stings a little! = Боль слегка покалывает!
+
+# --- блок свойств предмета: метки и значения ---
+# Каждое <b>...</b> отрезает свою ноду, поэтому метки и значения переводятся
+# по отдельности (см. get_inspect_entries в code/game/objects/items.dm).
+SHARPNESS: = ОСТРОТА:
+DURABILITY: = ПРОЧНОСТЬ:
+SKILL: = НАВЫК:
+PARRY: = ПАРИРОВАНИЕ:
+BALANCE: = БАЛАНС:
+LENGTH: = ДЛИНА:
+ALT-GRIPPABLE = МОЖНО ПЕРЕХВАТИТЬ
+Cannot Parry = Парировать нельзя
+Heavy = Тяжёлый
+Swift = Лёгкий
+Short = Короткая
+Long = Длинная
+Great = Очень длинная
+
+# --- особые приёмы оружия (SPECIAL в экзамайне) ---
+Piercing Lunge = Пронзающий выпад
+Shin Prod = Тычок по голени
+Distracting Swipe = Отвлекающий взмах
+Ground Smash = Удар оземь
+Flail Sweep = Круговой мах цепом
+Quarterstaff Sweep = Подсечка посохом
+Polearm Backstep = Отход с древком
+Great Swing = Великий замах
+Hefty Swing = Тяжёлый замах
+Backstep = Отход
+Upper Cut = Апперкот
+Whip Coil = Захлёст кнутом
+Triple Stab = Тройной укол
+A planned attack at the chest, extending ourselves. Pierces our enemy's armor and knocks the wind from them. However, those on the floor will not be struck = Выверенный удар в грудь с выпадом. Пробивает броню врага и вышибает из него дух. Однако лежащих на земле он не достанет.
+A hasty attack at the legs, extending ourselves. Slows down the opponent if hit. However, those on the floor will not be struck = Поспешный удар по ногам с выпадом. При попадании замедляет противника. Однако лежащих на земле он не достанет.
+Swing tall at your primary flank in a distracting fashion. Anyone caught in it will be exposed for a short while. However, those on the floor will not be struck. = Широкий отвлекающий замах в сторону ведущей руки. Всякий, кого он заденет, ненадолго раскроется. Однако лежащих на земле он не достанет.
+Swings downward, leaving a traveling quake for a few tiles. Anyone struck by it will be slowed and offbalanced, or knocked down if they're already off-balanced. = Удар сверху вниз, оставляющий бегущую дрожь на несколько клеток. Задетый будет замедлен и потеряет равновесие, а если уже потерял — упадёт.
+Swings in a perfect circle all around you, pushing people aside. However, those on the floor will not be struck = Ровный круговой замах вокруг себя, расталкивающий всех прочь. Однако лежащих на земле он не достанет.
+Sweep a five-tile frontal arc, knocking foes back and leaving them vulnerable. Aims for the targeted zone. = Подсечка по дуге в пять клеток перед собой: враги отлетают и остаются уязвимы. Бьёт по выбранной части тела.
+A defensive used to quickly gain distance, shoving back any pursuer backwards, slowing and exposing them. Always targets the chest. = Оборонительный приём, чтобы быстро разорвать дистанцию: преследователя отбрасывает назад, замедляет и раскрывает. Всегда бьёт в грудь.
+Swing your greatsword all around you in a ring of Judgement. = Обведи двуручником круг Правосудия вокруг себя.
+Swings from left to right. Anyone caught in the swing get immobilized and exposed. = Замах слева направо. Всякий, кого он заденет, лишается движения и раскрывается.
+A defensive attack used to quickly gain distance, shoving back any pursuer backwards, slowing and exposing them. = Оборонительный удар, чтобы быстро разорвать дистанцию: преследователя отбрасывает назад, замедляет и раскрывает.
+Charge up a devastating strike infront of you, if the target is Exposed they will fall over and be flung back with tremendous damage, if not exposed they will be pushed slightly back.. = Накопи сокрушительный удар перед собой: раскрытая цель рухнет и отлетит назад с чудовищным уроном, нераскрытую лишь слегка оттолкнёт.
+A long-range lash that coils around the ankles of the target, trying pulling them off their feet. = Дальний хлёст, что обвивается вокруг лодыжек цели и силится сбить её с ног.
+Stab for the chest three times in quick succession. = Три быстрых укола в грудь подряд.
+
+# --- названия навыков и характеристик ---
+# Приходят своей нодой и в блоке свойств оружия (SKILL:), и в листе персонажа.
+Strength = Сила
+Perception = Восприятие
+Intelligence = Разум
+Constitution = Телосложение
+Endurance = Выносливость
+Speed = Ловкость
+Fortune = Удача
+Knife-fighting = Бой ножом
+Sword-fighting = Бой мечом
+Axes & Maces = Топоры и булавы
+Polearms = Древковое
+Whips & Flails = Кнуты и цепы
+Shields = Щиты
+Fist-fighting = Кулачный бой
+Wrestling = Борьба
+Archery = Стрельба из лука
+Crossbows = Самострелы
+Firearms = Огнестрел
+Athletics = Атлетика
+Climbing = Лазание
+Swimming = Плавание
+Sneaking = Скрытность
+Riding = Верховая езда
+Reading = Грамота
+Mathematics = Счёт
+Medicine = Врачевание
+Alchemy = Алхимия
+Miracles = Чудеса
+Arcyne Magic = Аркановая магия
+Blood Magic = Кровавая магия
+Druidic Trickery = Друидские хитрости
+Music = Музыка
+Taming = Приручение
+Trapping = Ловчее дело
+Fishing = Рыбная ловля
+Farming = Земледелие
+Butchering = Разделка
+Mining = Горное дело
+Smelting = Плавка
+Lumberjacking = Лесорубное дело
+Masonry = Каменное дело
+Carpentry = Плотницкое дело
+Crafting = Ремесло
+Engineering = Механика
+Blacksmithing = Кузнечное дело
+Weaponsmithing = Оружейное дело
+Armorsmithing = Бронное дело
+Weapon Repair = Починка оружия
+Armor Repair = Починка брони
+Mending = Штопка
+Sewing = Шитьё
+Skincrafting = Кожевенное дело
+Hide Patching = Латание шкур
+Locksmithing = Замочное дело
+Lockpicking = Взлом замков
+Pickpocketing = Карманная кража
+Bombcrafting = Бомбоделие
+Cooking = Стряпня
+Fine Cuisine = Изысканная кухня
+Baking = Выпечка
+Grilling = Жарка
+Confectionery = Сладости
+Cheesemaking = Сыроварение
+Brewing = Пивоварение
+Winemaking = Виноделие
+Distilling = Винокурение
+Preservation = Заготовка впрок
+Preparation = Подготовка

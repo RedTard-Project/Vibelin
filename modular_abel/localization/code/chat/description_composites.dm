@@ -55,3 +55,14 @@ GLOBAL_LIST_INIT(spellbook_theme_flavor_ru, list(
 	if(!plant_type || ui_lang_code(user?.client) != UI_LANG_CODE_RU)
 		return ..()
 	return "Дикая поросль: [plant_type.name]."
+
+/// The blood decal prepends its word to the name, which no Russian adjective can
+/// do safely: "bloody" would have to agree with a noun the component never sees
+/// (окровавленный меч but окровавленная рапира). Moving the marker behind the
+/// name sidesteps agreement entirely and reads the same for every gender.
+/datum/component/decal/blood/get_examine_name(datum/source, mob/user, list/override)
+	. = ..()
+	if(. != COMPONENT_EXNAME_CHANGED || ui_lang_code(user?.client) != UI_LANG_CODE_RU)
+		return
+	override[EXAMINE_POSITION_BEFORE] = " "
+	override[EXAMINE_POSITION_BEFORE + 1] = "[override[EXAMINE_POSITION_BEFORE + 1]] <span class='bloody'>в крови</span>"
