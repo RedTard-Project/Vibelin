@@ -542,6 +542,22 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		shown += chargen_tr_term(parent, age)
 	return shown.Join(", ")
 
+/datum/preferences/proc/character_setup_strip_species_warning(text)
+	var/static/regex/inline_warning = regex(@"(WARNING:\s*)?THIS IS AN?\b[\s\S]*?(DISCRIMINATED|RESTRICTED)[\s\S]*$")
+	return trim(inline_warning.Replace("[text]", ""))
+
+/datum/preferences/proc/character_setup_species_warning(datum/species/species, list/raw_tags)
+	if(!("Discriminated" in raw_tags))
+		return null
+	var/source = "[species.desc]"
+	if(findtext(source, "CHALLENGE SPECIES"))
+		return chargen_tr_line(parent, "warn:Challenge", "WARNING: THIS IS A HEAVILY DISCRIMINATED AGAINST CHALLENGE SPECIES WITH ACTIVE SPECIES DETRIMENTS. YOU CAN AND WILL DIE A LOT; PLAY AT YOUR OWN RISK!")
+	if(findtext(source, "EXTREMELY"))
+		return chargen_tr_line(parent, "warn:Extreme", "THIS IS AN EXTREMELY DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
+	if(findtext(source, "NOBLES EVEN MORE SO"))
+		return chargen_tr_line(parent, "warn:Nobles", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
+	return chargen_tr_line(parent, "warn:Discriminated", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. PLAY AT YOUR OWN RISK.")
+
 /datum/preferences/proc/character_setup_species_options()
 	. = list()
 	for(var/species_id in GLOB.roundstart_species)
@@ -551,8 +567,9 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		var/datum/species/species = new species_type()
 		var/lock_reason = character_setup_species_lock_reason(species)
 		var/available = !lock_reason
+		var/list/raw_tags = character_setup_species_tags(species, available)
 		var/raw_desc = chargen_tr_desc(parent, species_type, species.desc)
-		var/description = raw_desc ? character_setup_chargen_clean_text(raw_desc, 900) : "No description available."
+		var/description = raw_desc ? character_setup_chargen_clean_text(character_setup_strip_species_warning(raw_desc), 900) : "No description available."
 		var/list/display_ages = character_setup_species_display_ages(species)
 		. += list(list(
 			"id" = species.id,
@@ -566,6 +583,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			"tags" = character_setup_species_shown_tags(species, available),
 			"tag_descriptions" = character_setup_species_tag_descriptions(species, available),
 			"stats" = character_setup_species_stat_modifiers(species),
+			"warning" = character_setup_species_warning(species, raw_tags),
 		))
 
 /datum/preferences/proc/character_setup_apply_species(mob/user, species_id)

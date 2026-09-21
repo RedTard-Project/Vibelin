@@ -585,6 +585,21 @@ export const PreferencesMenu = () => {
                   {display(inspectedSpecies.description, 'No description.')}
                 </Box>
 
+                {inspectedSpecies.warning ? (
+                  <Box
+                    mb={1}
+                    bold
+                    color="bad"
+                    style={{
+                      whiteSpace: 'normal',
+                      overflowWrap: 'anywhere',
+                      lineHeight: '15px',
+                    }}
+                  >
+                    {inspectedSpecies.warning}
+                  </Box>
+                ) : null}
+
                 <Stack mb={1}>
                   <Stack.Item grow>
                     <InfoRow

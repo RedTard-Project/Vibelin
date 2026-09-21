@@ -24,6 +24,7 @@ export type SpeciesEntry = {
   ages: string;
   tags: string[];
   tag_descriptions?: Record<string, string>;
+  warning?: string | null;
   stats: SpeciesStat[];
 };
 

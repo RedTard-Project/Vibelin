@@ -444,6 +444,7 @@
 	var/list/templates = list(
 		"tag:Discriminated", "tag:Exotic", "tag:Taur", "tag:Available",
 		"tag:Language", "tag:Ancestry", "tag:Age", "tag:Generic",
+		"warn:Discriminated", "warn:Nobles", "warn:Extreme", "warn:Challenge",
 	)
 	var/list/needs_term = list("tag:Language", "tag:Ancestry", "tag:Age", "tag:Generic")
 
@@ -454,9 +455,9 @@
 
 	for(var/list/pair as anything in pairs)
 		var/key = pair[1]
-		if(copytext(key, 1, 5) == "tag:")
+		if(copytext(key, 1, 5) == "tag:" || copytext(key, 1, 6) == "warn:")
 			if(!(key in templates))
-				TEST_FAIL("\"[key]\" is not a tooltip template chargen renders; the entry is dead")
+				TEST_FAIL("\"[key]\" is not a template chargen renders; the entry is dead")
 			else if((key in needs_term) && !findtext(pair[2], "%TERM%"))
 				TEST_FAIL("template \"[key]\" interpolates a term but its translation has no %TERM%")
 			continue
