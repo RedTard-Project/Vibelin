@@ -1,6 +1,13 @@
 /datum/asset/json/chargen_catalog
 	name = "chargen_catalog"
 
+/proc/character_setup_catalog_customizers(datum/species/species)
+	. = species.customizers ? species.customizers.Copy() : list()
+	for(var/customizer_type in GLOB.character_setup_smallclothes_customizers)
+		. |= customizer_type
+	for(var/customizer_type in GLOB.character_setup_genital_customizers)
+		. |= customizer_type
+
 /datum/asset/json/chargen_catalog/generate()
 	var/list/data = list()
 	data["background_options"] = character_setup_background_options()
@@ -50,7 +57,7 @@
 	var/list/accessory_index = list()
 	for(var/species_id in GLOB.character_setup_species_instances)
 		var/datum/species/species = GLOB.character_setup_species_instances[species_id]
-		for(var/customizer_type in species.customizers)
+		for(var/customizer_type in character_setup_catalog_customizers(species))
 			var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
 			if(!customizer)
 				continue
