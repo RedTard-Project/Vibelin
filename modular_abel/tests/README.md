@@ -22,6 +22,18 @@ recipe. What follows is what upstream's suite cannot see.
 
 ## Gotchas when adding a test here
 
+- **Never `new()` an asset datum — use `get_asset_datum()`.** `/datum/asset/New()` writes
+  `GLOB.asset_datums[type] = src` and calls `register()`, so constructing a second one silently
+  *replaces the live singleton* with your copy and regenerates the asset. `qdel()`ing it afterwards
+  then hard-deletes, because the GLOB entry still holds the reference, and the rest of the round
+  gets a deleted datum back from `get_asset_datum()`. `generate()` is pure, so call it on the
+  registered instance and destroy nothing.
+- **A hard-delete failure reported by `create_and_destroy` may not be its own.** That test only
+  instantiates `/atom/movable` and `/turf` — it never touches datums — but it accounts hard
+  deletes across the **whole run**. A datum type named in its failure was created and qdel'd by
+  some other test; `total del count` tells you how many qdels there were in total, which is the
+  fastest way to tell whose they are.
+
 - **The `TEST_ASSERT` macros are gone.** `code/modules/unit_tests/_unit_tests.dm` `#undef`s
   `TEST_ASSERT`, `TEST_ASSERT_EQUAL` and `TEST_ASSERT_NOTEQUAL` at the end of the file, and this
   module is included after it in the DME. `TEST_FAIL`, `TEST_ASSERT_NOTNULL`, `TEST_ASSERT_NULL`

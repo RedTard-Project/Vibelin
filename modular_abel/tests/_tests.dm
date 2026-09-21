@@ -512,7 +512,10 @@
 /// builder still reaches for a preferences datum, or a species is missing a language slice,
 /// the whole species picker silently comes up empty for everyone.
 /datum/unit_test/modular_chargen_catalog/Run()
-	var/datum/asset/json/chargen_catalog/catalog = new()
+	var/datum/asset/json/chargen_catalog/catalog = get_asset_datum(/datum/asset/json/chargen_catalog)
+	if(!catalog)
+		TEST_FAIL("the chargen catalog asset is not registered")
+		return
 	var/list/data = catalog.generate()
 
 	for(var/key in list("background_options", "tgui_themes", "age_tooltips", "species_order", "species"))
@@ -555,14 +558,10 @@
 	var/list/accessory_index = data["accessory_index"]
 	if(!islist(option_lists) || !islist(accessory_index))
 		TEST_FAIL("the catalog has no deduplicated accessory index")
-		qdel(catalog)
 		return
 
-	for(var/species_id in GLOB.roundstart_species)
-		var/species_type = GLOB.species_list[species_id]
-		if(!species_type)
-			continue
-		var/datum/species/species = new species_type()
+	for(var/species_id in GLOB.character_setup_species_instances)
+		var/datum/species/species = GLOB.character_setup_species_instances[species_id]
 		for(var/customizer_type in species.customizers)
 			var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
 			if(!customizer)
@@ -586,6 +585,5 @@
 							TEST_FAIL("[choice_type] for [species.id]/[gender] resolves option [i] as [a["value"]] but builds [b["value"]]")
 							break
 
-	qdel(catalog)
 
 #endif

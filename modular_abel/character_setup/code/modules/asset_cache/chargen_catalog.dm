@@ -13,11 +13,9 @@
 
 	var/list/order = list()
 	var/list/species_entries = list()
-	for(var/species_id in GLOB.roundstart_species)
-		var/species_type = GLOB.species_list[species_id]
-		if(!species_type)
-			continue
-		var/datum/species/species = new species_type()
+	for(var/species_id in GLOB.character_setup_species_instances)
+		var/datum/species/species = GLOB.character_setup_species_instances[species_id]
+		var/species_type = species.type
 		order += species.id
 
 		var/list/display_ages = character_setup_species_display_ages(species)
@@ -50,11 +48,8 @@
 
 	var/list/option_lists = list()
 	var/list/accessory_index = list()
-	for(var/species_id in GLOB.roundstart_species)
-		var/species_type = GLOB.species_list[species_id]
-		if(!species_type)
-			continue
-		var/datum/species/species = new species_type()
+	for(var/species_id in GLOB.character_setup_species_instances)
+		var/datum/species/species = GLOB.character_setup_species_instances[species_id]
 		for(var/customizer_type in species.customizers)
 			var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
 			if(!customizer)
