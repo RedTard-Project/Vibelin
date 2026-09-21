@@ -81,9 +81,6 @@ Layout:
   layer for tgui chat: a dictionary shipped as a browser asset (CDN webroot when one
   is configured, BYOND otherwise) and applied client-side to rendered chat text, plus
   the per-character case declensions that feed it. See `localization/README.md`.
-- `telemetry/` — temporary instrumentation for the tgui optimisation pass: the topic census
-  and the tgui census, with live toggles and two dedicated log files. See
-  `telemetry/README.md`. Remove once the optimisation pass is done.
 - `tests/` — the module's own unit tests (`tests/_tests.dm`), compiled only under
   `UNIT_TESTS`/`SPACEMAN_DMM`. They cover what upstream's suite does not reach: the loadout
   panel's key contract, the morphing-elixir invariants, and the exclusion lists in

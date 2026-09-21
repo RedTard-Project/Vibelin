@@ -136,7 +136,6 @@
 		. += list(accessory_option)
 
 /datum/preferences/proc/character_setup_build_feature_options()
-	var/_t = TICK_USAGE_REAL
 	var/list/choices = list()
 	var/list/accessories = list()
 	. = list("choices" = choices, "accessories" = accessories)
@@ -163,10 +162,8 @@
 			var/list/accessory_options = character_setup_accessory_option_list(iter_choice)
 			if(length(accessory_options))
 				accessories["[choice_type]"] = accessory_options
-	character_setup_log_op("build_feature_options", _t, "choices=[length(choices)] accessories=[length(accessories)]")
 
 /datum/preferences/proc/character_setup_build_features_data()
-	var/_t = TICK_USAGE_REAL
 	var/list/features = list()
 	if(!pref_species)
 		return features
@@ -221,5 +218,4 @@
 			feature["extras"] = extras
 
 		features += list(feature)
-	character_setup_log_op("build_features_data", _t, "features=[length(features)]")
 	return features

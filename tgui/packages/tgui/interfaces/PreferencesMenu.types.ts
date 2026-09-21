@@ -103,7 +103,6 @@ export type PrefsData = {
   declensions?: Record<string, string>;
   initial_tab: string;
   tgui_theme: string;
-  tgui_themes: { value: string; label: string }[];
   tgui_font_size: number | null;
   tgui_line_height: number | null;
   tgui_text_bounds: {
@@ -121,7 +120,7 @@ export type PrefsData = {
   preview_scale: number;
   species_id: string;
   species_name: string;
-  species_options: SpeciesEntry[];
+  species_availability: Record<string, { available: boolean; lock_reason: string }>;
   is_taur: Booleanish;
   taur_body: string;
   taur_color: string;
@@ -141,7 +140,6 @@ export type PrefsData = {
   age_min: number;
   age_max: number;
   age_options: string[];
-  age_tooltips: Record<string, string>;
   pronouns: string;
   domhand: string;
   ancestry_label: string;
@@ -154,7 +152,6 @@ export type PrefsData = {
   preview_clothes: Booleanish;
   preview_dir: number;
   background: string;
-  background_options: FeatureOption[];
   feature_choice_options?: Record<string, FeatureOption[]>;
   feature_accessory_options?: Record<string, FeatureOption[]>;
   preview_map: string | null;

@@ -2,7 +2,7 @@
 
 Replaces the upstream character-setup browser window with a modular one
 (`code/modules/client/preferences/character_menu.dm` in this folder), plus the smallclothes
-system, the topic census instrumentation and the modular preference hooks.
+system and the modular preference hooks.
 
 ## Topic routing
 
@@ -18,12 +18,6 @@ invalid key, so falling through is safe.
 The smallclothes module loads through the upstream `_load_appearence(savefile)` hook and saves
 in a `save_character()` override. Three other modules do the same (`erp`, `races/taur`,
 `loadout_panel`), so one character save currently opens the savefile several times over.
-
-## Topic census
-
-The topic census moved out of this module into `modular_abel/telemetry/`, together with the new
-tgui census. Its three call sites in `code/modules/client/client_procs.dm` are unchanged — the
-procs it calls are global, so only the file location moved.
 
 ## Interface themes
 
@@ -76,9 +70,8 @@ player's choice.
 The theme also reaches **every** tgui window now, not just this one. Upstream
 `/datum/tgui/get_payload` hardcodes `"theme" = "grim"` (`code/modules/tgui/tgui.dm:262`);
 `tgui_theme.dm` overrides `get_payload` and rewrites `config.window.theme` from the player's
-preference after `..()` runs. That is a second same-type redefinition of the same proc — the
-telemetry module also chains one — which BYOND resolves by running them in include order,
-outermost last.
+preference after `..()` runs. That is a same-type redefinition of the same proc, which BYOND
+resolves by running every definition in include order, outermost last.
 
 Rebuild the bundle after touching any `.scss`: `bun run tgui:build` from `tgui/`.
 
@@ -209,7 +202,8 @@ frontend half covers a menu closed without DM's `ui_close` having run first.
 ## Payload split and op timing
 
 `ui_data()` was 53 KB per partial payload with `static=0`, resent on every update — 423 payloads
-and 23.3 MB in one round for two clients (`modular_abel/telemetry/README.md`). The heavy blocks
+and 23.3 MB in one round for two clients, measured with the tgui census that instrumented the
+optimisation pass and has since been removed. The heavy blocks
 were already memoised in `character_setup_ui_heavy_cache`, so they were not being *rebuilt*; they
 were being re-serialised and re-sent. Caching the build is the wrong axis: what costs is the wire,
 and the framework mechanism for that is `ui_static_data()` plus an explicit `update_static_data()`
@@ -256,10 +250,76 @@ place it is now built). The option catalogs run through `customizer.is_allowed(s
 therefore be filtered by the ERP flag on some subtypes. Toggling ERP is rare, so the cost is one
 extra full update and the reward is that a whole class of stale-catalog bug cannot happen.
 
-`character_setup_log_op()` measured with `world.timeofday`, which is deciseconds — so every
-op in the round log read `took=0ds` and the 43 ms the tgui census attributes to `act/pref` was
-invisible to it. It now uses `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS` like the telemetry module and
-reports milliseconds.
+The instrumentation this module carried while that work was done — a per-op disk logger behind
+`GLOB.character_setup_debug`, 57 call sites deep — has been removed along with the tgui census.
+One lesson from it is worth keeping: it timed with `world.timeofday`, which is deciseconds, so
+every op read `took=0ds` and the 43 ms that `act/pref` actually cost was invisible. Sub-tick work
+in DM needs `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS`; anything coarser reports zero and hides the
+thing you are looking for.
+
+## The third tier: a constant catalog
+
+The static split above fixed the wrong half first. `ui_static_data()` is per player and is resent
+whenever `character_setup_static_sig` changes — and that signature is
+`species-gender-erp`. So every time a player clicked a different species, the server rebuilt and
+resent the full list of 33 species with their descriptions, tags and stat sheets: a block that
+cannot change when the species changes.
+
+/tg/ does not have this problem because its chargen has three tiers, not two
+(`code/modules/client/preferences.dm` + `preferences/assets.dm`):
+
+| tier | scope | how often |
+|---|---|---|
+| `compile_constant_data()` → `/datum/asset/json/preferences` | whole server | generated once, then browser-cached |
+| `ui_static_data()` | one player | on open, and on an explicit `update_static_data()` |
+| `ui_data()` | one player | every update |
+
+This fork inherited `compile_constant_data()` on the preference base types and **never called it** —
+the producer arrived at port time, the consumer (`/datum/asset/json/preferences` and the
+`preference_middleware` system) did not. Five overrides sat dead.
+
+`modular_abel/character_setup/code/modules/asset_cache/chargen_catalog.dm` is that missing tier,
+built for this fork's shape rather than copied. The difference that matters: /tg/'s constant data
+really is constant, because /tg/ has no per-player language. Ours has two, so the catalog carries
+an axis /tg/'s does not.
+
+What is genuinely invariant, and what is not:
+
+| block | varies by | where it lives now |
+|---|---|---|
+| background options, tgui themes, age tooltips | nothing | catalog |
+| species name, description, language, ancestry label, ages, tags, warning | **language** | catalog, under `en` / `ru` |
+| species stat modifiers | **gender** | catalog, under `stats.male` / `stats.female` |
+| species `available` / `lock_reason` | the player's unlocks | `ui_static_data()` |
+| ancestry options, age options, feature catalogs | the selected species | `ui_static_data()` |
+
+So the catalog holds every species once, with two language slices and two stat sheets, and
+`ui_static_data()` keeps a map of 33 `{available, lock_reason}` pairs. Changing species now resends
+that map and the species-dependent catalogs, and nothing else.
+
+Making that possible needed the translation layer to answer for a language rather than for a
+client. `chargen_tr_*()` funnelled everything through `chargen_sheet_active(target)`, so each
+resolver in `modular_abel/localization/code/chat/chargen_sheet.dm` grew a `_for(ru, …)` core and
+the client-taking proc became a one-line wrapper. Nothing at the call sites changed.
+
+The same lift applies on the DM side: the builders that never touched `src` became global procs,
+and the four that only needed `parent` for its language take `ru` instead. What stayed a
+`/datum/preferences/proc/` is exactly what is genuinely per player —
+`character_setup_species_lock_reason()` and `character_setup_species_availability()`.
+
+Two things to know before touching this:
+
+- **`generate()` runs at `SSassets` init, with no player in scope.** `/datum/asset/New()` calls
+  `register()` immediately and `SSassets.Initialize()` constructs every non-abstract asset, so a
+  builder that reaches for a preferences datum fails at roundstart rather than at first open.
+  `modular_chargen_catalog` in `modular_abel/tests/_tests.dm` generates the catalog and asserts
+  every roundstart species has both language slices and both stat sheets, which is what that
+  failure would look like.
+- **The frontend must wait for the asset mapping.** `resolveAsset()` returns the bare filename
+  until the `asset/mappings` message lands, so fetching on mount would 404 and leave the species
+  list permanently empty. `PreferencesMenu.catalog.ts` polls `loadedMappings` for the real url
+  first, then fetches with retries, and the picker distinguishes loading from failure from
+  no-match rather than showing one silent empty box for all three.
 
 ### The thumbnail map is gone
 

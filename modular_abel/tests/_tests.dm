@@ -170,42 +170,6 @@
 			else
 				seen[path] = list_name
 
-/datum/unit_test/modular_telemetry/Run()
-	var/list/before = GLOB.tgui_census_interfaces.Copy()
-	var/list/record = tgui_census_record("UnitTestInterface")
-	for(var/field in list("opens", "closes", "full", "partial", "process", "process_ms", "payloads", "payload_ms", "payload_ms_max", "full_payload_ms", "full_payloads", "bytes", "bytes_max", "static_bytes", "static_repeats", "acts", "act_ms", "act_ms_max", "slow"))
-		if(isnull(record[field]))
-			TEST_FAIL("tgui census record has no \"[field]\" counter, so tgui_census_format will print null for it")
-	if(!islist(record["actions"]))
-		TEST_FAIL("tgui census record has no actions list")
-
-	record["payloads"] = 4
-	record["payload_ms"] = 10
-	record["bytes"] = 400
-	record["acts"] = 2
-	record["act_ms"] = 3
-	record["actions"]["unit_test_action"] = 2
-	var/formatted = tgui_census_format("UnitTestInterface", record)
-	if(!findtext(formatted, "UnitTestInterface") || !findtext(formatted, "unit_test_action"))
-		TEST_FAIL("tgui_census_format dropped the interface or its actions: [formatted]")
-
-	tgui_census_flush()
-	if(length(GLOB.tgui_census_interfaces))
-		TEST_FAIL("tgui_census_flush left [length(GLOB.tgui_census_interfaces)] interfaces behind instead of resetting the window")
-	GLOB.tgui_census_interfaces = before
-
-	var/list/cases = list(
-		list("tgui" = 1, "type" = "act/toggle") = "act/toggle",
-		list("tgui" = 1, "type" = "ready") = "ready",
-		list("tgui" = 1) = "tgui:?",
-		list("_src_" = "prefs", "proc" = "set_name") = "legacy:prefs/set_name",
-	)
-	for(var/list/href_list in cases)
-		var/classified = topic_census_classify(href_list, null)
-		if(classified != cases[href_list])
-			TEST_FAIL("topic_census_classify returned \"[classified]\" for [json_encode(href_list)], expected \"[cases[href_list]]\"")
-	if(topic_census_classify(list(), null) != "raw")
-		TEST_FAIL("topic_census_classify does not fall back to \"raw\" for an empty href list")
 
 /datum/unit_test/modular_tgui_themes/Run()
 	if(!length(GLOB.tgui_themes))
@@ -543,5 +507,47 @@
 	for(var/case_key in valid_cases)
 		if(!seen_cases[case_key])
 			TEST_FAIL("no preference offers case \"[case_key]\", but a template can ask for it")
+
+/// The chargen catalog is generated once at asset init, outside any player context. If a
+/// builder still reaches for a preferences datum, or a species is missing a language slice,
+/// the whole species picker silently comes up empty for everyone.
+/datum/unit_test/modular_chargen_catalog/Run()
+	var/datum/asset/json/chargen_catalog/catalog = new()
+	var/list/data = catalog.generate()
+
+	for(var/key in list("background_options", "tgui_themes", "age_tooltips", "species_order", "species"))
+		if(isnull(data[key]))
+			TEST_FAIL("the chargen catalog has no \"[key]\" block, so the menu reads undefined for it")
+
+	var/list/species_entries = data["species"]
+	var/list/order = data["species_order"]
+
+	if(length(order) != length(GLOB.roundstart_species))
+		TEST_FAIL("catalog lists [length(order)] species but [length(GLOB.roundstart_species)] are roundstart")
+
+	for(var/species_id in GLOB.roundstart_species)
+		if(!(species_id in order))
+			TEST_FAIL("[species_id] is roundstart but missing from species_order, so it never renders")
+		var/list/entry = species_entries[species_id]
+		if(!islist(entry))
+			TEST_FAIL("[species_id] has no catalog entry")
+			continue
+
+		var/list/stats = entry["stats"]
+		if(!islist(stats) || isnull(stats["[MALE]"]) || isnull(stats["[FEMALE]"]))
+			TEST_FAIL("[species_id] is missing a per-gender stat sheet, so one gender shows no modifiers")
+
+		for(var/slice in list("en", "ru"))
+			var/list/text = entry[slice]
+			if(!islist(text))
+				TEST_FAIL("[species_id] has no \"[slice]\" slice, so that language shows a blank card")
+				continue
+			for(var/field in list("name", "description", "language", "ancestry_label", "ages", "locked_tag"))
+				if(!length(text[field]))
+					TEST_FAIL("[species_id] \"[slice]\" has an empty \"[field]\"")
+			if(!islist(text["tags"]) || !islist(text["tag_descriptions"]))
+				TEST_FAIL("[species_id] \"[slice]\" has no tag lists")
+
+	qdel(catalog)
 
 #endif

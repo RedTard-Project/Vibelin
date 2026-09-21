@@ -15,6 +15,10 @@ import { useBackend } from '../backend';
 import { Window } from '../layouts';
 import { ByondMapView } from './_common/ByondMapView';
 import {
+  buildSpeciesOptions,
+  useChargenCatalog,
+} from './PreferencesMenu.catalog';
+import {
   ActionButton,
   asBool,
   BACKDROP_KEY,
@@ -225,6 +229,14 @@ export const PreferencesMenu = () => {
     return () => clearTimeout(timer);
   }, [localRoundSeconds]);
 
+  const { catalog, failed: catalogFailed } = useChargenCatalog();
+  const speciesOptions = buildSpeciesOptions(
+    catalog,
+    data.species_availability,
+    data.lang,
+    data.gender,
+  );
+
   const ageOptions = data.age_options ?? [];
   const erpEnabled = asBool(data.erp_enabled);
   const loadouts = data.loadouts ?? [];
@@ -357,7 +369,6 @@ export const PreferencesMenu = () => {
   );
 
   const renderSpeciesPicker = () => {
-    const speciesOptions = data.species_options ?? [];
     const currentSpecies =
       speciesOptions.find((species) => species.id === data.species_id) ||
       speciesOptions.find((species) => species.name === data.species_name);
@@ -500,7 +511,11 @@ export const PreferencesMenu = () => {
                 })
               ) : (
                 <Box color="label" py={2} textAlign="center">
-                  No species match.
+                  {catalogFailed
+                    ? tp('Species catalog failed to load.')
+                    : catalog
+                      ? tp('No species match.')
+                      : tp('Loading species…')}
                 </Box>
               )}
             </Box>
@@ -1011,7 +1026,7 @@ export const PreferencesMenu = () => {
             />
             <FieldBlock label="Age">
               <Tooltip
-                content={data.age_tooltips?.[data.age] ?? ''}
+                content={catalog?.age_tooltips?.[data.age] ?? ''}
                 position="bottom"
               >
                 <Box>
@@ -1304,7 +1319,7 @@ export const PreferencesMenu = () => {
   const renderBackdropEditor = () => (
     <FieldBlock label="Backdrop tile" labelSize="18px">
       <OptionGrid
-        options={data.background_options ?? []}
+        options={catalog?.background_options ?? []}
         selected={data.background}
         labelSize="15px"
         onSelect={(value) =>
@@ -1855,7 +1870,7 @@ export const PreferencesMenu = () => {
 
         <Panel title="Interface Theme" icon="palette">
           <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {(data.tgui_themes ?? []).map((t) => (
+            {(catalog?.tgui_themes ?? []).map((t) => (
               <Button
                 key={t.value}
                 selected={data.tgui_theme === t.value}

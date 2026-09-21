@@ -570,9 +570,16 @@ to the English value whenever the player is on EN or the key is absent, so a **p
 file is a valid state** — untranslated entries simply stay English. That is deliberate: the file
 ships mostly empty and is filled incrementally.
 
-Resolution happens in `character_setup_species_options()`, `character_setup_faith_options()` and
-`character_setup_patron_options_for_faith()` (`modular_abel/character_setup/`), which is why the
-translated strings reach both `ui_static_data` and `ui_data` without the frontend knowing.
+Each resolver is a one-line wrapper over a `_for(ru, …)` core: `chargen_tr_name()` is
+`chargen_tr_name_for(chargen_sheet_active(target), …)`. The split exists because the chargen
+species catalog is generated once per server as a browser asset, with **both** languages in it,
+long before any client is in scope — see *The third tier* in
+`modular_abel/character_setup/README.md`. Anything that resolves for a player keeps using the
+client-taking form; anything that has to answer for a language it was handed uses `_for`.
+
+Faiths and patrons still resolve per player, in `character_setup_faith_options()` and
+`character_setup_patron_options_for_faith()` (`modular_abel/character_setup/`), so their
+translated strings reach `ui_static_data` and `ui_data` without the frontend knowing.
 
 Filling the file is copy-paste rather than transcription: the **Chargen Sheet: Missing Keys**
 verb (`Debug.Telemetry`, `R_DEBUG`) writes every species, faith and patron the sheet does not

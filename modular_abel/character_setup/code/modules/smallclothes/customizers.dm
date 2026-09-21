@@ -199,7 +199,6 @@ GLOBAL_LIST_INIT(character_setup_smallclothes_customizers, list(
 
 /datum/preferences/proc/character_setup_sync_smallclothes_from_entries()
 	character_setup_fix_socks_pref()
-	character_setup_log("SMALL", "sync_smallclothes_from_entries species=[pref_species?.id] gender=[cspref_gender()]")
 	for(var/customizer_type in GLOB.character_setup_smallclothes_customizers)
 		var/datum/customizer/bodypart_feature/smallclothes/customizer = CUSTOMIZER(customizer_type)
 		var/datum/customizer_entry/entry = get_customizer_entry_for_customizer_type(customizer_type)
@@ -249,9 +248,3 @@ GLOBAL_LIST_INIT(character_setup_smallclothes_customizers, list(
 		var/list/allowed = choice.character_setup_accessory_types(src)
 		if(length(allowed) && !(entry.accessory_type in allowed))
 			choice.set_accessory_type(src, allowed[1], entry)
-	if(GLOB.character_setup_debug)
-		var/list/bits = list()
-		for(var/customizer_type in GLOB.character_setup_smallclothes_customizers)
-			var/datum/customizer_entry/entry = get_customizer_entry_for_customizer_type(customizer_type)
-			bits += "[customizer_type]=[entry ? "[entry.accessory_type] dis=[entry.disabled]" : "NO-ENTRY"]"
-		character_setup_log("SMALL", "entries [bits.Join(" | ")] species_cust=[length(pref_species?.customizers)]")

@@ -62,30 +62,39 @@ GLOBAL_VAR_INIT(sheet_chargen_loaded, FALSE)
 /proc/chargen_sheet_active(client/target)
 	return ui_lang_code(target) == UI_LANG_CODE_RU
 
-/proc/chargen_tr_name(client/target, path, fallback)
-	if(!chargen_sheet_active(target))
+/proc/chargen_tr_name_for(ru, path, fallback)
+	if(!ru)
 		return fallback
 	chargen_sheet_ensure_loaded()
 	var/list/entry = GLOB.sheet_chargen[path]
 	return (entry && length(entry[1])) ? entry[1] : fallback
 
-/proc/chargen_tr_desc(client/target, path, fallback)
-	if(!chargen_sheet_active(target))
+/proc/chargen_tr_name(client/target, path, fallback)
+	return chargen_tr_name_for(chargen_sheet_active(target), path, fallback)
+
+/proc/chargen_tr_desc_for(ru, path, fallback)
+	if(!ru)
 		return fallback
 	chargen_sheet_ensure_loaded()
 	var/list/entry = GLOB.sheet_chargen[path]
 	return (entry && length(entry[2])) ? entry[2] : fallback
 
-/proc/chargen_tr_term(client/target, term)
-	if(!chargen_sheet_active(target))
+/proc/chargen_tr_desc(client/target, path, fallback)
+	return chargen_tr_desc_for(chargen_sheet_active(target), path, fallback)
+
+/proc/chargen_tr_term_for(ru, term)
+	if(!ru)
 		return term
 	chargen_sheet_ensure_loaded()
 	var/translated = GLOB.sheet_chargen_terms["[term]"]
 	return translated || term
 
-/proc/chargen_tr_line(client/target, key, fallback, term)
+/proc/chargen_tr_term(client/target, term)
+	return chargen_tr_term_for(chargen_sheet_active(target), term)
+
+/proc/chargen_tr_line_for(ru, key, fallback, term)
 	. = fallback
-	if(chargen_sheet_active(target))
+	if(ru)
 		chargen_sheet_ensure_loaded()
 		var/translated = GLOB.sheet_chargen_terms["[key]"]
 		if(length(translated))
@@ -93,12 +102,18 @@ GLOBAL_VAR_INIT(sheet_chargen_loaded, FALSE)
 	if(!isnull(term))
 		. = replacetext(., "%TERM%", "[term]")
 
-/proc/chargen_tr_field(client/target, path, field, fallback)
-	if(!chargen_sheet_active(target))
+/proc/chargen_tr_line(client/target, key, fallback, term)
+	return chargen_tr_line_for(chargen_sheet_active(target), key, fallback, term)
+
+/proc/chargen_tr_field_for(ru, path, field, fallback)
+	if(!ru)
 		return fallback
 	chargen_sheet_ensure_loaded()
 	var/translated = GLOB.sheet_chargen_fields["[path]:[field]"]
 	return length(translated) ? translated : fallback
+
+/proc/chargen_tr_field(client/target, path, field, fallback)
+	return chargen_tr_field_for(chargen_sheet_active(target), path, field, fallback)
 
 /// Writes every species, faith and patron the sheet does not cover to the log in
 /// the exact line format chargen.txt expects, so filling the file is copy-paste

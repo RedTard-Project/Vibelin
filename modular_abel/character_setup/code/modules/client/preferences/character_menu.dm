@@ -37,7 +37,6 @@
 /datum/preferences/var/character_setup_view_tile_center = 8
 /datum/preferences/var/character_setup_view_scale = 12
 /datum/preferences/var/character_setup_view_feet_margin = 20
-/datum/preferences/var/character_setup_view_last_flat = ""
 /datum/preferences/var/character_setup_render_main_only = FALSE
 /datum/preferences/var/mob/living/carbon/human/dummy/character_setup_body
 /datum/preferences/var/character_setup_hover_acc
@@ -53,14 +52,8 @@
 
 GLOBAL_LIST_EMPTY(character_setup_chargen_ooc_messages)
 
-GLOBAL_VAR_INIT(character_setup_debug, TRUE)
 GLOBAL_VAR_INIT(character_setup_flat_origin_x, 0)
 GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
-
-/proc/character_setup_glog(category, msg)
-	if(!GLOB.character_setup_debug)
-		return
-	WRITE_LOG("[GLOB.log_directory]/character_setup.log", "[world.timeofday]ds render \[[category]\] [msg]")
 
 /proc/character_setup_art_bounds(icon/scanned)
 	if(!isicon(scanned))
@@ -91,33 +84,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		if(lobby_client?.prefs)
 			SStgui.update_uis(lobby_client.prefs)
 
-/datum/preferences/var/list/character_setup_log_counts
-/datum/preferences/var/character_setup_log_action_name = ""
-/datum/preferences/var/character_setup_log_action_tod = 0
-
-/datum/preferences/proc/character_setup_log(category, msg)
-	if(!GLOB.character_setup_debug)
-		return
-	WRITE_LOG("[GLOB.log_directory]/character_setup.log", "[world.timeofday]ds [parent?.ckey || "?"] \[[category]\] [msg]")
-
-/datum/preferences/proc/character_setup_log_action(action_name, extra)
-	if(!GLOB.character_setup_debug)
-		return
-	character_setup_log_counts = list()
-	character_setup_log_action_name = action_name
-	character_setup_log_action_tod = world.timeofday
-	character_setup_log("ACTION", ">>>>> [action_name][extra ? " ([extra])" : ""]")
-
-/datum/preferences/proc/character_setup_log_op(op, start_tick, detail)
-	if(!GLOB.character_setup_debug)
-		return
-	LAZYINITLIST(character_setup_log_counts)
-	character_setup_log_counts[op] = (character_setup_log_counts[op] || 0) + 1
-	var/cnt = character_setup_log_counts[op]
-	var/delta = TICK_USAGE_TO_MS(start_tick)
-	if(delta < 0)
-		delta = 0
-	character_setup_log("OP", "[op] x[cnt] took=[round(delta, 0.01)]ms[detail ? " {[detail]}" : ""][cnt > 1 ? "  *** MULTIPLICATIVE in [character_setup_log_action_name] ***" : ""]")
 
 /datum/preferences/proc/cspref_age()
 	return read_preference(/datum/preference/choiced/age)
@@ -279,23 +245,18 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 
 	validate_customizer_entries()
 	character_setup_static_sig = character_setup_build_static_sig()
-	character_setup_log("LIFECYCLE", "build_and_show_menu user=[user.ckey] species=[pref_species?.id] gender=[cspref_gender()] static_sig=[character_setup_static_sig]")
 	ui_interact(user)
 
 /datum/preferences/proc/character_setup_build_static_sig()
 	return "[pref_species?.type]-[cspref_gender()]-[erp_enabled]"
 
 /datum/preferences/update_menu_data(mob/user, list/fields_to_update)
-	var/_t = TICK_USAGE_REAL
 	character_setup_ui_heavy_sig = null
 	var/new_static_sig = character_setup_build_static_sig()
-	var/static_refreshed = FALSE
 	if(new_static_sig != character_setup_static_sig)
 		character_setup_static_sig = new_static_sig
 		update_static_data(user)
-		static_refreshed = TRUE
 	character_setup_update_view()
-	character_setup_log_op("update_menu_data", _t, "fields=[fields_to_update ? jointext(fields_to_update, ",") : "all"] static_refresh=[static_refreshed]")
 
 /datum/preferences/proc/character_setup_sanitize_preferences_scale(value)
 	if(!isnum(value))
@@ -357,8 +318,10 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	return GLOB.always_state
 
 /datum/preferences/ui_assets(mob/user)
-	character_setup_log("ASSETS", "ui_assets served chargen spritesheet user=[user?.ckey]")
-	return list(get_asset_datum(/datum/asset/spritesheet/character_setup_chargen))
+	return list(
+		get_asset_datum(/datum/asset/spritesheet/character_setup_chargen),
+		get_asset_datum(/datum/asset/json/chargen_catalog),
+	)
 
 /datum/preferences/proc/character_setup_handle_color_task(mob/user, list/href_list)
 	var/customizer_type = text2path(href_list["customizer"])
@@ -380,7 +343,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/new_color = input(user, "Choose color", "Color", he.vars[field]) as color|null
 	if(new_color)
 		he.vars[field] = sanitize_hexcolor(new_color)
-	character_setup_log("COLOR", "color_task field=[field] customizer=[customizer_type] new=[new_color || "cancel"]")
 	return TRUE
 
 /datum/preferences/proc/character_setup_age_option_list()
@@ -393,22 +355,13 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		. += "[possible_age]"
 
 /datum/preferences/ui_static_data(mob/user)
-	var/_t = TICK_USAGE_REAL
 	. = list()
-	.["background_options"] = character_setup_background_options()
-	.["species_options"] = character_setup_species_options()
+	.["species_availability"] = character_setup_species_availability()
 	.["ancestry_options"] = character_setup_ancestry_options()
-	.["tgui_themes"] = tgui_theme_options()
-	var/list/age_options = character_setup_age_option_list()
-	var/list/age_tooltips = list()
-	for(var/age_option in age_options)
-		age_tooltips["[age_option]"] = character_setup_age_stat_tooltip(age_option)
-	.["age_options"] = age_options
-	.["age_tooltips"] = age_tooltips
+	.["age_options"] = character_setup_age_option_list()
 	var/list/feature_options = character_setup_build_feature_options()
 	.["feature_choice_options"] = feature_options["choices"]
 	.["feature_accessory_options"] = feature_options["accessories"]
-	character_setup_log_op("ui_static_data", _t, "species=[length(.["species_options"])] ages=[length(age_options)] ancestry=[length(.["ancestry_options"])] feat_choices=[length(.["feature_choice_options"])] feat_acc=[length(.["feature_accessory_options"])]")
 
 /datum/preferences/proc/character_setup_species_lock_reason(datum/species/species)
 	if(!species)
@@ -420,7 +373,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			return "Triumph unlock"
 	return "Unavailable"
 
-/datum/preferences/proc/character_setup_stat_modifiers_for_sheet(sheet_type)
+/proc/character_setup_stat_modifiers_for_sheet(sheet_type)
 	. = list()
 	if(!sheet_type)
 		return
@@ -439,15 +392,15 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			"value" = value,
 		))
 
-/datum/preferences/proc/character_setup_species_stat_modifiers(datum/species/species)
+/proc/character_setup_species_stats_for(datum/species/species, gender)
 	if(!species)
 		return list()
 	var/sheet_type = species.statsheet_male
-	if(cspref_gender() == FEMALE && species.statsheet_female)
+	if(gender == FEMALE && species.statsheet_female)
 		sheet_type = species.statsheet_female
 	return character_setup_stat_modifiers_for_sheet(sheet_type)
 
-/datum/preferences/proc/character_setup_age_sheet_type(age_name)
+/proc/character_setup_age_sheet_type(age_name)
 	switch(age_name)
 		if(AGE_MIDDLEAGED)
 			return /datum/attribute_holder/sheet/age/middleaged
@@ -456,7 +409,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		if(AGE_CHILD)
 			return /datum/attribute_holder/sheet/age/child
 
-/datum/preferences/proc/character_setup_stat_modifier_summary(list/modifiers)
+/proc/character_setup_stat_modifier_summary(list/modifiers)
 	if(!length(modifiers))
 		return "No stat modifiers."
 	var/list/parts = list()
@@ -465,13 +418,13 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		parts += "[modifier["label"]] [value > 0 ? "+" : ""][value]"
 	return parts.Join(", ")
 
-/datum/preferences/proc/character_setup_age_stat_tooltip(age_name)
+/proc/character_setup_age_stat_tooltip(age_name)
 	var/list/modifiers = character_setup_stat_modifiers_for_sheet(character_setup_age_sheet_type(age_name))
 	if(!length(modifiers))
 		return "[age_name]: No age stat modifiers."
 	return "[age_name]: [character_setup_stat_modifier_summary(modifiers)]"
 
-/datum/preferences/proc/character_setup_species_tags(datum/species/species, available)
+/proc/character_setup_species_tags(datum/species/species, available)
 	. = list()
 	if(!species)
 		return
@@ -491,35 +444,33 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	if(!available)
 		. += "Locked"
 
-/datum/preferences/proc/character_setup_species_tag_description(datum/species/species, tag, available)
+/proc/character_setup_species_tag_description(ru, datum/species/species, tag, available)
 	switch(tag)
 		if("Discriminated")
-			return chargen_tr_line(parent, "tag:Discriminated", "This species faces social discrimination; expect a more difficult roundstart experience.")
+			return chargen_tr_line_for(ru, "tag:Discriminated", "This species faces social discrimination; expect a more difficult roundstart experience.")
 		if("Exotic")
-			return chargen_tr_line(parent, "tag:Exotic", "This species is considered uncommon or exotic in most local cultures.")
+			return chargen_tr_line_for(ru, "tag:Exotic", "This species is considered uncommon or exotic in most local cultures.")
 		if("Taur")
-			return chargen_tr_line(parent, "tag:Taur", "Tauric body plan; some equipment and clothing may fit differently.")
+			return chargen_tr_line_for(ru, "tag:Taur", "Tauric body plan; some equipment and clothing may fit differently.")
 		if("Locked")
-			if(available)
-				return chargen_tr_line(parent, "tag:Available", "Available.")
-			return character_setup_species_lock_reason(species)
+			return chargen_tr_line_for(ru, "tag:Available", "Available.")
 
 	if(species)
 		if(species.native_language && tag == "[species.native_language]")
-			return chargen_tr_line(parent, "tag:Language", "Native language or culture group: %TERM%.", chargen_tr_term(parent, tag))
+			return chargen_tr_line_for(ru, "tag:Language", "Native language or culture group: %TERM%.", chargen_tr_term_for(ru, tag))
 		if(species.skin_tone_wording && tag == "[species.skin_tone_wording]")
-			return chargen_tr_line(parent, "tag:Ancestry", "This species uses %TERM% as its ancestry/color choice.", chargen_tr_term(parent, tag))
+			return chargen_tr_line_for(ru, "tag:Ancestry", "This species uses %TERM% as its ancestry/color choice.", chargen_tr_term_for(ru, tag))
 		if(tag in character_setup_species_display_ages(species))
-			return chargen_tr_line(parent, "tag:Age", "Available age category: %TERM%.", chargen_tr_term(parent, tag))
+			return chargen_tr_line_for(ru, "tag:Age", "Available age category: %TERM%.", chargen_tr_term_for(ru, tag))
 
-	return chargen_tr_line(parent, "tag:Generic", "%TERM% species tag.", chargen_tr_term(parent, tag))
+	return chargen_tr_line_for(ru, "tag:Generic", "%TERM% species tag.", chargen_tr_term_for(ru, tag))
 
-/datum/preferences/proc/character_setup_species_tag_descriptions(datum/species/species, available)
+/proc/character_setup_species_tag_descriptions(ru, datum/species/species, available)
 	. = list()
 	for(var/tag in character_setup_species_tags(species, available))
-		.["[chargen_tr_term(parent, tag)]"] = character_setup_species_tag_description(species, tag, available)
+		.["[chargen_tr_term_for(ru, tag)]"] = character_setup_species_tag_description(ru, species, tag, available)
 
-/datum/preferences/proc/character_setup_species_display_ages(datum/species/species)
+/proc/character_setup_species_display_ages(datum/species/species)
 	. = list()
 	if(!species)
 		return
@@ -529,36 +480,39 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		if(!(possible_age in .))
 			. += possible_age
 
-/datum/preferences/proc/character_setup_species_shown_tags(datum/species/species, available)
+/proc/character_setup_species_shown_tags(ru, datum/species/species, available)
 	. = list()
 	for(var/tag in character_setup_species_tags(species, available))
-		. += chargen_tr_term(parent, tag)
+		. += chargen_tr_term_for(ru, tag)
 
-/datum/preferences/proc/character_setup_species_shown_ages(list/display_ages)
+/proc/character_setup_species_shown_ages(ru, list/display_ages)
 	if(!length(display_ages))
-		return chargen_tr_term(parent, "Any")
+		return chargen_tr_term_for(ru, "Any")
 	var/list/shown = list()
 	for(var/age in display_ages)
-		shown += chargen_tr_term(parent, age)
+		shown += chargen_tr_term_for(ru, age)
 	return shown.Join(", ")
 
-/datum/preferences/proc/character_setup_strip_species_warning(text)
+/proc/character_setup_strip_species_warning(text)
 	var/static/regex/inline_warning = regex(@"(WARNING:\s*)?THIS IS AN?\b[\s\S]*?(DISCRIMINATED|RESTRICTED)[\s\S]*$")
 	return trim(inline_warning.Replace("[text]", ""))
 
-/datum/preferences/proc/character_setup_species_warning(datum/species/species, list/raw_tags)
+/proc/character_setup_species_warning(ru, datum/species/species, list/raw_tags)
 	if(!("Discriminated" in raw_tags))
 		return null
 	var/source = "[species.desc]"
 	if(findtext(source, "CHALLENGE SPECIES"))
-		return chargen_tr_line(parent, "warn:Challenge", "WARNING: THIS IS A HEAVILY DISCRIMINATED AGAINST CHALLENGE SPECIES WITH ACTIVE SPECIES DETRIMENTS. YOU CAN AND WILL DIE A LOT; PLAY AT YOUR OWN RISK!")
+		return chargen_tr_line_for(ru, "warn:Challenge", "WARNING: THIS IS A HEAVILY DISCRIMINATED AGAINST CHALLENGE SPECIES WITH ACTIVE SPECIES DETRIMENTS. YOU CAN AND WILL DIE A LOT; PLAY AT YOUR OWN RISK!")
 	if(findtext(source, "EXTREMELY"))
-		return chargen_tr_line(parent, "warn:Extreme", "THIS IS AN EXTREMELY DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
+		return chargen_tr_line_for(ru, "warn:Extreme", "THIS IS AN EXTREMELY DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
 	if(findtext(source, "NOBLES EVEN MORE SO"))
-		return chargen_tr_line(parent, "warn:Nobles", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
-	return chargen_tr_line(parent, "warn:Discriminated", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. PLAY AT YOUR OWN RISK.")
+		return chargen_tr_line_for(ru, "warn:Nobles", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
+	return chargen_tr_line_for(ru, "warn:Discriminated", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. PLAY AT YOUR OWN RISK.")
 
-/datum/preferences/proc/character_setup_species_options()
+/// The only part of the species list that varies per player. Everything else -- names,
+/// descriptions, tags, ages and stat sheets -- is in /datum/asset/json/chargen_catalog,
+/// generated once and cached by the browser.
+/datum/preferences/proc/character_setup_species_availability()
 	. = list()
 	for(var/species_id in GLOB.roundstart_species)
 		var/species_type = GLOB.species_list[species_id]
@@ -566,28 +520,12 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			continue
 		var/datum/species/species = new species_type()
 		var/lock_reason = character_setup_species_lock_reason(species)
-		var/available = !lock_reason
-		var/list/raw_tags = character_setup_species_tags(species, available)
-		var/raw_desc = chargen_tr_desc(parent, species_type, species.desc)
-		var/description = raw_desc ? character_setup_chargen_clean_text(character_setup_strip_species_warning(raw_desc), 900) : "No description available."
-		var/list/display_ages = character_setup_species_display_ages(species)
-		. += list(list(
-			"id" = species.id,
-			"name" = chargen_tr_name(parent, species_type, species.name),
-			"description" = trim(description),
-			"available" = available,
+		.[species.id] = list(
+			"available" = !lock_reason,
 			"lock_reason" = lock_reason,
-			"language" = chargen_tr_term(parent, species.native_language || "Imperial"),
-			"ancestry_label" = chargen_tr_term(parent, species.skin_tone_wording || "Ancestry"),
-			"ages" = character_setup_species_shown_ages(display_ages),
-			"tags" = character_setup_species_shown_tags(species, available),
-			"tag_descriptions" = character_setup_species_tag_descriptions(species, available),
-			"stats" = character_setup_species_stat_modifiers(species),
-			"warning" = character_setup_species_warning(species, raw_tags),
-		))
+		)
 
 /datum/preferences/proc/character_setup_apply_species(mob/user, species_id)
-	var/_t = TICK_USAGE_REAL
 	if(!user || !species_id)
 		return FALSE
 	if(!(species_id in GLOB.roundstart_species))
@@ -651,31 +589,25 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		cspref_set_real_name(saved_name)
 
 	update_menu_data(user)
-	character_setup_log_op("apply_species", _t, "species=[species_id] age=[cspref_age()] gender=[cspref_gender()]")
 	return TRUE
 
 /datum/preferences/ui_interact(mob/user, datum/tgui/ui)
 	var/window_width = character_setup_preferences_fullscreen ? 7680 : 1180
 	var/window_height = character_setup_preferences_fullscreen ? 4320 : 760
 	ui = SStgui.try_update_ui(user, src, ui)
-	var/created = FALSE
 	if(!ui)
-		created = TRUE
 		ui = new(user, src, "PreferencesMenu", "Character Setup", window_width, window_height)
 		ui.set_autoupdate(FALSE)
 		ui.open()
-	character_setup_log("LIFECYCLE", "ui_interact user=[user?.ckey] created=[created] fullscreen=[character_setup_preferences_fullscreen] win=[window_width]x[window_height]")
 	character_setup_ensure_view(user, ui)
 
 /datum/preferences/ui_close(mob/user)
 	. = ..()
-	character_setup_log("LIFECYCLE", "ui_close user=[user?.ckey]")
 	var/remaining = 0
 	for(var/datum/tgui/open_ui in open_uis)
 		if(open_ui.user == user)
 			remaining++
 	if(remaining > 1)
-		character_setup_log("VIEW", "ui_close keep view, other windows remain=[remaining - 1]")
 		return
 	character_setup_teardown_view(user)
 
@@ -727,7 +659,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	return TRUE
 
 /datum/preferences/proc/character_setup_round_action(mob/user)
-	character_setup_log("ROUND", "round_action user=[user?.ckey] state=[SSticker?.current_state]")
 	var/mob/dead/new_player/new_player
 	if(istype(user, /mob/dead/new_player))
 		new_player = user
@@ -799,7 +730,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		character_setup_bg_side.assigned_map = character_setup_view_side.assigned_map
 		if(!character_setup_body)
 			character_setup_body = new
-		character_setup_log("VIEW", "ensure_view created map=[character_setup_view.assigned_map] user=[user?.ckey] window=[ui?.window ? "yes" : "NO"] window_visible=[ui?.window?.visible] tile_top=[character_setup_view_tile_top]")
 		character_setup_update_view()
 	if(character_setup_view_shown)
 		return
@@ -807,7 +737,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	if(!target_client || QDELETED(ui) || !ui.window)
 		return
 	if(!ui.window.visible)
-		character_setup_log("VIEW", "await window visible, retry queued")
 		addtimer(CALLBACK(src, PROC_REF(character_setup_ensure_view), user, ui), 5, TIMER_UNIQUE)
 		return
 	character_setup_view_shown = TRUE
@@ -817,29 +746,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	target_client.register_map_obj(character_setup_bg)
 	target_client.register_map_obj(character_setup_bg_front)
 	target_client.register_map_obj(character_setup_bg_side)
-	character_setup_log("VIEW", "displayed maps=[character_setup_view.assigned_map],[character_setup_view_front.assigned_map],[character_setup_view_side.assigned_map] window=[ui.window.id] tile_center=[character_setup_view_tile_center] scale=[character_setup_view_scale]")
-	character_setup_diag_controls(user, "post_display")
-
-/datum/preferences/proc/character_setup_diag_controls(mob/user, context)
-	set waitfor = FALSE
-	if(!GLOB.character_setup_debug || !user?.client)
-		return
-	sleep(1 SECONDS)
-	if(!user?.client)
-		return
-	var/client/C = user.client
-	var/window_id = character_setup_active_window_id(user)
-	character_setup_log("CTRL", "[context] === geometry dump === window_id=[window_id] view=[C.view] scaling=[C.window_scaling] tile_center=[character_setup_view_tile_center] feet_margin=[character_setup_view_feet_margin] last_flat=[character_setup_view_last_flat]")
-	if(window_id)
-		character_setup_log("CTRL", "[context] WINDOW [window_id] winget=[winget(user, window_id, "size;pos;is-visible;is-maximized;inner-size")]")
-		character_setup_log("CTRL", "[context] WINDOW.map winget=[winget(user, "[window_id].map", "size;pos;is-visible")]")
-	for(var/atom/movable/screen/map_view/view as anything in list(character_setup_view, character_setup_view_front, character_setup_view_side))
-		if(!view)
-			continue
-		var/list/bound = C.screen_maps[view.assigned_map]
-		var/in_screen = (view in C.screen) ? "yes" : "NO"
-		var/ctrl = winget(user, view.assigned_map, "parent;type;pos;size;view-size;icon-size;zoom;letterbox;zoom-mode;is-visible")
-		character_setup_log("CTRL", "[context] MAP id=[view.assigned_map] screen_loc=[view.screen_loc] transform_scale=[character_setup_current_view_scale()] registered=[length(bound)] in_screen=[in_screen] winget=[ctrl ? ctrl : "MISSING"]")
 
 /datum/preferences/proc/character_setup_apply_map_background(mob/user)
 	if(!user?.client)
@@ -853,7 +759,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	for(var/atom/movable/screen/map_view/view as anything in list(character_setup_view, character_setup_view_front, character_setup_view_side))
 		if(view)
 			winset(user, view.assigned_map, "background-color=[bg_hex]")
-	character_setup_log("BACKDROP", "apply_map_background bg=[character_setup_preview_background || "none"] hex=[bg_hex]")
 
 /datum/preferences/proc/character_setup_apply_reported_zoom(mob/user, zoom_main, zoom_mini)
 	if(!user?.client)
@@ -866,8 +771,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		if(character_setup_view_side)
 			winset(user, character_setup_view_side.assigned_map, "zoom=[zoom_mini]")
 	character_setup_apply_map_background(user)
-	if(GLOB.character_setup_debug)
-		character_setup_log("ZOOM", "applied main=[zoom_main] mini=[zoom_mini]")
 
 /datum/preferences/proc/character_setup_active_window_id(mob/user)
 	for(var/datum/tgui/open_ui in open_uis)
@@ -879,10 +782,8 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	if(!user?.client || !view?.assigned_map)
 		return
 	winset(user, view.assigned_map, "is-visible=false;parent=")
-	character_setup_log("VIEW", "released control [view.assigned_map] user=[user.ckey]")
 
 /datum/preferences/proc/character_setup_teardown_view(mob/user)
-	character_setup_log("VIEW", "teardown map=[character_setup_view?.assigned_map] user=[user?.ckey]")
 	character_setup_hover_acc = null
 	character_setup_hover_color = null
 	character_setup_hover_customizer = null
@@ -904,18 +805,14 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 /datum/preferences/proc/character_setup_update_view()
 	set waitfor = FALSE
 	if(!character_setup_view || !character_setup_body || !pref_species)
-		character_setup_log("VIEW", "update_view SKIP view=[!!character_setup_view] body=[!!character_setup_body] species=[!!pref_species]")
 		return
 	if(character_setup_view_busy)
 		character_setup_view_pending = TRUE
-		character_setup_log("VIEW", "update_view BUSY -> pending")
 		return
 	character_setup_view_busy = TRUE
 	do
 		character_setup_view_pending = FALSE
-		var/_t = TICK_USAGE_REAL
 		character_setup_render_body()
-		character_setup_log_op("render_body", _t, "dir=[character_setup_preview_dir] hover=[character_setup_hover_acc || "none"] species=[pref_species?.id]")
 	while(character_setup_view_pending)
 	character_setup_view_busy = FALSE
 	var/bbox_sig = "[character_setup_view_zoom_w]x[character_setup_view_zoom_h]"
@@ -941,7 +838,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		for(var/datum/job/advclass/class as anything in SSrole_class_handler.sorted_class_categories[ctag])
 			var/class_outfit = character_setup_job_outfit(class)
 			if(class_outfit)
-				character_setup_log("VIEW", "preview outfit for [job.title] taken from class [class.title] ([ctag])")
 				return class_outfit
 	return null
 
@@ -1004,7 +900,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	if(!main_only)
 		character_setup_apply_to_view(character_setup_view_front, body, SOUTH)
 		character_setup_apply_to_view(character_setup_view_side, body, EAST)
-	character_setup_log("VIEW", "render done main_only=[main_only] dir=[character_setup_preview_dir] flat=[character_setup_view_last_flat] feet_margin=[character_setup_view_feet_margin] underwear=[body.underwear]")
 
 /datum/preferences/proc/character_setup_measure_signature()
 	var/list/parts = list(
@@ -1032,7 +927,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/list/cached = character_setup_measure_cache?[cache_key]
 	if(cached)
 		return cached.Copy()
-	var/_t = TICK_USAGE_REAL
 	var/icon/measure = character_setup_get_flat_icon(body, dir, no_anim = TRUE)
 	var/measure_w = isicon(measure) ? measure.Width() : 32
 	var/measure_h = isicon(measure) ? measure.Height() : 32
@@ -1047,7 +941,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/list/result = list(measure_w, measure_h, GLOB.character_setup_flat_origin_x + art_x, GLOB.character_setup_flat_origin_y + art_y)
 	LAZYINITLIST(character_setup_measure_cache)
 	character_setup_measure_cache[cache_key] = result.Copy()
-	character_setup_log_op("measure_art", _t, "dir=[dir] bbox=[measure_w]x[measure_h] cached_dirs=[length(character_setup_measure_cache)]")
 	return result
 
 /datum/preferences/proc/character_setup_measure_body(dir)
@@ -1063,15 +956,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	character_setup_bg?.fill_rect(1, 1, character_setup_view_canvas_w, character_setup_view_canvas_h)
 	character_setup_bg_front?.fill_rect(1, 1, character_setup_view_canvas_w, character_setup_view_canvas_h)
 	character_setup_bg_side?.fill_rect(1, 1, character_setup_view_canvas_w, character_setup_view_canvas_h)
-	if(GLOB.character_setup_debug)
-		character_setup_log("VIEW", "measure dir=[dir] art=[character_setup_view_bbox_w]x[character_setup_view_bbox_h] origin=[character_setup_view_off_x],[character_setup_view_off_y] extent=[character_setup_view_extent_w]x[character_setup_view_extent_h] zoom_dims=[character_setup_view_zoom_w]x[character_setup_view_zoom_h] species=[pref_species?.id] taur=[pref_species?.forced_taur ? 1 : 0]")
-		var/mob/living/carbon/human/dummy/diag_body = character_setup_body
-		if(diag_body)
-			var/list/slot_bits = list()
-			for(var/slot in list("smallclothes_bottom", "smallclothes_top", "smallclothes_legs"))
-				var/datum/bodypart_feature/smallclothes/feature = diag_body.get_bodypart_feature_of_slot(slot)
-				slot_bits += "[slot]=[feature ? "[feature.accessory_type] colors=[feature.accessory_colors]" : "NONE"]"
-			character_setup_log("SMALL", "[slot_bits.Join(" | ")] mob_underwear=[diag_body.underwear] mob_undershirt=[diag_body.undershirt] mob_socks=[diag_body.socks] suppressed=[diag_body.smallclothes_render_suppressed]")
 
 /proc/character_setup_get_flat_icon(image/appearance, defdir, deficon, defstate, defblend, start = TRUE, no_anim = FALSE)
 	#define CHARACTER_SETUP_PROCESS_OVERLAYS_OR_UNDERLAYS(flat, process, base_layer) \
@@ -1263,23 +1147,20 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/anchor_px = round(character_setup_view_canvas_cx - character_setup_view_bbox_w / 2) - character_setup_view_off_x + character_setup_view_doll_px
 	var/anchor_py = round(character_setup_view_canvas_cy - character_setup_view_bbox_h / 2) - character_setup_view_off_y + character_setup_view_doll_py
 	view.set_position(character_setup_view_doll_x, character_setup_view_doll_y, anchor_px, anchor_py)
-	if(GLOB.character_setup_debug)
-		character_setup_log("VIEW", "apply map=[view.assigned_map] dir=[view_dir] bbox=[character_setup_view_bbox_w]x[character_setup_view_bbox_h] extent=[character_setup_view_extent_w]x[character_setup_view_extent_h] screen_loc=[view.screen_loc] base_icon=[body.icon] overlays=[length(view.overlays)] appearance_flags=[view.appearance_flags] view_dir=[view.dir]")
-	character_setup_view_last_flat = "appearance dir=[view_dir] bbox=[character_setup_view_bbox_w]x[character_setup_view_bbox_h] extent=[character_setup_view_extent_w]x[character_setup_view_extent_h] overlays=[length(view.overlays)] view_dir=[view.dir]"
 
 /datum/preferences/proc/character_setup_current_view_scale()
 	if(pref_species?.forced_taur && LAZYLEN(pref_species.allowed_taur_types))
 		return max(1, round(character_setup_view_scale * 0.55))
 	return character_setup_view_scale
 
-/datum/preferences/proc/character_setup_background_options()
+/proc/character_setup_background_options()
 	return list(
 		list("name" = "None", "value" = "none"),
 		list("name" = "White", "value" = "white"),
 		list("name" = "Dark", "value" = "dark"),
 	)
 
-/datum/preferences/proc/character_setup_chargen_clean_text(text, limit = 900)
+/proc/character_setup_chargen_clean_text(text, limit = 900)
 	if(!text)
 		return ""
 	var/static/regex/whitespace_runs = regex(@"[\s\n]+", "g")
@@ -1381,7 +1262,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	to_chat(user, "<font color='red'>Considers these to be Sins: [selected_patron.sins]</font>")
 	to_chat(user, "<font color='white'>Blessed with boon(s): [selected_patron.boons]</font>")
 	save_character()
-	character_setup_log("MUTATE", "apply_patron [patron_id] -> [selected_patron.name] faith=[selected_patron.associated_faith]")
 	update_menu_data(user)
 	return TRUE
 
@@ -1412,7 +1292,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	to_chat(user, "<font color='purple'>Faith: [faith.name]</font>")
 	to_chat(user, "<font color='purple'>Background: [faith.desc]</font>")
 	save_character()
-	character_setup_log("MUTATE", "apply_faith [faith_id] patron=[patron_type]")
 	update_menu_data(user)
 	return TRUE
 
@@ -1425,7 +1304,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/new_skin_tone = skins[ancestry_name]
 	if(cspref_skin_tone() != new_skin_tone)
 		cspref_set_skin_tone(new_skin_tone)
-		character_setup_log("MUTATE", "apply_ancestry [ancestry_name] tone=[new_skin_tone]")
 		save_character()
 		update_menu_data(user)
 	return TRUE
@@ -1440,12 +1318,10 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		user.client.lobbyooc(message)
 	else
 		user.client.ooc(message)
-	character_setup_log("OOC", "send_ooc user=[user?.ckey] len=[length(message)]")
 	character_setup_push_all_prefs()
 	return TRUE
 
 /datum/preferences/ui_data(mob/user)
-	var/_t = TICK_USAGE_REAL
 	var/list/data = list()
 
 	data["lang"] = ui_lang_code(user?.client)
@@ -1672,7 +1548,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		"language" = "[cspref_language()]",
 	)
 
-	character_setup_log_op("ui_data", _t, "keys=[length(data)] heavy_rebuilt=[heavy_rebuilt] species=[pref_species?.id] dir=[character_setup_preview_dir]")
 	return data
 
 /datum/preferences/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
@@ -1684,7 +1559,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	if(!user)
 		return FALSE
 
-	character_setup_log("ACT", "ui_act action=[action] pref=[islist(params) ? params["preference"] : "?"]")
 	switch(action)
 		if("pref")
 			if(!islist(params) || !params["preference"])
@@ -1733,7 +1607,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	return TRUE
 
 /datum/preferences/proc/character_setup_handle_system_action(mob/user, list/href_list)
-	character_setup_log("DISPATCH", "system/core fallthrough pref=[href_list["preference"]]")
 	switch(href_list["preference"])
 		if("save")
 			to_chat(user, span_info("Preferences Saved."))
@@ -1841,7 +1714,6 @@ GLOBAL_LIST_INIT(character_setup_settings_flags, list(
 	return FALSE
 
 /datum/preferences/process_link(mob/user, list/href_list)
-	character_setup_log_action("pref:[href_list["preference"]]", json_encode(href_list))
 	if(character_setup_handle_settings_toggle(user, href_list["preference"]))
 		return TRUE
 	switch(href_list["preference"])
@@ -1859,21 +1731,17 @@ GLOBAL_LIST_INIT(character_setup_settings_flags, list(
 			return character_setup_round_action(user)
 		if("character_setup_preferences_fullscreen")
 			character_setup_preferences_fullscreen = !character_setup_preferences_fullscreen
-			character_setup_log("WINDOW", "fullscreen=[character_setup_preferences_fullscreen]")
 			SStgui.update_uis(src)
 			return TRUE
 		if("character_setup_preferences_scale")
 			character_setup_preferences_scale = character_setup_sanitize_preferences_scale(href_list["scale"])
-			character_setup_log("WINDOW", "menu_scale=[character_setup_preferences_scale]")
 			save_preferences()
 			return TRUE
 		if("character_setup_preview_scale")
 			character_setup_preview_scale = character_setup_sanitize_preview_scale(href_list["scale"])
-			character_setup_log("WINDOW", "preview_scale=[character_setup_preview_scale]")
 			save_preferences()
 			return TRUE
 		if("character_setup_report_geometry")
-			character_setup_log("GEOMETRY", "main=[href_list["main_w"]]x[href_list["main_h"]] front=[href_list["front_w"]]x[href_list["front_h"]] side=[href_list["side_w"]]x[href_list["side_h"]] window=[href_list["win_w"]]x[href_list["win_h"]] dpr=[href_list["dpr"]] menu_scale=[href_list["menu_scale"]] zoom_main=[href_list["zoom_main"]] zoom_mini=[href_list["zoom_mini"]] bbox=[href_list["bbox"]]")
 			character_setup_apply_reported_zoom(user, text2num(href_list["zoom_main"]), text2num(href_list["zoom_mini"]))
 			return TRUE
 		if("character_setup_customizer")
@@ -1944,8 +1812,6 @@ GLOBAL_LIST_INIT(character_setup_settings_flags, list(
 			if(character_setup_view && character_setup_body)
 				character_setup_measure_body(character_setup_preview_dir)
 				character_setup_apply_to_view(character_setup_view, character_setup_body, character_setup_preview_dir)
-			if(GLOB.character_setup_debug)
-				character_setup_log("VIEW", "rotate main dir=[character_setup_preview_dir] view=[character_setup_view?.assigned_map] view_dir=[character_setup_view?.dir]")
 			return TRUE
 		if("character_setup_preview_background")
 			var/bg_choice = href_list["bg"]
