@@ -111,7 +111,7 @@
 	return TRUE
 
 /datum/preferences/proc/character_setup_build_features_data()
-	var/_t = world.timeofday
+	var/_t = TICK_USAGE_REAL
 	var/list/features = list()
 	if(!pref_species)
 		return features

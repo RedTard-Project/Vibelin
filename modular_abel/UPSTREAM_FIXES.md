@@ -137,3 +137,46 @@ tgui by same-type redefinition and chains through `..()`, so no upstream body is
 `GLOB.topic_census_debug`, `GLOB.tgui_census_debug` and `GLOB.tgui_census_payload_bytes` all
 default to `TRUE` and can be switched off live. Remove the module and the three call sites once
 the optimisation pass is finished. See `modular_abel/telemetry/README.md`.
+
+## `tgui/packages/tgui-panel/modular_chat/`
+
+Chat-embedded components are a two-sided protocol (`tgui/docs/chat-embedded-components.md`
+upstream): DM emits `<span data-component="Name" data-prop="…">`, and the renderer instantiates
+only names listed in `TGUI_CHAT_COMPONENTS`, passing only attributes listed in
+`TGUI_CHAT_ATTRIBUTES_TO_PROPS`.
+
+`span_tooltip_dangerous_html()` (`code/__DEFINES/chat/span.dm:203`, from the Examine Highlights
+port, `5dce59367`) emits `data-component="TooltipHTML"` with the tip as an HTML string in
+`data-html`. That commit touched 13 DM files and no tgui file, so the name was never registered
+and the attribute was never mapped: every item examine both lost its tooltip and posted a
+~1.7 KB `type=log` Topic back to the server. All 13 `OVER-SEC` lines in the 2026-09-20 round log
+are that relay, and 30 of the 36 limiter-counted topics in the busiest second of the round.
+
+`TooltipHTML` itself lives in `modular_chat/components.tsx` — `Tooltip`'s `content` is a
+ReactNode, so the HTML string needs a wrapper. TypeScript has no override mechanism, so the
+upstream renderer carries a hook, the same shape `localization/` already uses:
+
+| Upstream file | Hook | Re-sync obligation |
+| --- | --- | --- |
+| `tgui/packages/tgui-panel/chat/renderer.tsx` | one import plus `...MODULAR_CHAT_COMPONENTS` and `...MODULAR_CHAT_ATTRIBUTES_TO_PROPS` spread into the two maps | re-apply after a tgui re-sync; if upstream ever registers `TooltipHTML` itself the spread becomes a harmless no-op and the module can go |
+
+Not fixed, deliberately: the attribute loop writes `outputProps[undefined]` for any attribute
+absent from the map (`class="tooltip"` on every one of these spans). It is upstream's behaviour,
+it is inert for a component that ignores unknown props, and guarding it would be an original fix
+in an upstream file rather than a hook.
+
+## `character_setup/` preview controls
+
+`ByondMapView.tsx` is fork-authored (like `PreferencesMenu.tsx`), so it is not an upstream touch
+point — but it replaced `tgui-core`'s `ByondUi` and inherited only part of its contract. `ByondUi`
+clears the control on unmount **and** on `beforeunload`; the replacement kept only the unmount
+path, and React unmount does not run when a tgui window is destroyed outright rather than
+suspended. Combined with `clear_map()` never touching the skin element, three chargen preview
+maps survived `ui_close` still parented to the pooled `tgui-window-1` and painted over the next
+interface opened in it. Both halves are covered now —
+`character_setup_release_control()` DM-side and the restored `beforeunload`/`pagehide` release
+client-side. Full reasoning in `modular_abel/character_setup/README.md`.
+
+**Re-sync obligation:** if `ByondMapView` is ever dropped back to stock `ByondUi`, pass
+`phonehome={false}` with it — DM owns the control lifecycle here, and stock `ByondUi` sends a
+`renderByondUi` Topic on every internal render. The current component sends none.

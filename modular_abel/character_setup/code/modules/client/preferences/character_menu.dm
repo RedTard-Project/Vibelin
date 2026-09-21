@@ -106,14 +106,16 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	character_setup_log_action_tod = world.timeofday
 	character_setup_log("ACTION", ">>>>> [action_name][extra ? " ([extra])" : ""]")
 
-/datum/preferences/proc/character_setup_log_op(op, start_tod, detail)
+/datum/preferences/proc/character_setup_log_op(op, start_tick, detail)
 	if(!GLOB.character_setup_debug)
 		return
 	LAZYINITLIST(character_setup_log_counts)
 	character_setup_log_counts[op] = (character_setup_log_counts[op] || 0) + 1
 	var/cnt = character_setup_log_counts[op]
-	var/delta = world.timeofday - start_tod
-	character_setup_log("OP", "[op] x[cnt] took=[delta]ds[detail ? " {[detail]}" : ""][cnt > 1 ? "  *** MULTIPLICATIVE in [character_setup_log_action_name] ***" : ""]")
+	var/delta = TICK_USAGE_TO_MS(start_tick)
+	if(delta < 0)
+		delta = 0
+	character_setup_log("OP", "[op] x[cnt] took=[round(delta, 0.01)]ms[detail ? " {[detail]}" : ""][cnt > 1 ? "  *** MULTIPLICATIVE in [character_setup_log_action_name] ***" : ""]")
 
 /datum/preferences/proc/cspref_age()
 	return read_preference(/datum/preference/choiced/age)
@@ -279,7 +281,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	ui_interact(user)
 
 /datum/preferences/update_menu_data(mob/user, list/fields_to_update)
-	var/_t = world.timeofday
+	var/_t = TICK_USAGE_REAL
 	character_setup_ui_heavy_sig = null
 	var/new_static_sig = "[pref_species?.type]-[cspref_gender()]"
 	var/static_refreshed = FALSE
@@ -376,13 +378,30 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	character_setup_log("COLOR", "color_task field=[field] customizer=[customizer_type] new=[new_color || "cancel"]")
 	return TRUE
 
+/datum/preferences/proc/character_setup_age_option_list()
+	. = list()
+	var/list/selectable_ages = character_setup_selectable_ages()
+	if(!length(selectable_ages))
+		. += "[cspref_age() || AGE_ADULT]"
+		return .
+	for(var/possible_age in selectable_ages)
+		. += "[possible_age]"
+
 /datum/preferences/ui_static_data(mob/user)
-	var/_t = world.timeofday
+	var/_t = TICK_USAGE_REAL
 	. = list()
 	.["background_options"] = character_setup_background_options()
 	.["thumbs"] = character_setup_thumbnail_catalog()
 	.["species_options"] = character_setup_species_options()
-	character_setup_log_op("ui_static_data", _t, "thumbs=[length(.["thumbs"])] species=[length(.["species_options"])]")
+	.["ancestry_options"] = character_setup_ancestry_options()
+	.["tgui_themes"] = tgui_theme_options()
+	var/list/age_options = character_setup_age_option_list()
+	var/list/age_tooltips = list()
+	for(var/age_option in age_options)
+		age_tooltips["[age_option]"] = character_setup_age_stat_tooltip(age_option)
+	.["age_options"] = age_options
+	.["age_tooltips"] = age_tooltips
+	character_setup_log_op("ui_static_data", _t, "thumbs=[length(.["thumbs"])] species=[length(.["species_options"])] ages=[length(age_options)] ancestry=[length(.["ancestry_options"])]")
 
 /datum/preferences/proc/character_setup_species_lock_reason(datum/species/species)
 	if(!species)
@@ -527,7 +546,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		))
 
 /datum/preferences/proc/character_setup_apply_species(mob/user, species_id)
-	var/_t = world.timeofday
+	var/_t = TICK_USAGE_REAL
 	if(!user || !species_id)
 		return FALSE
 	if(!(species_id in GLOB.roundstart_species))
@@ -595,7 +614,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	return TRUE
 
 /datum/preferences/proc/character_setup_thumbnail_catalog()
-	var/_t = world.timeofday
+	var/_t = TICK_USAGE_REAL
 	. = list()
 	if(!pref_species)
 		return
@@ -836,12 +855,21 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			return open_ui.window.id
 	return null
 
+/datum/preferences/proc/character_setup_release_control(mob/user, atom/movable/screen/map_view/view)
+	if(!user?.client || !view?.assigned_map)
+		return
+	winset(user, view.assigned_map, "is-visible=false;parent=")
+	character_setup_log("VIEW", "released control [view.assigned_map] user=[user.ckey]")
+
 /datum/preferences/proc/character_setup_teardown_view(mob/user)
 	character_setup_log("VIEW", "teardown map=[character_setup_view?.assigned_map] user=[user?.ckey]")
 	character_setup_hover_acc = null
 	character_setup_hover_color = null
 	character_setup_hover_customizer = null
 	character_setup_view_shown = FALSE
+	character_setup_release_control(user, character_setup_view)
+	character_setup_release_control(user, character_setup_view_front)
+	character_setup_release_control(user, character_setup_view_side)
 	character_setup_view?.hide_from(user)
 	character_setup_view_front?.hide_from(user)
 	character_setup_view_side?.hide_from(user)
@@ -865,7 +893,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	character_setup_view_busy = TRUE
 	do
 		character_setup_view_pending = FALSE
-		var/_t = world.timeofday
+		var/_t = TICK_USAGE_REAL
 		character_setup_render_body()
 		character_setup_log_op("render_body", _t, "dir=[character_setup_preview_dir] hover=[character_setup_hover_acc || "none"] species=[pref_species?.id]")
 	while(character_setup_view_pending)
@@ -1345,7 +1373,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	return TRUE
 
 /datum/preferences/ui_data(mob/user)
-	var/_t = world.timeofday
+	var/_t = TICK_USAGE_REAL
 	var/list/data = list()
 
 	data["lang"] = ui_lang_code(user?.client)
@@ -1386,38 +1414,28 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		var/list/heavy = list()
 
 		var/list/selectable_ages = character_setup_selectable_ages()
-		var/list/age_options = list()
 		var/age_index = 1
 		if(length(selectable_ages))
 			var/current_index = 1
 			for(var/possible_age in selectable_ages)
-				age_options += "[possible_age]"
 				if(possible_age == cspref_age())
 					age_index = current_index
 				current_index++
-		else
-			age_options += "[cspref_age() || AGE_ADULT]"
 		var/display_age = cspref_age()
 		if(length(selectable_ages) && !(display_age in selectable_ages))
 			display_age = selectable_ages[1]
-		var/list/age_tooltips = list()
-		for(var/age_option in age_options)
-			age_tooltips["[age_option]"] = character_setup_age_stat_tooltip(age_option)
 
-		heavy["age_options"] = age_options
+		heavy["age_count"] = max(1, length(selectable_ages))
 		heavy["age_index"] = age_index
 		heavy["display_age"] = display_age
-		heavy["age_tooltips"] = age_tooltips
 		heavy["faith_options"] = character_setup_faith_options()
-		heavy["ancestry_options"] = character_setup_ancestry_options()
 		heavy["features"] = character_setup_build_features_data()
 		character_setup_ui_heavy_cache = heavy
 		character_setup_ui_heavy_sig = heavy_sig
 	var/list/heavy_cache = character_setup_ui_heavy_cache
-	var/list/age_options = heavy_cache["age_options"]
+	var/age_count = heavy_cache["age_count"]
 	var/age_index = heavy_cache["age_index"]
 	var/display_age = heavy_cache["display_age"]
-	var/list/age_tooltips = heavy_cache["age_tooltips"]
 
 	var/list/loadout_slots = list()
 	for(var/slot_number in 1 to 3)
@@ -1441,7 +1459,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	data["tgui_font_size"] = character_setup_tgui_font_size
 	data["tgui_line_height"] = character_setup_tgui_line_height
 	data["tgui_text_bounds"] = tgui_text_bounds()
-	data["tgui_themes"] = tgui_theme_options()
 	data["preferences_fullscreen"] = !!character_setup_preferences_fullscreen
 	data["preferences_scale"] = character_setup_preferences_scale
 	data["preview_scale"] = character_setup_preview_scale
@@ -1460,14 +1477,11 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	data["age"] = display_age
 	data["age_index"] = age_index
 	data["age_min"] = 1
-	data["age_max"] = max(1, length(age_options))
-	data["age_options"] = age_options
-	data["age_tooltips"] = age_tooltips
+	data["age_max"] = age_count
 	data["pronouns"] = cspref_pronouns() || "None"
 	data["domhand"] = (cspref_domhand() == 1) ? "Left" : "Right"
 	data["ancestry_label"] = pref_species?.skin_tone_wording || "Ancestry"
 	data["ancestry_value"] = character_setup_current_ancestry_name()
-	data["ancestry_options"] = heavy_cache["ancestry_options"]
 
 	data["erp_enabled"] = !!erp_enabled
 	data["headshot"] = is_valid_headshot_link(null, cspref_headshot_link(), TRUE) ? cspref_headshot_link() : null
@@ -1875,23 +1889,23 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			var/new_customizer = href_list["customizer"]
 			if(!new_acc || !new_customizer)
 				if(!character_setup_hover_acc)
-					return TRUE
+					return FALSE
 				character_setup_hover_acc = null
 				character_setup_hover_color = null
 				character_setup_hover_customizer = null
 				character_setup_render_main_only = TRUE
 				character_setup_update_view()
-				return TRUE
+				return FALSE
 			if(new_acc == character_setup_hover_acc && href_list["color"] == character_setup_hover_color && new_customizer == character_setup_hover_customizer)
-				return TRUE
+				return FALSE
 			if(!text2path(new_acc) || !text2path(new_customizer))
-				return TRUE
+				return FALSE
 			character_setup_hover_acc = new_acc
 			character_setup_hover_color = href_list["color"]
 			character_setup_hover_customizer = new_customizer
 			character_setup_render_main_only = TRUE
 			character_setup_update_view()
-			return TRUE
+			return FALSE
 	if(character_setup_handle_system_action(user, href_list))
 		return TRUE
 	. = ..()

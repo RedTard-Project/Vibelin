@@ -163,3 +163,83 @@ still `82%` wide at a `0.82/1` aspect ratio, so halving the column halves the do
 axes as asked.
 
 Rebuild the bundle after touching any of this: `bun run tgui:build` from `tgui/`.
+
+## The preview controls outlive the menu (black rectangles over other interfaces)
+
+Reported as "TGUI artifacts": three black rectangles painted over an unrelated interface — in
+the field report, a `SpellBook` window. They are the chargen preview maps.
+
+A `map_view` is two things with two owners. DM owns the **content** — the
+`/atom/movable/screen/map_view` object registered on the client by `register_map_obj()`. The
+frontend owns the **control** — the BYOND skin element `ByondMapView` creates with
+`winset(id, {parent: <window>, type: 'map', …})`. `clear_map()`
+(`code/_onclick/hud/map_popups.dm`) only unregisters screen objects; it never touches the skin
+element.
+
+So `character_setup_teardown_view()` used to destroy the content and leave three controls
+parented to the window, `is-visible=true`, at their last geometry. The round log shows that
+state immediately before a teardown:
+
+```
+[CTRL] post_display MAP id=character_setup_main_…_map  winget=parent=tgui-window-1;…;pos=301,156;size=321x391;is-visible=true
+[CTRL] post_display MAP id=character_setup_front_…_map winget=parent=tgui-window-1;…;pos=7,797;size=119x119;is-visible=true
+[CTRL] post_display MAP id=character_setup_side_…_map  winget=parent=tgui-window-1;…;pos=133,797;size=119x119;is-visible=true
+[LIFECYCLE] ui_close user=…
+[VIEW] teardown map=character_setup_main_…_map user=…
+```
+
+tgui windows are pooled, so `tgui-window-1` goes to the next interface with those three
+controls still attached — and a BYOND child control composites *over* the WebView, so whatever
+is drawn underneath is simply not visible. One tall rectangle plus two small squares side by
+side near the bottom left, which is what the report shows.
+
+Two things were missing, and both are now in place:
+
+- **`character_setup_release_control()`** winsets `is-visible=false;parent=` for each view
+  before `hide_from()`. DM decides when the preview dies and knows the control ids, so DM
+  releases them; this runs whatever the client does.
+- **`ByondMapView` releases on `beforeunload`/`pagehide`.** `tgui-core`'s `ByondUi` clears the
+  control on unmount *and* on `beforeunload`; the local replacement kept only the unmount path.
+  React unmount does not run when the window is destroyed outright (`browse(null)`) rather than
+  suspended, which is exactly the case the unmount path cannot cover.
+
+Neither half is redundant: the DM half covers a client that never processes the teardown, the
+frontend half covers a menu closed without DM's `ui_close` having run first.
+
+## Payload split and op timing
+
+`ui_data()` was 53 KB per partial payload with `static=0`, resent on every update — 423 payloads
+and 23.3 MB in one round for two clients (`modular_abel/telemetry/README.md`). The heavy blocks
+were already memoised in `character_setup_ui_heavy_cache`, so they were not being *rebuilt*; they
+were being re-serialised and re-sent. Caching the build is the wrong axis: what costs is the wire,
+and the framework mechanism for that is `ui_static_data()` plus an explicit `update_static_data()`
+push.
+
+Moved to `ui_static_data()`, all keyed by the existing `character_setup_static_sig`
+(`species-gender`) that `update_menu_data()` already pushes on:
+
+- `age_options` and `age_tooltips` — the tooltip text is the expensive half, and it is derived
+  from `pref_species.possible_ages`.
+- `ancestry_options` — `pref_species.get_skin_list()`.
+- `tgui_themes` — a constant list that was being rebuilt and resent on every update.
+
+`age_index`, `display_age` and `age_max` stay in `ui_data()` because they track the current
+selection; `age_count` replaces the length of the list that no longer travels with them.
+
+**No frontend change was needed.** `backendStateAtom` (`tgui/packages/tgui/events/store.ts`)
+composes `data` as `{...gameDataAtom, ...gameStaticDataAtom}`, so a key reads the same from
+`useBackend().data` whichever side sends it. The corollary is that a key must live in exactly one
+of the two — static wins the merge, so a key left in both is silently dead weight in `ui_data`.
+
+Still in `ui_data()` and still the largest single block: **`features`**. It cannot move wholesale
+because it interleaves catalog and selection — `choice_options`/`accessory_options` are static per
+species, while `choice_value`, `accessory_value`, `enabled` and `colors` change on every pick. The
+split is to lift the two option lists into a static `feature_options` map keyed by customizer type
+and have `PreferencesMenu.tsx` read `featureOptions[feature.key]` at the four call sites that use
+them today. Not done here: it needs a live client to verify, and none was available.
+
+`character_setup_log_op()` measured with `world.timeofday`, which is deciseconds — so every
+op in the round log read `took=0ds` and the 43 ms the tgui census attributes to `act/pref` was
+invisible to it. It now uses `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS` like the telemetry module and
+reports milliseconds. This is the prerequisite for the hover-cost work, not the work itself: where
+those 43 ms actually go is still unmeasured, and the next round's log is what should decide it.
