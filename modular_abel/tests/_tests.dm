@@ -379,6 +379,41 @@
 	if(!length(GLOB.sheet_traits))
 		TEST_FAIL("no traits loaded, so every sheet line falls back to English")
 
+/datum/unit_test/modular_chargen_sheet/Run()
+	var/datum/asset/json/chat_localization/asset = get_asset_datum(/datum/asset/json/chat_localization)
+	if(!asset)
+		TEST_FAIL("the localization asset is missing, so the chargen sheet cannot be loaded")
+		return
+
+	var/list/allowed_fields = list("domain", "boons", "sins", "flaws", "worshippers")
+	for(var/list/pair as anything in asset.read_pairs("chargen.txt"))
+		var/key = pair[1]
+		var/field_at = findtext(key, ":")
+		var/path_text = field_at ? copytext(key, 1, field_at) : key
+		var/path = text2path(path_text)
+
+		if(!ispath(path))
+			TEST_FAIL("\"[path_text]\" is not a type; the entry is dead and chargen keeps its English")
+			continue
+		if(!ispath(path, /datum/species) && !ispath(path, /datum/faith) && !ispath(path, /datum/patron))
+			TEST_FAIL("[path] is not a species, faith or patron, so chargen never looks it up")
+			continue
+
+		if(field_at)
+			var/field = copytext(key, field_at + 1)
+			if(!(field in allowed_fields))
+				TEST_FAIL("\"[key]\" uses field \"[field]\", which chargen does not render")
+			else if(!ispath(path, /datum/patron))
+				TEST_FAIL("\"[key]\" sets a patron field on [path], which is not a patron")
+			continue
+
+		if(!findtext(pair[2], " | "))
+			TEST_FAIL("\"[key]\" has no \" | \" between its name and description")
+
+	load_chargen_sheet()
+	if(!length(GLOB.sheet_chargen))
+		TEST_FAIL("no chargen entries loaded, so every species and faith falls back to English")
+
 /datum/unit_test/modular_description_composites/Run()
 	for(var/obj/item/spellbook/path as anything in subtypesof(/obj/item/spellbook))
 		var/form = initial(path.themed_form)

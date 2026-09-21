@@ -14,7 +14,7 @@ All live globals, so they can be flipped mid-round from VV without a rebuild.
 | --- | --- | --- |
 | `GLOB.topic_census_debug` | `TRUE` | one log line per `client/Topic()` plus a per-minute summary |
 | `GLOB.tgui_census_debug` | `TRUE` | counters and `TICK_USAGE` timing around every payload build, process tick and act |
-| `GLOB.tgui_census_payload_bytes` | `TRUE` | **an extra `json_encode` of every payload, plus one of `static_data` and an md5 on full updates** — this roughly doubles payload serialisation cost. Turn it off first if the instrumentation itself distorts the numbers. |
+| `GLOB.tgui_census_payload_bytes` | `FALSE` | **an extra `json_encode` of every payload, plus one of `static_data` and an md5 on full updates** — this roughly doubles payload serialisation cost, so it ships off. Flip it on from VV for one round when byte sizes are the question, then flip it back. Everything else in the census is counters and `TICK_USAGE`, which is cheap enough to leave running. |
 | `GLOB.tgui_census_slow_call_ms` | `5` | threshold in ms for an immediate `*** SLOW` line; `0` disables |
 
 ## `topic_census.log`

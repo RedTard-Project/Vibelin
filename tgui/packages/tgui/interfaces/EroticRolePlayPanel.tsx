@@ -1968,18 +1968,18 @@ export const EroticRolePlayPanel: React.FC = () => {
   const partnerArousal = clamp01(data.partner_arousal ?? 0);
   const [activeTab, setActiveTab] = useState<string>(data.active_tab || 'actions');
   useEffect(() => {
-    if (data.active_tab && data.active_tab !== activeTab) setActiveTab(data.active_tab);
+    // Setting the same value is a no-op in React, so no `!== activeTab` guard is
+    // needed — and reading activeTab here while it is not a dependency is how a
+    // stale closure gets in.
+    if (data.active_tab) setActiveTab(data.active_tab);
   }, [data.active_tab]);
   const kinkEntries = data.tabs?.erp?.entries ?? [];
+  // kinkLocal holds only the values this player has changed since the panel
+  // opened; every read falls back to the live `k.pref`. It used to be pre-filled
+  // from the backend by an effect that ran once and then refused to run again,
+  // which meant the fallback could never fire afterwards and the panel stayed
+  // pinned to the first snapshot it ever saw.
   const [kinkLocal, setKinkLocal] = useState<Record<string, number>>({});
-  useEffect(() => {
-    const next: Record<string, number> = {};
-    for (const k of kinkEntries) next[k.type] = k.pref ?? 0;
-    setKinkLocal((prev) => {
-      if (Object.keys(prev).length) return prev;
-      return next;
-    });
-  }, [kinkEntries]);
   const statusEntries = data.tabs?.status?.entries ?? [];
   const actionsPayload = data.tabs?.actions;
   const editorTemplates = data.tabs?.editor?.templates ?? [];

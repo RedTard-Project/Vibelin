@@ -194,3 +194,50 @@ client-side. Full reasoning in `modular_abel/character_setup/README.md`.
 **Re-sync obligation:** if `ByondMapView` is ever dropped back to stock `ByondUi`, pass
 `phonehome={false}` with it — DM owns the control lifecycle here, and stock `ByondUi` sends a
 `renderByondUi` Topic on every internal render. The current component sends none.
+
+## `character_setup/` Settings rows
+
+Most of the Settings tab did nothing when clicked. Every row sends the same
+`act('pref', {preference: <key>})`, so the frontend was identical for the ones that worked and
+the ones that did not — the split is entirely upstream's.
+
+`process_link()`'s fallback branch (`_preferences.dm:1172`) looks the key up in
+`GLOB.preference_entries_by_key` and then calls `preference.handle_link()`. Two ways that dies:
+
+- **`/datum/preference/toggle` has no `handle_link()`.** The base implementation
+  (`datums/_base.dm:227`) is `CRASH("handle_link() not implemented on [type]!")`, and only
+  *one* toggle subtype overrides it (`toggle/hotkeys`). So `see_chat_non_mob`, `tgui_fancy`,
+  `tgui_lock`, `windowflashing`, `ambientocclusion`, `auto_fit_viewport`, `widescreenpref` and
+  `buttons_locked` all crashed on click.
+- **Three rows are not preferences at all.** `lobby_music`, `hear_midis` and
+  `allow_midround_antag` are bit flags inside `/datum/preference/bitwise/toggles`, so their
+  names were never savefile keys and the lookup itself crashed — that is the
+  `invalid key lobby_music in menu` runtime in the round logs.
+
+`character_setup_handle_settings_toggle()` intercepts exactly those two sets before
+`process_link()` reaches upstream, using the helpers upstream already provides —
+`toggle_preference()` for the toggles, `preference_toggle_flag()` for the bit flags — then saves
+and refreshes the menu. Rows whose preference *does* implement `handle_link()` (`hotkeys`,
+`pixel_size`, `scaling_method`, and the modular `language`) are deliberately **not** intercepted,
+because their handlers carry side effects the lists here would have to duplicate.
+
+**Remove when** upstream gives `/datum/preference/toggle` a generic `handle_link()`. The
+bit-flag rows stay modular regardless: they are a chargen UI concept, not a preference key.
+
+**Re-sync obligation:** the two lists in `character_menu.dm` name preference types and flag
+defines directly. A renamed toggle or a moved flag makes that row silently dead again rather
+than throwing, so check them when the Settings tab gains or loses a row.
+
+## `character_setup_chargen_clean_text()`
+
+Two visible defects in one helper, both from `STRIP_HTML_FULL` (`code/__DEFINES/text.dm:30`):
+
+- It strips tags by replacing them with **nothing**, so a description written as
+  `"<b>Ау'Ра</b><br>Изогнутые рога…"` rendered as `АуРаИзогнутые рога…` — the name glued to the
+  first word.
+- Its `copytext(text, 1, limit)` counts **bytes**. Cyrillic is two bytes per character in UTF-8,
+  so the 900-byte cut landed mid-character and the blurb ended in a replacement glyph.
+
+The modular helper no longer uses the define: it replaces tags with a space, collapses the
+resulting whitespace runs, and truncates with `copytext_char()`. Same class of bug as the
+`copytext` → `copytext_char` fix recorded under `cyrillic_say_fix.dm`.

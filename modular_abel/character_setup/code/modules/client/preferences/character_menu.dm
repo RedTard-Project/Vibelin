@@ -48,6 +48,8 @@
 /datum/preferences/var/character_setup_view_shown = FALSE
 /datum/preferences/var/list/character_setup_ui_heavy_cache
 /datum/preferences/var/character_setup_ui_heavy_sig
+/datum/preferences/var/list/character_setup_measure_cache
+/datum/preferences/var/character_setup_measure_sig
 
 GLOBAL_LIST_EMPTY(character_setup_chargen_ooc_messages)
 
@@ -394,7 +396,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/_t = TICK_USAGE_REAL
 	. = list()
 	.["background_options"] = character_setup_background_options()
-	.["thumbs"] = character_setup_thumbnail_catalog()
 	.["species_options"] = character_setup_species_options()
 	.["ancestry_options"] = character_setup_ancestry_options()
 	.["tgui_themes"] = tgui_theme_options()
@@ -407,7 +408,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/list/feature_options = character_setup_build_feature_options()
 	.["feature_choice_options"] = feature_options["choices"]
 	.["feature_accessory_options"] = feature_options["accessories"]
-	character_setup_log_op("ui_static_data", _t, "thumbs=[length(.["thumbs"])] species=[length(.["species_options"])] ages=[length(age_options)] ancestry=[length(.["ancestry_options"])] feat_choices=[length(.["feature_choice_options"])] feat_acc=[length(.["feature_accessory_options"])]")
+	character_setup_log_op("ui_static_data", _t, "species=[length(.["species_options"])] ages=[length(age_options)] ancestry=[length(.["ancestry_options"])] feat_choices=[length(.["feature_choice_options"])] feat_acc=[length(.["feature_accessory_options"])]")
 
 /datum/preferences/proc/character_setup_species_lock_reason(datum/species/species)
 	if(!species)
@@ -535,11 +536,12 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		var/datum/species/species = new species_type()
 		var/lock_reason = character_setup_species_lock_reason(species)
 		var/available = !lock_reason
-		var/description = species.desc ? character_setup_chargen_clean_text(species.desc, 900) : "No description available."
+		var/raw_desc = chargen_tr_desc(parent, species_type, species.desc)
+		var/description = raw_desc ? character_setup_chargen_clean_text(raw_desc, 900) : "No description available."
 		var/list/display_ages = character_setup_species_display_ages(species)
 		. += list(list(
 			"id" = species.id,
-			"name" = species.name,
+			"name" = chargen_tr_name(parent, species_type, species.name),
 			"description" = trim(description),
 			"available" = available,
 			"lock_reason" = lock_reason,
@@ -618,28 +620,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	update_menu_data(user)
 	character_setup_log_op("apply_species", _t, "species=[species_id] age=[cspref_age()] gender=[cspref_gender()]")
 	return TRUE
-
-/datum/preferences/proc/character_setup_thumbnail_catalog()
-	var/_t = TICK_USAGE_REAL
-	. = list()
-	if(!pref_species)
-		return
-	for(var/customizer_type in pref_species.customizers)
-		var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
-		if(!customizer)
-			continue
-		for(var/choice_type in customizer.customizer_choices)
-			var/datum/customizer_choice/choice = CUSTOMIZER_CHOICE(choice_type)
-			if(!choice || !LAZYLEN(choice.sprite_accessories))
-				continue
-			for(var/accessory_type in choice.sprite_accessories)
-				var/key = "[accessory_type]"
-				if(.[key])
-					continue
-				var/datum/sprite_accessory/accessory = SPRITE_ACCESSORY(accessory_type)
-				if(accessory)
-					.[key] = sanitize_css_class_name("[accessory_type]")
-	character_setup_log_op("thumbnail_catalog", _t, "entries=[length(.)] species=[pref_species?.id]")
 
 /datum/preferences/ui_interact(mob/user, datum/tgui/ui)
 	var/window_width = character_setup_preferences_fullscreen ? 7680 : 1180
@@ -970,10 +950,33 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		character_setup_apply_to_view(character_setup_view_side, body, EAST)
 	character_setup_log("VIEW", "render done main_only=[main_only] dir=[character_setup_preview_dir] flat=[character_setup_view_last_flat] feet_margin=[character_setup_view_feet_margin] underwear=[body.underwear]")
 
+/datum/preferences/proc/character_setup_measure_signature()
+	var/list/parts = list(
+		"[pref_species?.type]",
+		"[cspref_gender()]",
+		"[character_setup_preview_clothes]",
+		"[character_setup_preview_underwear]",
+		"[character_setup_preview_job()?.type]",
+		"[character_setup_hover_acc]",
+		"[character_setup_hover_customizer]",
+	)
+	for(var/datum/customizer_entry/entry as anything in customizer_entries)
+		parts += "[entry.customizer_type]:[entry.customizer_choice_type]:[entry.accessory_type]:[entry.disabled ? 1 : 0]"
+	return jointext(parts, "|")
+
 /datum/preferences/proc/character_setup_measure_art(dir)
 	var/mob/living/carbon/human/dummy/body = character_setup_body
 	if(!body)
 		return null
+	var/signature = character_setup_measure_signature()
+	if(signature != character_setup_measure_sig)
+		character_setup_measure_sig = signature
+		character_setup_measure_cache = list()
+	var/cache_key = "[dir]"
+	var/list/cached = character_setup_measure_cache?[cache_key]
+	if(cached)
+		return cached.Copy()
+	var/_t = TICK_USAGE_REAL
 	var/icon/measure = character_setup_get_flat_icon(body, dir, no_anim = TRUE)
 	var/measure_w = isicon(measure) ? measure.Width() : 32
 	var/measure_h = isicon(measure) ? measure.Height() : 32
@@ -985,7 +988,11 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		art_y = art[2] - 1
 		measure_w = art[3] - art[1] + 1
 		measure_h = art[4] - art[2] + 1
-	return list(measure_w, measure_h, GLOB.character_setup_flat_origin_x + art_x, GLOB.character_setup_flat_origin_y + art_y)
+	var/list/result = list(measure_w, measure_h, GLOB.character_setup_flat_origin_x + art_x, GLOB.character_setup_flat_origin_y + art_y)
+	LAZYINITLIST(character_setup_measure_cache)
+	character_setup_measure_cache[cache_key] = result.Copy()
+	character_setup_log_op("measure_art", _t, "dir=[dir] bbox=[measure_w]x[measure_h] cached_dirs=[length(character_setup_measure_cache)]")
+	return result
 
 /datum/preferences/proc/character_setup_measure_body(dir)
 	var/list/art = character_setup_measure_art(dir)
@@ -1219,7 +1226,10 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 /datum/preferences/proc/character_setup_chargen_clean_text(text, limit = 900)
 	if(!text)
 		return ""
-	return trim(STRIP_HTML_FULL(replacetext("[text]", "\n", " "), limit))
+	var/static/regex/whitespace_runs = regex(@"[\s\n]+", "g")
+	var/stripped = GLOB.html_tags.Replace("[text]", " ")
+	stripped = whitespace_runs.Replace(html_decode(stripped), " ")
+	return trim(copytext_char(stripped, 1, limit))
 
 /datum/preferences/proc/character_setup_patron_options_for_faith(faith_type)
 	. = list()
@@ -1237,13 +1247,13 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		var/patron_name = patron.display_name ? patron.display_name : patron.name
 		. += list(list(
 			"id" = "[patron_type]",
-			"name" = patron_name,
-			"domain" = patron.domain || "",
-			"description" = character_setup_chargen_clean_text(patron.desc, 700),
-			"flaws" = patron.flaws || "",
-			"worshippers" = patron.worshippers || "",
-			"sins" = patron.sins || "",
-			"boons" = patron.boons || "",
+			"name" = chargen_tr_name(parent, patron_type, patron_name),
+			"domain" = chargen_tr_field(parent, patron_type, "domain", patron.domain || ""),
+			"description" = character_setup_chargen_clean_text(chargen_tr_desc(parent, patron_type, patron.desc), 700),
+			"flaws" = chargen_tr_field(parent, patron_type, "flaws", patron.flaws || ""),
+			"worshippers" = chargen_tr_field(parent, patron_type, "worshippers", patron.worshippers || ""),
+			"sins" = chargen_tr_field(parent, patron_type, "sins", patron.sins || ""),
+			"boons" = chargen_tr_field(parent, patron_type, "boons", patron.boons || ""),
 			"available" = available,
 			"selected" = current_patron_type == patron_type,
 		))
@@ -1262,8 +1272,8 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			continue
 		. += list(list(
 			"id" = "[faith_type]",
-			"name" = faith.name || "[faith_type]",
-			"description" = character_setup_chargen_clean_text(faith.desc, 700),
+			"name" = chargen_tr_name(parent, faith_type, faith.name || "[faith_type]"),
+			"description" = character_setup_chargen_clean_text(chargen_tr_desc(parent, faith_type, faith.desc), 700),
 			"available" = available,
 			"selected" = faith_type == current_faith,
 			"patrons" = patrons,
@@ -1412,6 +1422,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	var/patron_name = "None"
 	if(current_patron)
 		patron_name = current_patron.display_name ? current_patron.display_name : current_patron.name
+		patron_name = chargen_tr_name(parent, current_patron.type, patron_name)
 	var/current_faith_type = current_patron ? current_patron.associated_faith : /datum/patron/divine/astrata::associated_faith
 
 	var/heavy_sig = "[pref_species?.type]|[cspref_gender()]|[current_patron?.type]|[cspref_age()]|[cspref_skin_tone()]|[erp_enabled]"
@@ -1468,14 +1479,14 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	data["preferences_fullscreen"] = !!character_setup_preferences_fullscreen
 	data["preferences_scale"] = character_setup_preferences_scale
 	data["preview_scale"] = character_setup_preview_scale
-	data["species_name"] = pref_species ? pref_species.name : "Human"
+	data["species_name"] = pref_species ? chargen_tr_name(parent, pref_species.type, pref_species.name) : "Human"
 	data["species_id"] = pref_species ? pref_species.id : SPEC_ID_HUMEN
 	data["gender"] = gender_name
 	data["gender_short"] = gender_short
 	data["default_slot"] = default_slot
 
 	data["patron_name"] = patron_name
-	data["faith_name"] = selected_faith ? selected_faith.name : "None"
+	data["faith_name"] = selected_faith ? chargen_tr_name(parent, selected_faith.type, selected_faith.name) : "None"
 	data["selected_patron_id"] = current_patron ? "[current_patron.type]" : ""
 	data["selected_faith_id"] = current_faith_type ? "[current_faith_type]" : ""
 	data["faith_options"] = heavy_cache["faith_options"]
@@ -1740,8 +1751,43 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			return TRUE
 	return FALSE
 
+GLOBAL_LIST_INIT(character_setup_settings_toggles, list(
+	"ambientocclusion" = /datum/preference/toggle/ambientocclusion,
+	"auto_fit_viewport" = /datum/preference/toggle/auto_fit_viewport,
+	"buttons_locked" = /datum/preference/toggle/buttons_locked,
+	"see_chat_non_mob" = /datum/preference/toggle/see_chat_non_mob,
+	"tgui_fancy" = /datum/preference/toggle/tgui_fancy,
+	"tgui_lock" = /datum/preference/toggle/tgui_lock,
+	"widescreenpref" = /datum/preference/toggle/widescreenpref,
+	"windowflashing" = /datum/preference/toggle/windowflashing,
+))
+
+GLOBAL_LIST_INIT(character_setup_settings_flags, list(
+	"allow_midround_antag" = MIDROUND_ANTAG,
+	"hear_midis" = SOUND_MIDI,
+	"lobby_music" = SOUND_LOBBY,
+))
+
+/datum/preferences/proc/character_setup_handle_settings_toggle(mob/user, key)
+	var/datum/preference/toggle_type = GLOB.character_setup_settings_toggles[key]
+	if(toggle_type)
+		if(!toggle_preference(toggle_type))
+			return FALSE
+		save_preferences()
+		update_menu_data(user)
+		return TRUE
+	var/flag = GLOB.character_setup_settings_flags[key]
+	if(flag)
+		preference_toggle_flag(/datum/preference/bitwise/toggles, flag)
+		save_preferences()
+		update_menu_data(user)
+		return TRUE
+	return FALSE
+
 /datum/preferences/process_link(mob/user, list/href_list)
 	character_setup_log_action("pref:[href_list["preference"]]", json_encode(href_list))
+	if(character_setup_handle_settings_toggle(user, href_list["preference"]))
+		return TRUE
 	switch(href_list["preference"])
 		if("character_setup_select_species")
 			return character_setup_apply_species(user, href_list["species_id"])

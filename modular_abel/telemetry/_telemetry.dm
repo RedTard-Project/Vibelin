@@ -1,6 +1,6 @@
 GLOBAL_VAR_INIT(topic_census_debug, TRUE)
 GLOBAL_VAR_INIT(tgui_census_debug, TRUE)
-GLOBAL_VAR_INIT(tgui_census_payload_bytes, TRUE)
+GLOBAL_VAR_INIT(tgui_census_payload_bytes, FALSE)
 GLOBAL_VAR_INIT(tgui_census_slow_call_ms, 5)
 GLOBAL_VAR_INIT(tgui_census_flush_running, FALSE)
 GLOBAL_LIST_EMPTY(tgui_census_interfaces)

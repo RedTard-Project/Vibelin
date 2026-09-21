@@ -259,5 +259,38 @@ extra full update and the reward is that a whole class of stale-catalog bug cann
 `character_setup_log_op()` measured with `world.timeofday`, which is deciseconds — so every
 op in the round log read `took=0ds` and the 43 ms the tgui census attributes to `act/pref` was
 invisible to it. It now uses `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS` like the telemetry module and
-reports milliseconds. This is the prerequisite for the hover-cost work, not the work itself: where
-those 43 ms actually go is still unmeasured, and the next round's log is what should decide it.
+reports milliseconds.
+
+### The thumbnail map is gone
+
+`ui_static_data()` used to ship `thumbs`: one entry per accessory, mapping its type path to its
+spritesheet CSS class. The class is `sanitize_css_class_name(path)`
+(`code/modules/asset_cache/asset_list.dm`), i.e. the path with everything non-alphanumeric
+stripped — **a pure function of the key it was stored under**. 435 entries, ~80 KB per full
+update, carrying no information the frontend did not already hold in `option.value`.
+
+`spriteClassFor()` in `PreferencesMenu.components.tsx` applies the same rule client-side. The one
+thing the map really encoded was *which grids show thumbnails at all*, and that is a property of
+the grid, not of the data: accessory grids do, choice grids do not. `OptionGrid` now takes an
+explicit `spriteThumbs` prop, passed only at the accessory call site. If the DM rule ever changes,
+change it in both places — the mirror is noted in the helper's comment.
+
+The dead `option.thumb` / `data:`-URL branch went with it: no DM code has ever set that field.
+
+### The preview bbox is cached
+
+`character_setup_measure_art()` flattens the whole dummy through
+`character_setup_get_flat_icon()` for one reason — to read its content bounding box, so the map
+zoom and offsets can be computed. The 2026-09-20 round ran it **345 times against 297 renders**
+(a second, perpendicular measurement runs whenever the render is not `main_only`).
+
+It is now memoised per direction behind `character_setup_measure_signature()`, which lists
+everything that can change the doll's silhouette: species, gender, the preview job, the clothes
+and underwear toggles, the hovered accessory, and every customizer entry's choice, accessory and
+disabled flag. **Accessory colours are deliberately excluded** — `accessory_colors` are opaque
+hex, so a colour change cannot add or remove a pixel, and including them would throw the cache
+away on every click of the colour picker.
+
+The invariant to preserve: the signature must be a *superset* of what feeds the flatten. Adding a
+preview-only toggle that changes the doll's outline without extending the signature will produce
+a subtly mis-sized preview with no error anywhere.
