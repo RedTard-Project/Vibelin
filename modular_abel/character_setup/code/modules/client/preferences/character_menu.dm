@@ -13,9 +13,12 @@
 /datum/preferences/var/atom/movable/screen/map_view/character_setup_view
 /datum/preferences/var/atom/movable/screen/map_view/character_setup_view_front
 /datum/preferences/var/atom/movable/screen/map_view/character_setup_view_side
-/datum/preferences/var/atom/movable/screen/background/character_setup_bg
-/datum/preferences/var/atom/movable/screen/background/character_setup_bg_front
-/datum/preferences/var/atom/movable/screen/background/character_setup_bg_side
+/atom/movable/screen/background/character_setup
+	layer = GAME_PLANE - 1
+
+/datum/preferences/var/atom/movable/screen/background/character_setup/character_setup_bg
+/datum/preferences/var/atom/movable/screen/background/character_setup/character_setup_bg_front
+/datum/preferences/var/atom/movable/screen/background/character_setup/character_setup_bg_side
 /datum/preferences/var/character_setup_view_extent_w = 1
 /datum/preferences/var/character_setup_view_extent_h = 1
 /datum/preferences/var/character_setup_view_bbox_w = 32

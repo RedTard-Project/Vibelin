@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fetchRetry } from 'tgui-core/http';
 
 import { loadedMappings, resolveAsset } from '../assets';
 import type {
@@ -39,8 +40,6 @@ export type ChargenCatalog = {
 export type SpeciesLocks = Record<string, string>;
 
 const ASSET_NAME = 'chargen_catalog.json';
-const RETRIES = 4;
-const RETRY_DELAY_MS = 500;
 const MAPPING_POLL_MS = 100;
 const MAPPING_TIMEOUT_MS = 15000;
 
@@ -60,21 +59,11 @@ async function resolveWhenMapped(): Promise<string> {
 }
 
 async function fetchCatalog(): Promise<ChargenCatalog> {
-  const url = await resolveWhenMapped();
-  let last: unknown;
-  for (let attempt = 0; attempt < RETRIES; attempt++) {
-    try {
-      const response = await fetch(url);
-      if (response.ok) {
-        return await response.json();
-      }
-      last = new Error(`HTTP ${response.status}`);
-    } catch (error) {
-      last = error;
-    }
-    await delay(RETRY_DELAY_MS);
+  const response = await fetchRetry(await resolveWhenMapped());
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
   }
-  throw last;
+  return await response.json();
 }
 
 export type CatalogState = {
