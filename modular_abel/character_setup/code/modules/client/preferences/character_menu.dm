@@ -23,6 +23,8 @@
 /datum/preferences/var/character_setup_view_extent_h = 1
 /datum/preferences/var/character_setup_view_bbox_w = 32
 /datum/preferences/var/character_setup_view_bbox_h = 33
+/datum/preferences/var/character_setup_zoom_main = 0
+/datum/preferences/var/character_setup_zoom_mini = 0
 /datum/preferences/var/character_setup_view_zoom_w = 32
 /datum/preferences/var/character_setup_view_zoom_h = 36
 /datum/preferences/var/character_setup_view_off_x = 0
@@ -512,8 +514,6 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		return chargen_tr_line_for(ru, "warn:Nobles", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
 	return chargen_tr_line_for(ru, "warn:Discriminated", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. PLAY AT YOUR OWN RISK.")
 
-/// One instance of every roundstart species, kept because the availability check is a proc
-/// call and rebuilding 33 datums on each static push was the last per-species cost on the path.
 GLOBAL_LIST_INIT(character_setup_species_instances, character_setup_build_species_instances())
 
 /proc/character_setup_build_species_instances()
@@ -524,8 +524,6 @@ GLOBAL_LIST_INIT(character_setup_species_instances, character_setup_build_specie
 			continue
 		.[species_id] = new species_type()
 
-/// Only the species this player cannot pick. Anything absent is available, so the common case
-/// sends two entries rather than one per species.
 /datum/preferences/proc/character_setup_species_locks()
 	. = list()
 	for(var/species_id in GLOB.character_setup_species_instances)
@@ -765,20 +763,25 @@ GLOBAL_LIST_INIT(character_setup_species_instances, character_setup_build_specie
 			bg_hex = "#d8d8d8"
 		if("dark")
 			bg_hex = "#0a0a0a"
-	for(var/atom/movable/screen/map_view/view as anything in list(character_setup_view, character_setup_view_front, character_setup_view_side))
-		if(view)
-			winset(user, view.assigned_map, "background-color=[bg_hex]")
+	character_setup_winset_view(user, character_setup_view, bg_hex, character_setup_zoom_main)
+	character_setup_winset_view(user, character_setup_view_front, bg_hex, character_setup_zoom_mini)
+	character_setup_winset_view(user, character_setup_view_side, bg_hex, character_setup_zoom_mini)
+
+/datum/preferences/proc/character_setup_winset_view(mob/user, atom/movable/screen/map_view/view, bg_hex, zoom)
+	if(!view?.assigned_map)
+		return
+	if(zoom > 0)
+		winset(user, view.assigned_map, "zoom=[zoom];background-color=[bg_hex]")
+	else
+		winset(user, view.assigned_map, "background-color=[bg_hex]")
 
 /datum/preferences/proc/character_setup_apply_reported_zoom(mob/user, zoom_main, zoom_mini)
 	if(!user?.client)
 		return
-	if(zoom_main > 0 && character_setup_view)
-		winset(user, character_setup_view.assigned_map, "zoom=[zoom_main]")
+	if(zoom_main > 0)
+		character_setup_zoom_main = zoom_main
 	if(zoom_mini > 0)
-		if(character_setup_view_front)
-			winset(user, character_setup_view_front.assigned_map, "zoom=[zoom_mini]")
-		if(character_setup_view_side)
-			winset(user, character_setup_view_side.assigned_map, "zoom=[zoom_mini]")
+		character_setup_zoom_mini = zoom_mini
 	character_setup_apply_map_background(user)
 
 /datum/preferences/proc/character_setup_active_window_id(mob/user)

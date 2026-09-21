@@ -258,6 +258,32 @@ every op read `took=0ds` and the 43 ms that `act/pref` actually cost was invisib
 in DM needs `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS`; anything coarser reports zero and hides the
 thing you are looking for.
 
+## Zoom and backdrop are one winset, not two
+
+The preview maps get exactly two properties from DM after they are placed: `zoom`, from the
+frontend's geometry report, and `background-color`, from the backdrop picker. They were applied on
+separate paths, and only one of those paths was complete.
+
+`character_setup_apply_reported_zoom()` set the zoom and *then* called
+`character_setup_apply_map_background()` — the author already knew the order matters. The backdrop
+href called `character_setup_apply_map_background()` on its own, so a backdrop change re-winset the
+map with no zoom alongside it.
+
+That is unrecoverable from DM, because the zoom was never stored: it arrived in the href, went
+straight into `winset`, and was discarded. Nothing could put it back until the frontend sent
+another geometry report — which happens on a resize, a scale change, or a remount. Hence the
+symptom: after touching the backdrop the character preview stays blank *until the window is
+reopened*.
+
+`character_setup_zoom_main` / `character_setup_zoom_mini` now hold the last reported values, and
+`character_setup_winset_view()` is the single place that talks to a preview map, emitting
+`zoom` and `background-color` in one `winset`. Both callers go through it, so the two paths cannot
+diverge again.
+
+The rule this leaves behind: **a preview map has no recoverable state in DM.** Anything winset onto
+it must be re-winset by whoever touches it next, so every property that matters belongs in one call
+from one proc — not spread across the handlers that happen to change each one.
+
 ## The third tier: a constant catalog
 
 The static split above fixed the wrong half first. `ui_static_data()` is per player and is resent
