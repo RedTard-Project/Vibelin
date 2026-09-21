@@ -258,6 +258,38 @@ every op read `took=0ds` and the 43 ms that `act/pref` actually cost was invisib
 in DM needs `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS`; anything coarser reports zero and hides the
 thing you are looking for.
 
+## The settle counter could not reach its own threshold
+
+`ByondMapView` hides its BYOND control whenever the anchor div measures zero, and shows it again
+only after the rect has been **stable for `SETTLE_TICKS` (2) consecutive `place()` calls**. The
+reposition branch scheduled exactly **one** follow-up frame, so the counter reached 1 and stopped:
+nothing scheduled the second call, and the control stayed hidden until some unrelated event — a
+window resize, a scroll, a `visibilitychange` — happened to call `place()` again.
+
+On mount this never showed, because the effect's `retry()` fires seven timers
+(`RETRY_DELAYS = [0, 50, 150, 400, 900, 1800, 3200]`) and the counter always got its second tick.
+It only bit *mid-life*, when a re-render briefly collapsed the anchor to zero size.
+
+That is what a backdrop change does. The live log shows it directly — a geometry report with
+`front_w: 0, side_w: 0` immediately after `preview_background`, then a second report with the real
+113x113 a moment later. The first one hid the control; the second repositioned it while still
+invisible; the counter stalled at 1.
+
+It also explains the two things that looked like separate bugs:
+
+- **"the character disappears until I reopen the window"** — nothing was ever going to call
+  `place()` again on its own.
+- **"pressing Zoom fixes it"** — changing the scale changes `menuScale`/`previewScale`, which are in
+  the component's `deps`, so the effect re-runs and `retry()` pumps `place()` seven more times.
+
+The fix is that the settle branch now schedules its own next frame while it is still counting, so
+the sequence completes without needing an outside event.
+
+The general rule: **a state machine driven by a frame scheduler has to keep scheduling until it
+reaches a terminal state.** Any branch that returns while still mid-sequence is a place the machine
+can die, and it will die exactly where it is hardest to notice — not on mount, where retries paper
+over it, but on the one interaction that disturbs layout.
+
 ## Zoom and backdrop are one winset, not two
 
 The preview maps get exactly two properties from DM after they are placed: `zoom`, from the

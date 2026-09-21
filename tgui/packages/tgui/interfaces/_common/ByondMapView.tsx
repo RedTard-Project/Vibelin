@@ -93,8 +93,10 @@ export function ByondMapView(props: ByondMapViewProps) {
     if (sameRect(placedRect.current, rect) && !paramsChanged) {
       if (settled.current < SETTLE_TICKS) {
         settled.current++;
+        scheduleRef.current();
+        return;
       }
-      if (settled.current >= SETTLE_TICKS && !visible.current) {
+      if (!visible.current) {
         visible.current = true;
         Byond.winset(controlId, { 'is-visible': true });
       }
