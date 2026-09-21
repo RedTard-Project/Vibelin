@@ -152,18 +152,32 @@ and the attribute was never mapped: every item examine both lost its tooltip and
 ~1.7 KB `type=log` Topic back to the server. All 13 `OVER-SEC` lines in the 2026-09-20 round log
 are that relay, and 30 of the 36 limiter-counted topics in the busiest second of the round.
 
-`TooltipHTML` itself lives in `modular_chat/components.tsx` — `Tooltip`'s `content` is a
-ReactNode, so the HTML string needs a wrapper. TypeScript has no override mechanism, so the
-upstream renderer carries a hook, the same shape `localization/` already uses:
+**This module touches no upstream tgui file.** Registering the name properly would mean adding it
+to the two `const` maps, which live in `chat/renderer.tsx` itself. A fork module cannot reach them
+without the import cycle `renderer -> localization/translate -> modular_chat -> renderer`, and the
+rspack build **rejects circular dependencies outright** (verified: `ERROR ... Circular dependency
+detected`), so that route does not exist.
 
-| Upstream file | Hook | Re-sync obligation |
+What does exist: the renderer writes the message HTML into a node, calls the fork's
+`translateNode()`, and *only then* scans for `[data-component]`. Rewriting the node in that window
+reaches the same end state with no upstream file involved. `rewriteModularChatComponents()` renames
+`TooltipHTML` to the `Tooltip` upstream does register and flattens `data-html` into `data-content`.
+
+| File | Owner | Role |
 | --- | --- | --- |
-| `tgui/packages/tgui-panel/chat/renderer.tsx` | one import plus `...MODULAR_CHAT_COMPONENTS` and `...MODULAR_CHAT_ATTRIBUTES_TO_PROPS` spread into the two maps | re-apply after a tgui re-sync; if upstream ever registers `TooltipHTML` itself the spread becomes a harmless no-op and the module can go |
+| `tgui/packages/tgui-panel/modular_chat/rewrite.ts` | fork | the rewrite, plus `rewrite.test.ts` |
+| `tgui/packages/tgui-panel/localization/translate.ts` | fork | calls it from `translateNode()`, **above** the `isActive()` guard so it runs for EN players too |
+| `tgui/packages/tgui-panel/chat/renderer.tsx` | upstream | **unchanged** |
 
-Not fixed, deliberately: the attribute loop writes `outputProps[undefined]` for any attribute
-absent from the map (`class="tooltip"` on every one of these spans). It is upstream's behaviour,
-it is inert for a component that ignores unknown props, and guarding it would be an original fix
-in an upstream file rather than a hook.
+Two consequences worth knowing before touching either file:
+
+- The call sits in the localization module because that is the only fork-owned function the
+  renderer already calls per message. It is not localization work; if `translateNode()` is ever
+  removed or its `isActive()` guard moved above the call, the tooltips silently go back to
+  flooding the server.
+- `Tooltip` takes `content` as a plain string, so the tip loses its markup: the `<br>` that
+  `carbon/examine.dm` puts between the description and the explanation becomes a visible
+  ` — ` separator. Accepted — the alternative was a themed tooltip that does not render at all.
 
 ## `character_setup/` preview controls
 

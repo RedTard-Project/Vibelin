@@ -231,12 +231,30 @@ composes `data` as `{...gameDataAtom, ...gameStaticDataAtom}`, so a key reads th
 `useBackend().data` whichever side sends it. The corollary is that a key must live in exactly one
 of the two — static wins the merge, so a key left in both is silently dead weight in `ui_data`.
 
-Still in `ui_data()` and still the largest single block: **`features`**. It cannot move wholesale
-because it interleaves catalog and selection — `choice_options`/`accessory_options` are static per
-species, while `choice_value`, `accessory_value`, `enabled` and `colors` change on every pick. The
-split is to lift the two option lists into a static `feature_options` map keyed by customizer type
-and have `PreferencesMenu.tsx` read `featureOptions[feature.key]` at the four call sites that use
-them today. Not done here: it needs a live client to verify, and none was available.
+**`features`** was the largest single block and could not move wholesale, because it interleaves
+catalog and selection: `choice_options`/`accessory_options` are fixed for a species, while
+`choice_value`, `accessory_value`, `enabled` and `colors` change on every pick. It is now split:
+
+- `character_setup_build_feature_options()` (`features_tgui.dm`) builds both catalogs and they ride
+  in `ui_static_data()` as `feature_choice_options` and `feature_accessory_options`.
+- `character_setup_build_features_data()` keeps only what a pick changes.
+
+The two catalogs are keyed differently and it matters. Choices are keyed by **customizer type**;
+accessories by **customizer-choice type**, because `character_setup_accessory_types()` is asked of
+the *selected* choice — a customizer offering Hair and Bald has a different accessory list per
+variant, so keying by customizer would serve the wrong list the moment the variant changed. The
+catalogs are therefore built for every choice, not just the selected one.
+
+`PreferencesMenu.tsx` reads `data.feature_accessory_options?.[feature.choice_value]` and gates it on
+`feature.accessory_value` being present. That gate is not cosmetic: the backend only fills
+`accessory_value` when the entry actually has an accessory, and the style grid only used to appear
+in that case — without the gate it would start appearing for features that never showed one.
+
+`character_setup_static_sig` gained **`erp_enabled`** (`character_setup_build_static_sig()`, the one
+place it is now built). The option catalogs run through `customizer.is_allowed(src)` and
+`choice.character_setup_accessory_types(src)`, both of which take the preferences datum and can
+therefore be filtered by the ERP flag on some subtypes. Toggling ERP is rare, so the cost is one
+extra full update and the reward is that a whole class of stale-catalog bug cannot happen.
 
 `character_setup_log_op()` measured with `world.timeofday`, which is deciseconds — so every
 op in the round log read `took=0ds` and the 43 ms the tgui census attributes to `act/pref` was

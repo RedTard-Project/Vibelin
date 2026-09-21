@@ -276,14 +276,17 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	user << browse(null, "window=preferences_browser")
 
 	validate_customizer_entries()
-	character_setup_static_sig = "[pref_species?.type]-[cspref_gender()]"
+	character_setup_static_sig = character_setup_build_static_sig()
 	character_setup_log("LIFECYCLE", "build_and_show_menu user=[user.ckey] species=[pref_species?.id] gender=[cspref_gender()] static_sig=[character_setup_static_sig]")
 	ui_interact(user)
+
+/datum/preferences/proc/character_setup_build_static_sig()
+	return "[pref_species?.type]-[cspref_gender()]-[erp_enabled]"
 
 /datum/preferences/update_menu_data(mob/user, list/fields_to_update)
 	var/_t = TICK_USAGE_REAL
 	character_setup_ui_heavy_sig = null
-	var/new_static_sig = "[pref_species?.type]-[cspref_gender()]"
+	var/new_static_sig = character_setup_build_static_sig()
 	var/static_refreshed = FALSE
 	if(new_static_sig != character_setup_static_sig)
 		character_setup_static_sig = new_static_sig
@@ -401,7 +404,10 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		age_tooltips["[age_option]"] = character_setup_age_stat_tooltip(age_option)
 	.["age_options"] = age_options
 	.["age_tooltips"] = age_tooltips
-	character_setup_log_op("ui_static_data", _t, "thumbs=[length(.["thumbs"])] species=[length(.["species_options"])] ages=[length(age_options)] ancestry=[length(.["ancestry_options"])]")
+	var/list/feature_options = character_setup_build_feature_options()
+	.["feature_choice_options"] = feature_options["choices"]
+	.["feature_accessory_options"] = feature_options["accessories"]
+	character_setup_log_op("ui_static_data", _t, "thumbs=[length(.["thumbs"])] species=[length(.["species_options"])] ages=[length(age_options)] ancestry=[length(.["ancestry_options"])] feat_choices=[length(.["feature_choice_options"])] feat_acc=[length(.["feature_accessory_options"])]")
 
 /datum/preferences/proc/character_setup_species_lock_reason(datum/species/species)
 	if(!species)

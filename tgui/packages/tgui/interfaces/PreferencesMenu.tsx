@@ -106,10 +106,8 @@ type FeatureEntry = {
   can_disable: Booleanish;
   choice_name: string;
   choice_value?: string;
-  choice_options?: FeatureOption[];
   accessory_name?: string;
   accessory_value?: string;
-  accessory_options?: FeatureOption[];
   colors?: FeatureColor[];
   extras?: FeatureExtra[];
   erp?: Booleanish;
@@ -175,6 +173,13 @@ type PrefsData = {
   background: string;
   background_options: FeatureOption[];
   thumbs?: Record<string, string>;
+  // Option catalogs ride in ui_static_data: they change only with species,
+  // gender or the ERP toggle, while the selections in `features` change on
+  // every pick. Keyed by customizer type and by customizer-choice type
+  // respectively — the accessory list belongs to the chosen variant, not to
+  // the customizer.
+  feature_choice_options?: Record<string, FeatureOption[]>;
+  feature_accessory_options?: Record<string, FeatureOption[]>;
   preview_map: string | null;
   preview_map_front: string | null;
   preview_map_side: string | null;
@@ -1556,6 +1561,13 @@ export const PreferencesMenu = () => {
 
   const renderFeatureBody = (feature: FeatureEntry, skipColors?: boolean) => {
     const extraControls = renderFeatureExtras(feature);
+    const choiceOptions = data.feature_choice_options?.[feature.key];
+    // Gated on the selection, not just on the catalog: the backend only fills
+    // accessory_value when the entry actually has an accessory, and the style
+    // grid used to appear only in that case.
+    const accessoryOptions = feature.accessory_value
+      ? data.feature_accessory_options?.[feature.choice_value ?? '']
+      : undefined;
 
     return (
       <>
@@ -1563,10 +1575,10 @@ export const PreferencesMenu = () => {
           <FieldBlock label="Colors">{renderColorSwatches(feature)}</FieldBlock>
         ) : null}
 
-        {feature.choice_options ? (
+        {choiceOptions ? (
           <FieldBlock label="Type">
             <OptionGrid
-              options={feature.choice_options}
+              options={choiceOptions}
               selected={feature.choice_value}
               onSelect={(value) =>
                 doPref('character_setup_set_choice', undefined, {
@@ -1578,7 +1590,7 @@ export const PreferencesMenu = () => {
           </FieldBlock>
         ) : null}
 
-        {feature.accessory_options ? (
+        {accessoryOptions ? (
           <Box mb={1}>
             <Stack align="center" mb={0.5}>
               <Stack.Item>
@@ -1587,7 +1599,7 @@ export const PreferencesMenu = () => {
               {extraControls ? <Stack.Item grow>{extraControls}</Stack.Item> : null}
             </Stack>
             <OptionGrid
-              options={feature.accessory_options}
+              options={accessoryOptions}
               selected={feature.accessory_value}
               onSelect={(value) =>
                 customizerAct(feature.key, 'select_acc', { acc_type: value })

@@ -110,6 +110,61 @@
 /datum/customizer_choice/organ/vagina/character_setup_is_erp()
 	return TRUE
 
+/datum/preferences/proc/character_setup_accessory_option_list(datum/customizer_choice/choice)
+	. = list()
+	var/list/accessory_types = choice.character_setup_accessory_types(src)
+	if(length(accessory_types) < 2)
+		return .
+	var/section = choice.character_setup_section()
+	for(var/accessory_type in accessory_types)
+		var/datum/sprite_accessory/iter_accessory = SPRITE_ACCESSORY(accessory_type)
+		if(!iter_accessory)
+			continue
+		var/list/accessory_option = list(
+			"name" = iter_accessory.name,
+			"value" = "[accessory_type]",
+		)
+		if(section == "underwear")
+			var/list/coverage = list()
+			if(iter_accessory.smallclothes_covers_torso)
+				coverage += "torso"
+			if(iter_accessory.smallclothes_covers_groin)
+				coverage += "groin"
+			if(iter_accessory.smallclothes_covers_legs)
+				coverage += "legs"
+			accessory_option["coverage"] = length(coverage) ? jointext(coverage, ", ") : "decorative"
+		. += list(accessory_option)
+
+/datum/preferences/proc/character_setup_build_feature_options()
+	var/_t = TICK_USAGE_REAL
+	var/list/choices = list()
+	var/list/accessories = list()
+	. = list("choices" = choices, "accessories" = accessories)
+	if(!pref_species)
+		return .
+	if(length(customizer_entries) < length(pref_species.customizers))
+		validate_customizer_entries()
+	for(var/customizer_type in pref_species.customizers)
+		var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
+		if(!customizer || !customizer.is_allowed(src))
+			continue
+		if(length(customizer.customizer_choices) > 1)
+			var/list/choice_options = list()
+			for(var/choice_type in customizer.customizer_choices)
+				var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
+				if(!iter_choice)
+					continue
+				choice_options += list(list("name" = iter_choice.name, "value" = "[choice_type]"))
+			choices["[customizer_type]"] = choice_options
+		for(var/choice_type in customizer.customizer_choices)
+			var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
+			if(!iter_choice)
+				continue
+			var/list/accessory_options = character_setup_accessory_option_list(iter_choice)
+			if(length(accessory_options))
+				accessories["[choice_type]"] = accessory_options
+	character_setup_log_op("build_feature_options", _t, "choices=[length(choices)] accessories=[length(accessories)]")
+
 /datum/preferences/proc/character_setup_build_features_data()
 	var/_t = TICK_USAGE_REAL
 	var/list/features = list()
@@ -141,38 +196,12 @@
 		if(feature_section)
 			feature["section"] = feature_section
 
-		if(length(customizer.customizer_choices) > 1)
-			var/list/choice_options = list()
-			for(var/choice_type in customizer.customizer_choices)
-				var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
-				choice_options += list(list("name" = iter_choice.name, "value" = "[choice_type]"))
-			feature["choice_options"] = choice_options
-
 		var/list/accessory_types = choice.character_setup_accessory_types(src)
 		if(length(accessory_types) && entry.accessory_type)
 			var/datum/sprite_accessory/accessory = SPRITE_ACCESSORY(entry.accessory_type)
 			if(accessory)
 				feature["accessory_name"] = accessory.name
 				feature["accessory_value"] = "[entry.accessory_type]"
-				if(length(accessory_types) > 1)
-					var/list/accessory_options = list()
-					for(var/accessory_type in accessory_types)
-						var/datum/sprite_accessory/iter_accessory = SPRITE_ACCESSORY(accessory_type)
-						var/list/accessory_option = list(
-							"name" = iter_accessory.name,
-							"value" = "[accessory_type]",
-						)
-						if(feature_section == "underwear")
-							var/list/coverage = list()
-							if(iter_accessory.smallclothes_covers_torso)
-								coverage += "torso"
-							if(iter_accessory.smallclothes_covers_groin)
-								coverage += "groin"
-							if(iter_accessory.smallclothes_covers_legs)
-								coverage += "legs"
-							accessory_option["coverage"] = length(coverage) ? jointext(coverage, ", ") : "decorative"
-						accessory_options += list(accessory_option)
-					feature["accessory_options"] = accessory_options
 				if(choice.allows_accessory_color_customization && accessory.color_keys)
 					var/list/colors = list()
 					var/list/color_list = color_string_to_list(entry.accessory_colors)
