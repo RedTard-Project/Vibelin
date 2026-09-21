@@ -548,6 +548,44 @@
 			if(!islist(text["tags"]) || !islist(text["tag_descriptions"]))
 				TEST_FAIL("[species_id] \"[slice]\" has no tag lists")
 
+	if(length(GLOB.character_setup_species_instances) != length(GLOB.roundstart_species))
+		TEST_FAIL("the cached species instance list holds [length(GLOB.character_setup_species_instances)] of [length(GLOB.roundstart_species)] roundstart species")
+
+	var/list/option_lists = data["option_lists"]
+	var/list/accessory_index = data["accessory_index"]
+	if(!islist(option_lists) || !islist(accessory_index))
+		TEST_FAIL("the catalog has no deduplicated accessory index")
+		qdel(catalog)
+		return
+
+	for(var/species_id in GLOB.roundstart_species)
+		var/species_type = GLOB.species_list[species_id]
+		if(!species_type)
+			continue
+		var/datum/species/species = new species_type()
+		for(var/customizer_type in species.customizers)
+			var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
+			if(!customizer)
+				continue
+			for(var/choice_type in customizer.customizer_choices)
+				var/datum/customizer_choice/choice = CUSTOMIZER_CHOICE(choice_type)
+				if(!choice)
+					continue
+				var/index = accessory_index["[choice_type]"]
+				for(var/gender in list(MALE, FEMALE))
+					var/key = istext(index) ? index : index?["[species.id]|[gender]"]
+					var/list/resolved = key ? option_lists[key] : null
+					var/list/fresh = character_setup_accessory_options_for(choice, species, gender)
+					if(length(resolved) != length(fresh))
+						TEST_FAIL("[choice_type] for [species.id]/[gender] resolves to [length(resolved)] options but builds [length(fresh)] — the dedup index collapsed two different lists")
+						continue
+					for(var/i in 1 to length(fresh))
+						var/list/a = resolved[i]
+						var/list/b = fresh[i]
+						if(a["value"] != b["value"])
+							TEST_FAIL("[choice_type] for [species.id]/[gender] resolves option [i] as [a["value"]] but builds [b["value"]]")
+							break
+
 	qdel(catalog)
 
 #endif

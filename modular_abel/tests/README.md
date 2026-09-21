@@ -17,7 +17,7 @@ recipe. What follows is what upstream's suite cannot see.
 | `modular_stash_naming` | Three copies of one pick produce three distinct stash entries rather than overwriting each other. |
 | `modular_morphing_elixir` | Every kit maps onto a type the result inherits from, the result is concrete and not the target itself, keys are ordered specific-first so none is unreachable, and the swap changes no armour value. This is what keeps reskins cosmetic. |
 | `modular_test_exclusions` | The modular additions to upstream's unit-test exclusion lists are non-empty and have no duplicates — a refactor emptied one of them once and nothing noticed. |
-| `modular_chargen_catalog` | The chargen constant asset generates at `SSassets` init with no player in scope: every roundstart species is in it, with both language slices and both per-gender stat sheets. A builder that still reaches for a preferences datum fails here rather than emptying the species picker live. |
+| `modular_chargen_catalog` | The chargen constant asset generates at `SSassets` init with no player in scope: every roundstart species is in it, with both language slices and both per-gender stat sheets. A builder that still reaches for a preferences datum fails here rather than emptying the species picker live. Also checks the deduplicated accessory index: resolving it for every species, gender and choice must return the same options, in the same order, as building the list fresh. |
 | `modular_abyssor_gating` | No `/datum/map_config` turns `abyssor_cult` on in code; it is a per-map json switch. |
 
 ## Gotchas when adding a test here

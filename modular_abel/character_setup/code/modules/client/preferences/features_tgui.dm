@@ -111,8 +111,11 @@
 	return TRUE
 
 /datum/preferences/proc/character_setup_accessory_option_list(datum/customizer_choice/choice)
+	return character_setup_accessory_options_for(choice, pref_species, cspref_gender())
+
+/proc/character_setup_accessory_options_for(datum/customizer_choice/choice, datum/species/species, gender)
 	. = list()
-	var/list/accessory_types = choice.character_setup_accessory_types(src)
+	var/list/accessory_types = choice.character_setup_accessory_types_for(species, gender)
 	if(length(accessory_types) < 2)
 		return .
 	var/section = choice.character_setup_section()
@@ -135,33 +138,41 @@
 			accessory_option["coverage"] = length(coverage) ? jointext(coverage, ", ") : "decorative"
 		. += list(accessory_option)
 
-/datum/preferences/proc/character_setup_build_feature_options()
-	var/list/choices = list()
-	var/list/accessories = list()
-	. = list("choices" = choices, "accessories" = accessories)
+/datum/preferences/proc/character_setup_allowed_customizers()
+	. = list()
 	if(!pref_species)
-		return .
+		return
 	if(length(customizer_entries) < length(pref_species.customizers))
 		validate_customizer_entries()
 	for(var/customizer_type in pref_species.customizers)
 		var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
 		if(!customizer || !customizer.is_allowed(src))
 			continue
-		if(length(customizer.customizer_choices) > 1)
-			var/list/choice_options = list()
-			for(var/choice_type in customizer.customizer_choices)
-				var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
-				if(!iter_choice)
-					continue
-				choice_options += list(list("name" = iter_choice.name, "value" = "[choice_type]"))
-			choices["[customizer_type]"] = choice_options
+		. += customizer
+
+/datum/preferences/proc/character_setup_build_choice_options()
+	. = list()
+	for(var/datum/customizer/customizer as anything in character_setup_allowed_customizers())
+		if(length(customizer.customizer_choices) <= 1)
+			continue
+		var/list/choice_options = list()
+		for(var/choice_type in customizer.customizer_choices)
+			var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
+			if(!iter_choice)
+				continue
+			choice_options += list(list("name" = iter_choice.name, "value" = "[choice_type]"))
+		.["[customizer.type]"] = choice_options
+
+/datum/preferences/proc/character_setup_build_accessory_options()
+	. = list()
+	for(var/datum/customizer/customizer as anything in character_setup_allowed_customizers())
 		for(var/choice_type in customizer.customizer_choices)
 			var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
 			if(!iter_choice)
 				continue
 			var/list/accessory_options = character_setup_accessory_option_list(iter_choice)
 			if(length(accessory_options))
-				accessories["[choice_type]"] = accessory_options
+				.["[choice_type]"] = accessory_options
 
 /datum/preferences/proc/character_setup_build_features_data()
 	var/list/features = list()

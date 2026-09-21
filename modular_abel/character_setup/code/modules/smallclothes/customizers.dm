@@ -73,8 +73,11 @@ GLOBAL_LIST_INIT(character_setup_smallclothes_customizers, list(
 	var/datum/species/species = return_species(prefs)
 	return !species?.forced_taur
 
-/datum/customizer_choice/proc/character_setup_accessory_types(datum/preferences/prefs)
+/datum/customizer_choice/proc/character_setup_accessory_types_for(datum/species/species, gender)
 	return sprite_accessories
+
+/datum/customizer_choice/proc/character_setup_accessory_types(datum/preferences/prefs)
+	return character_setup_accessory_types_for(prefs?.pref_species, prefs?.cspref_gender())
 
 /datum/customizer_choice/proc/character_setup_section()
 	return null
@@ -100,10 +103,9 @@ GLOBAL_LIST_INIT(character_setup_smallclothes_customizers, list(
 /datum/customizer_choice/bodypart_feature/smallclothes/top/smallclothes_coverage_allowed(datum/sprite_accessory/accessory)
 	return accessory.smallclothes_covers_torso
 
-/datum/customizer_choice/bodypart_feature/smallclothes/character_setup_accessory_types(datum/preferences/prefs)
-	var/datum/species/species = return_species(prefs)
+/datum/customizer_choice/bodypart_feature/smallclothes/character_setup_accessory_types_for(datum/species/species, gender)
 	var/species_id = species?.id_override || species?.id
-	var/pref_gender = prefs?.cspref_gender()
+	var/pref_gender = gender
 	var/list/allowed = list()
 	var/list/loose = list()
 	for(var/accessory_type in sprite_accessories)
@@ -164,9 +166,8 @@ GLOBAL_LIST_INIT(character_setup_smallclothes_customizers, list(
 	feature_type = /datum/bodypart_feature/smallclothes/top
 	accessory_root = /datum/sprite_accessory/undershirt
 
-/datum/customizer_choice/bodypart_feature/smallclothes/top/character_setup_accessory_types(datum/preferences/prefs)
+/datum/customizer_choice/bodypart_feature/smallclothes/top/character_setup_accessory_types_for(datum/species/species, gender)
 	var/list/allowed = ..()
-	var/datum/species/species = return_species(prefs)
 	if(!species?.forced_taur)
 		return allowed
 	var/list/taur_allowed = list()

@@ -120,7 +120,7 @@ export type PrefsData = {
   preview_scale: number;
   species_id: string;
   species_name: string;
-  species_availability: Record<string, { available: boolean; lock_reason: string }>;
+  species_locks: Record<string, string>;
   is_taur: Booleanish;
   taur_body: string;
   taur_color: string;

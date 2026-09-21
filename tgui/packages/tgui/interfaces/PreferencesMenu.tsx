@@ -16,6 +16,7 @@ import { Window } from '../layouts';
 import { ByondMapView } from './_common/ByondMapView';
 import {
   buildSpeciesOptions,
+  resolveAccessoryOptions,
   useChargenCatalog,
 } from './PreferencesMenu.catalog';
 import {
@@ -232,7 +233,7 @@ export const PreferencesMenu = () => {
   const { catalog, failed: catalogFailed } = useChargenCatalog();
   const speciesOptions = buildSpeciesOptions(
     catalog,
-    data.species_availability,
+    data.species_locks,
     data.lang,
     data.gender,
   );
@@ -1176,7 +1177,13 @@ export const PreferencesMenu = () => {
     const extraControls = renderFeatureExtras(feature);
     const choiceOptions = data.feature_choice_options?.[feature.key];
     const accessoryOptions = feature.accessory_value
-      ? data.feature_accessory_options?.[feature.choice_value ?? '']
+      ? (data.feature_accessory_options?.[feature.choice_value ?? ''] ??
+        resolveAccessoryOptions(
+          catalog,
+          feature.choice_value,
+          data.species_id,
+          data.gender,
+        ))
       : undefined;
 
     return (

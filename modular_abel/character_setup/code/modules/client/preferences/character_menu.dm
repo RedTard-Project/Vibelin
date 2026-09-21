@@ -248,7 +248,7 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 	ui_interact(user)
 
 /datum/preferences/proc/character_setup_build_static_sig()
-	return "[pref_species?.type]-[cspref_gender()]-[erp_enabled]"
+	return "[pref_species?.type]-[cspref_gender()]-[cspref_age()]"
 
 /datum/preferences/update_menu_data(mob/user, list/fields_to_update)
 	character_setup_ui_heavy_sig = null
@@ -356,12 +356,12 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 
 /datum/preferences/ui_static_data(mob/user)
 	. = list()
-	.["species_availability"] = character_setup_species_availability()
+	.["species_locks"] = character_setup_species_locks()
 	.["ancestry_options"] = character_setup_ancestry_options()
 	.["age_options"] = character_setup_age_option_list()
-	var/list/feature_options = character_setup_build_feature_options()
-	.["feature_choice_options"] = feature_options["choices"]
-	.["feature_accessory_options"] = feature_options["accessories"]
+	.["feature_choice_options"] = character_setup_build_choice_options()
+	if(pref_species && !(pref_species.id in GLOB.roundstart_species))
+		.["feature_accessory_options"] = character_setup_build_accessory_options()
 
 /datum/preferences/proc/character_setup_species_lock_reason(datum/species/species)
 	if(!species)
@@ -509,21 +509,27 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		return chargen_tr_line_for(ru, "warn:Nobles", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. NOBLES EVEN MORE SO. PLAY AT YOUR OWN RISK.")
 	return chargen_tr_line_for(ru, "warn:Discriminated", "THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. PLAY AT YOUR OWN RISK.")
 
-/// The only part of the species list that varies per player. Everything else -- names,
-/// descriptions, tags, ages and stat sheets -- is in /datum/asset/json/chargen_catalog,
-/// generated once and cached by the browser.
-/datum/preferences/proc/character_setup_species_availability()
+/// One instance of every roundstart species, kept because the availability check is a proc
+/// call and rebuilding 33 datums on each static push was the last per-species cost on the path.
+GLOBAL_LIST_INIT(character_setup_species_instances, character_setup_build_species_instances())
+
+/proc/character_setup_build_species_instances()
 	. = list()
 	for(var/species_id in GLOB.roundstart_species)
 		var/species_type = GLOB.species_list[species_id]
 		if(!species_type)
 			continue
-		var/datum/species/species = new species_type()
+		.[species_id] = new species_type()
+
+/// Only the species this player cannot pick. Anything absent is available, so the common case
+/// sends two entries rather than one per species.
+/datum/preferences/proc/character_setup_species_locks()
+	. = list()
+	for(var/species_id in GLOB.character_setup_species_instances)
+		var/datum/species/species = GLOB.character_setup_species_instances[species_id]
 		var/lock_reason = character_setup_species_lock_reason(species)
-		.[species.id] = list(
-			"available" = !lock_reason,
-			"lock_reason" = lock_reason,
-		)
+		if(lock_reason)
+			.[species_id] = lock_reason
 
 /datum/preferences/proc/character_setup_apply_species(mob/user, species_id)
 	if(!user || !species_id)

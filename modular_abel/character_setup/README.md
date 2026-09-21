@@ -244,11 +244,12 @@ catalogs are therefore built for every choice, not just the selected one.
 `accessory_value` when the entry actually has an accessory, and the style grid only used to appear
 in that case — without the gate it would start appearing for features that never showed one.
 
-`character_setup_static_sig` gained **`erp_enabled`** (`character_setup_build_static_sig()`, the one
-place it is now built). The option catalogs run through `customizer.is_allowed(src)` and
-`choice.character_setup_accessory_types(src)`, both of which take the preferences datum and can
-therefore be filtered by the ERP flag on some subtypes. Toggling ERP is rare, so the cost is one
-extra full update and the reward is that a whole class of stale-catalog bug cannot happen.
+`character_setup_static_sig` (`character_setup_build_static_sig()`, the one place it is built)
+carried `erp_enabled` for a while, on the reasoning that the option catalogs run through
+`customizer.is_allowed(src)` and `choice.character_setup_accessory_types(src)`, which both take the
+preferences datum and could therefore filter on the ERP flag. Nothing ever did — no override in
+either chain mentions it — so that was a full static rebuild bought for nothing. See
+*Making an apply O(1)* below for what the signature tracks now and why.
 
 The instrumentation this module carried while that work was done — a per-op disk logger behind
 `GLOB.character_setup_debug`, 57 call sites deep — has been removed along with the tgui census.
@@ -320,6 +321,76 @@ Two things to know before touching this:
   list permanently empty. `PreferencesMenu.catalog.ts` polls `loadedMappings` for the real url
   first, then fetches with retries, and the picker distinguishes loading from failure from
   no-match rather than showing one silent empty box for all three.
+
+### Making an apply O(1): move the bytes, not everything
+
+Browsing the species list never reaches the server — `previewSpeciesId` is local React state, and
+since the species catalog is an asset the whole list is client-side. The only round trip is
+*applying* a species, and that is what had to stop scaling.
+
+Three measurements decided the shape rather than a preference for symmetry:
+
+- **872 sprite accessories exist, but only three choices filter them.** The smallclothes choices
+  (`top`, `bottom`, `legs`, 61 accessories between them) override
+  `character_setup_accessory_types`; the other ~130 choices use the base, which returns its whole
+  list unfiltered. So most of the catalog is invariant and duplicating it per species would be
+  pure waste.
+- **`smallclothes_coverage_allowed()` is a pure function of the accessory** — it reads
+  `smallclothes_covers_torso` / `_groin` and nothing about the character. The accessory list is a
+  catalog, not character state, so it can be precomputed at all.
+- **The filters need exactly species and gender.** `character_setup_accessory_types()` reached for
+  them through the preferences datum; splitting out a `character_setup_accessory_types_for(species,
+  gender)` core (the same shape as the localization `_for` split) removes the last player
+  dependency, and the prefs-taking proc is a one-line wrapper.
+
+So the asset carries the resolved lists **deduplicated by content**: every distinct list is stored
+once under a signature, and `accessory_index[choice]` maps `"<species>|<gender>"` to a signature —
+collapsing to a bare signature when every combination agrees, which is the case for those ~130
+invariant choices. No predicate logic is replicated on the client, so there is nothing for the two
+sides to disagree about; the client does a lookup.
+
+**What deliberately stayed in `ui_static_data`, and why.** The *choices* block — which customizers
+a species offers — runs through upstream's `/datum/customizer/proc/is_allowed()`, which is
+dual-typed (it takes a human *or* a preferences datum, branching on `istype`) and reads `age` in
+`.../bodypart_feature/accessory.dm` and age, gender and species in `.../hair.dm`. Precomputing it
+would mean either standing up a fake preferences datum to satisfy that signature, or
+reimplementing two upstream predicates in the asset and owning the drift. For roughly forty small
+entries that is a bad trade. It stays a per-player build.
+
+Three cheaper cuts finished the job, because a static push sends the *whole* of
+`ui_static_data()` and anything riding along pays on every apply:
+
+- **The choices builder was building the accessory lists too, and `ui_static_data()` threw them
+  away.** `character_setup_build_feature_options()` returned both halves; it is now
+  `character_setup_build_choice_options()` and `character_setup_build_accessory_options()` over a
+  shared `character_setup_allowed_customizers()`, so the per-apply path does no accessory work at
+  all. This was the largest remaining cost and it was pure waste.
+- **Availability became locks.** Sending `{available, lock_reason}` for all 33 species meant one
+  entry per species on every push. `character_setup_species_locks()` sends only the species the
+  player *cannot* pick — typically two — and the frontend treats anything absent as available.
+- **The 33 species datums are cached.** The availability check is a proc call, so it needs an
+  instance; `GLOB.character_setup_species_instances` builds one of each once instead of
+  allocating 33 per push.
+
+What is left on the wire for an apply is the choices block, ancestry and ages — a couple of
+kilobytes that does not grow with the accessory catalog, the species count, or the length of any
+description.
+
+**A bug this surfaced.** `character_setup_static_sig` was `species-gender-erp`. Nothing filters on
+the ERP flag — no `is_allowed` or `character_setup_accessory_types` override mentions it, so
+toggling ERP forced a full static rebuild for nothing. Age, which two upstream `is_allowed`
+overrides *do* read, was absent, so changing age never refreshed the customizer list and facial
+hair stayed offered to a Youngling. The signature is now `species-gender-age`.
+
+**The one visual edge case.** A savefile can hold a species that is no longer roundstart, and the
+asset only covers roundstart species, which would have left that character's accessory dropdowns
+empty. `ui_static_data()` still ships `feature_accessory_options` in exactly that case and the
+frontend prefers it when present, so the fallback costs nothing for everyone else.
+
+`modular_chargen_catalog` asserts the equivalence that matters here: for every species, gender and
+choice, resolving through the deduplicated index returns the same options, in the same order, as
+building the list fresh. A dedup signature that collided would show up as a wrong dropdown for one
+species, and this is what catches it.
 
 ### The thumbnail map is gone
 

@@ -32,12 +32,11 @@ export type ChargenCatalog = {
   age_tooltips: Record<string, string>;
   species_order: string[];
   species: Record<string, CatalogSpecies>;
+  option_lists: Record<string, FeatureOption[]>;
+  accessory_index: Record<string, string | Record<string, string>>;
 };
 
-export type SpeciesAvailability = Record<
-  string,
-  { available: boolean; lock_reason: string }
->;
+export type SpeciesLocks = Record<string, string>;
 
 const ASSET_NAME = 'chargen_catalog.json';
 const RETRIES = 4;
@@ -109,7 +108,7 @@ export function useChargenCatalog(): CatalogState {
 
 export function buildSpeciesOptions(
   catalog: ChargenCatalog | undefined,
-  availability: SpeciesAvailability | undefined,
+  locks: SpeciesLocks | undefined,
   lang: string | undefined,
   gender: string | undefined,
 ): SpeciesEntry[] {
@@ -125,9 +124,8 @@ export function buildSpeciesOptions(
       return [];
     }
     const text = entry[slice];
-    const lock = availability?.[id];
-    const available = lock ? lock.available : true;
-    const lockReason = lock?.lock_reason ?? '';
+    const lockReason = locks?.[id] ?? '';
+    const available = !lockReason;
 
     const tags = available ? text.tags : [...text.tags, text.locked_tag];
     const tagDescriptions = { ...text.tag_descriptions };
@@ -152,4 +150,24 @@ export function buildSpeciesOptions(
       },
     ];
   });
+}
+
+export function resolveAccessoryOptions(
+  catalog: ChargenCatalog | undefined,
+  choiceType: string | undefined,
+  speciesId: string | undefined,
+  gender: string | undefined,
+): FeatureOption[] | undefined {
+  if (!catalog || !choiceType) {
+    return undefined;
+  }
+  const index = catalog.accessory_index[choiceType];
+  if (!index) {
+    return undefined;
+  }
+  const key =
+    typeof index === 'string'
+      ? index
+      : index[`${speciesId}|${`${gender}`.toLowerCase()}`];
+  return key ? catalog.option_lists[key] : undefined;
 }
