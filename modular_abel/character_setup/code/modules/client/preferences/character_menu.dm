@@ -889,12 +889,34 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 		character_setup_view_bbox_sent = bbox_sig
 		SStgui.update_uis(src)
 
+/datum/preferences/proc/character_setup_job_outfit(datum/job/job)
+	if(!job)
+		return null
+	return (cspref_gender() == FEMALE && job.outfit_female) ? job.outfit_female : job.outfit
+
+/// A job whose kit lives on its advanced classes has no outfit of its own, so the
+/// preview dummy came out naked. Fall back to the first class the job can roll
+/// that actually carries an outfit.
+/datum/preferences/proc/character_setup_preview_outfit(datum/job/job)
+	var/outfit = character_setup_job_outfit(job)
+	if(outfit)
+		return outfit
+	if(!length(job?.advclass_cat_rolls) || !SSrole_class_handler?.initialized)
+		return null
+	for(var/ctag in job.advclass_cat_rolls)
+		for(var/datum/job/advclass/class as anything in SSrole_class_handler.sorted_class_categories[ctag])
+			var/class_outfit = character_setup_job_outfit(class)
+			if(class_outfit)
+				character_setup_log("VIEW", "preview outfit for [job.title] taken from class [class.title] ([ctag])")
+				return class_outfit
+	return null
+
 /datum/preferences/proc/character_setup_render_body()
 	var/mob/living/carbon/human/dummy/body = character_setup_body
 	var/datum/job/preview_job = character_setup_preview_clothes ? character_setup_preview_job() : null
 	var/datum/outfit/preview_outfit
 	if(preview_job)
-		preview_outfit = (cspref_gender() == FEMALE && preview_job.outfit_female) ? preview_job.outfit_female : preview_job.outfit
+		preview_outfit = character_setup_preview_outfit(preview_job)
 	character_setup_validate_smallclothes()
 	var/was_sync_suppressed = character_setup_suppress_smallclothes_sync
 	character_setup_suppress_smallclothes_sync = TRUE
