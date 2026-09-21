@@ -177,9 +177,6 @@ export function translateText(text: string): string {
 }
 
 export function translateNode(node: Node): void {
-  // Not localization: this is the fork's only guaranteed entry point into the
-  // chat pipeline, and it has to run for EN players too, so it sits above the
-  // isActive() guard. See ../modular_chat/rewrite.
   rewriteModularChatComponents(node);
 
   if (!isActive()) {

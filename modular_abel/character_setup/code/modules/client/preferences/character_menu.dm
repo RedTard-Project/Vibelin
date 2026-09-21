@@ -494,28 +494,30 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 /datum/preferences/proc/character_setup_species_tag_description(datum/species/species, tag, available)
 	switch(tag)
 		if("Discriminated")
-			return "This species faces social discrimination; expect a more difficult roundstart experience."
+			return chargen_tr_line(parent, "tag:Discriminated", "This species faces social discrimination; expect a more difficult roundstart experience.")
 		if("Exotic")
-			return "This species is considered uncommon or exotic in most local cultures."
+			return chargen_tr_line(parent, "tag:Exotic", "This species is considered uncommon or exotic in most local cultures.")
 		if("Taur")
-			return "Tauric body plan; some equipment and clothing may fit differently."
+			return chargen_tr_line(parent, "tag:Taur", "Tauric body plan; some equipment and clothing may fit differently.")
 		if("Locked")
-			return available ? "Available." : character_setup_species_lock_reason(species)
+			if(available)
+				return chargen_tr_line(parent, "tag:Available", "Available.")
+			return character_setup_species_lock_reason(species)
 
 	if(species)
 		if(species.native_language && tag == "[species.native_language]")
-			return "Native language or culture group: [tag]."
+			return chargen_tr_line(parent, "tag:Language", "Native language or culture group: %TERM%.", chargen_tr_term(parent, tag))
 		if(species.skin_tone_wording && tag == "[species.skin_tone_wording]")
-			return "This species uses [tag] as its ancestry/color choice."
+			return chargen_tr_line(parent, "tag:Ancestry", "This species uses %TERM% as its ancestry/color choice.", chargen_tr_term(parent, tag))
 		if(tag in character_setup_species_display_ages(species))
-			return "Available age category: [tag]."
+			return chargen_tr_line(parent, "tag:Age", "Available age category: %TERM%.", chargen_tr_term(parent, tag))
 
-	return "[tag] species tag."
+	return chargen_tr_line(parent, "tag:Generic", "%TERM% species tag.", chargen_tr_term(parent, tag))
 
 /datum/preferences/proc/character_setup_species_tag_descriptions(datum/species/species, available)
 	. = list()
 	for(var/tag in character_setup_species_tags(species, available))
-		.["[tag]"] = character_setup_species_tag_description(species, tag, available)
+		.["[chargen_tr_term(parent, tag)]"] = character_setup_species_tag_description(species, tag, available)
 
 /datum/preferences/proc/character_setup_species_display_ages(datum/species/species)
 	. = list()
@@ -526,6 +528,19 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			continue
 		if(!(possible_age in .))
 			. += possible_age
+
+/datum/preferences/proc/character_setup_species_shown_tags(datum/species/species, available)
+	. = list()
+	for(var/tag in character_setup_species_tags(species, available))
+		. += chargen_tr_term(parent, tag)
+
+/datum/preferences/proc/character_setup_species_shown_ages(list/display_ages)
+	if(!length(display_ages))
+		return chargen_tr_term(parent, "Any")
+	var/list/shown = list()
+	for(var/age in display_ages)
+		shown += chargen_tr_term(parent, age)
+	return shown.Join(", ")
 
 /datum/preferences/proc/character_setup_species_options()
 	. = list()
@@ -545,10 +560,10 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 			"description" = trim(description),
 			"available" = available,
 			"lock_reason" = lock_reason,
-			"language" = species.native_language || "Imperial",
-			"ancestry_label" = species.skin_tone_wording || "Ancestry",
-			"ages" = length(display_ages) ? display_ages.Join(", ") : "Any",
-			"tags" = character_setup_species_tags(species, available),
+			"language" = chargen_tr_term(parent, species.native_language || "Imperial"),
+			"ancestry_label" = chargen_tr_term(parent, species.skin_tone_wording || "Ancestry"),
+			"ages" = character_setup_species_shown_ages(display_ages),
+			"tags" = character_setup_species_shown_tags(species, available),
 			"tag_descriptions" = character_setup_species_tag_descriptions(species, available),
 			"stats" = character_setup_species_stat_modifiers(species),
 		))
@@ -733,7 +748,8 @@ GLOBAL_VAR_INIT(character_setup_flat_origin_y, 0)
 /datum/preferences/proc/character_setup_validate_smallclothes()
 	validate_customizer_entries()
 
-/datum/preferences/proc/character_setup_preview_job()
+/datum/preferences/proc/character_setup_preview_job() as /datum/job
+	RETURN_TYPE(/datum/job)
 	var/datum/job/result
 	var/highest = 0
 	for(var/job_type in job_preferences)

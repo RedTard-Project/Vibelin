@@ -1,7 +1,3 @@
-/**
- * @file Payload and option shapes for PreferencesMenu.
- */
-
 import type { Lang } from '../i18n';
 
 export type Booleanish = boolean | number;
@@ -158,11 +154,6 @@ export type PrefsData = {
   preview_dir: number;
   background: string;
   background_options: FeatureOption[];
-  // Option catalogs ride in ui_static_data: they change only with species,
-  // gender or the ERP toggle, while the selections in `features` change on
-  // every pick. Keyed by customizer type and by customizer-choice type
-  // respectively — the accessory list belongs to the chosen variant, not to
-  // the customizer.
   feature_choice_options?: Record<string, FeatureOption[]>;
   feature_accessory_options?: Record<string, FeatureOption[]>;
   preview_map: string | null;

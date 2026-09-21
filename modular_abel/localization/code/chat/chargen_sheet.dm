@@ -1,5 +1,6 @@
 GLOBAL_LIST_EMPTY(sheet_chargen)
 GLOBAL_LIST_EMPTY(sheet_chargen_fields)
+GLOBAL_LIST_EMPTY(sheet_chargen_terms)
 GLOBAL_VAR_INIT(sheet_chargen_loaded, FALSE)
 
 /// Loads strings/chargen.txt. Like traits.txt this resolves server-side and never
@@ -50,6 +51,9 @@ GLOBAL_VAR_INIT(sheet_chargen_loaded, FALSE)
 			copytext(value, split_at + length(" | ")),
 		)
 
+	for(var/list/pair as anything in asset.read_pairs("chargen_terms.txt"))
+		GLOB.sheet_chargen_terms[pair[1]] = pair[2]
+
 /proc/chargen_sheet_ensure_loaded()
 	if(!GLOB.sheet_chargen_loaded)
 		load_chargen_sheet()
@@ -71,6 +75,23 @@ GLOBAL_VAR_INIT(sheet_chargen_loaded, FALSE)
 	chargen_sheet_ensure_loaded()
 	var/list/entry = GLOB.sheet_chargen[path]
 	return (entry && length(entry[2])) ? entry[2] : fallback
+
+/proc/chargen_tr_term(client/target, term)
+	if(!chargen_sheet_active(target))
+		return term
+	chargen_sheet_ensure_loaded()
+	var/translated = GLOB.sheet_chargen_terms["[term]"]
+	return translated || term
+
+/proc/chargen_tr_line(client/target, key, fallback, term)
+	. = fallback
+	if(chargen_sheet_active(target))
+		chargen_sheet_ensure_loaded()
+		var/translated = GLOB.sheet_chargen_terms["[key]"]
+		if(length(translated))
+			. = translated
+	if(!isnull(term))
+		. = replacetext(., "%TERM%", "[term]")
 
 /proc/chargen_tr_field(client/target, path, field, fallback)
 	if(!chargen_sheet_active(target))

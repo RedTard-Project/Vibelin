@@ -1,10 +1,3 @@
-/**
- * @file Presentational pieces of PreferencesMenu, plus the constants and pure
- * helpers they share with it. Everything here is prop-only: nothing reads
- * `useBackend`, so these stay outside the main component and cannot be part of
- * a remount-per-render subtree.
- */
-
 import { Box, Button, Icon, Section, Stack } from 'tgui-core/components';
 
 import { usePrefsTp } from './PreferencesMenu.strings';
@@ -245,13 +238,6 @@ export const ActionButton = (props: {
   );
 };
 
-/**
- * Mirrors sanitize_css_class_name() (code/modules/asset_cache/asset_list.dm):
- * the spritesheet class for an accessory is its type path with everything
- * non-alphanumeric stripped. The server used to ship the whole path->class map
- * in ui_static_data, which was ~80 KB of values that are a pure function of
- * their own keys.
- */
 export function spriteClassFor(value: string): string {
   return value.replace(/[^a-zA-Z0-9]/g, '');
 }
@@ -261,7 +247,6 @@ export const OptionGrid = (props: {
   selected?: string;
   onSelect: (value: string) => void;
   onHover?: (value: string | null) => void;
-  /** Accessory grids render a spritesheet thumbnail; choice grids do not. */
   spriteThumbs?: boolean;
   labelSize?: string;
 }) => {

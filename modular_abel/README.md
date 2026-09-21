@@ -5,6 +5,35 @@ content from PR #1. `modular_abel/_module.dm` is the single module entry point
 included from `vanderlin.dme`; it pulls in `erp/_erp.dm` (ERP system) and the
 Twilight Axis support files.
 
+## Conventions
+
+Two rules that apply to every module here, including the tgui side of one.
+
+**Code carries no comments.** Not in `.dm`, not in `.ts`/`.tsx`. The port and design
+narrative lives in the per-module `README.md`, and `UPSTREAM_FIXES.md` records every
+override and its re-sync obligation; a comment in code is a second copy that goes stale on
+its own. Three exceptions: config and `strings/` files (documented with `#` headers by
+design), a genuinely load-bearing warning that cannot live anywhere else, and `///`
+doc-comments on datum vars, which are the codebase's own convention. Upstream's existing
+comments are left alone — the rule is about what we add.
+
+**Text never lives in code.** Player-facing translations go in keyed `.txt` files under
+`modular_abel/localization/strings/`, loaded at runtime — never in a `GLOBAL_LIST_INIT`,
+never as a literal in a proc, and this holds for modular code too. The English stays in
+code because English *is* the source text; only the translation is externalised, and every
+resolver falls back to the English it was handed, so a half-filled file is a valid state.
+
+Key choice, in order of preference:
+
+1. **A type path** (`chargen.txt`, `traits.txt`, `descriptions.txt`) — an upstream reword of
+   the English cannot orphan the entry.
+2. **An English string**, only when DM hands out a bare value with no type behind it
+   (`chargen_terms.txt` covers `native_language`, `skin_tone_wording`, ages and computed
+   tags). A unit test then has to verify the key is still something the game produces.
+
+Sentences that interpolate a term use `%TERM%` and go through `chargen_tr_line()`, so no
+prose ends up inline. See `modular_abel/localization/README.md` for the full mechanism.
+
 Layout:
 
 - `_module.dm` — single entry point: includes `erp/_erp.dm` (ERP system),

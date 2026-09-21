@@ -532,10 +532,10 @@ export const PreferencesMenu = () => {
                   <Stack.Item grow>
                     <Box color="label">
                       {inspectedSpecies.id === data.species_id
-                        ? 'Selected species'
+                        ? tp('Selected species')
                         : asBool(inspectedSpecies.available)
-                          ? 'Ready to apply'
-                          : display(inspectedSpecies.lock_reason, 'Locked')}
+                          ? tp('Ready to apply')
+                          : tp(display(inspectedSpecies.lock_reason, 'Locked'))}
                     </Box>
                   </Stack.Item>
                   <Stack.Item>
@@ -789,6 +789,7 @@ export const PreferencesMenu = () => {
                     style={{
                       maxHeight: '300px',
                       overflowY: 'auto',
+                      overflowX: 'hidden',
                       border: '1px solid rgba(255,255,255,0.18)',
                       backgroundColor: 'rgba(0,0,0,0.22)',
                     }}
@@ -821,11 +822,26 @@ export const PreferencesMenu = () => {
                               }
                             />
                           </Stack.Item>
-                          <Stack.Item grow>
-                            <Box textAlign="left" bold>
+                          <Stack.Item grow style={{ minWidth: 0 }}>
+                            <Box
+                              textAlign="left"
+                              bold
+                              style={{
+                                whiteSpace: 'normal',
+                                overflowWrap: 'anywhere',
+                              }}
+                            >
                               {patron.name}
                             </Box>
-                            <Box textAlign="left" color="label">
+                            <Box
+                              textAlign="left"
+                              color="label"
+                              style={{
+                                whiteSpace: 'normal',
+                                overflowWrap: 'anywhere',
+                                lineHeight: '13px',
+                              }}
+                            >
                               {display(patron.domain)}
                             </Box>
                             <Box
@@ -834,6 +850,7 @@ export const PreferencesMenu = () => {
                                 fontSize: '11px',
                                 lineHeight: '13px',
                                 whiteSpace: 'normal',
+                                overflowWrap: 'anywhere',
                                 display: '-webkit-box',
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
@@ -1128,9 +1145,6 @@ export const PreferencesMenu = () => {
   const renderFeatureBody = (feature: FeatureEntry, skipColors?: boolean) => {
     const extraControls = renderFeatureExtras(feature);
     const choiceOptions = data.feature_choice_options?.[feature.key];
-    // Gated on the selection, not just on the catalog: the backend only fills
-    // accessory_value when the entry actually has an accessory, and the style
-    // grid used to appear only in that case.
     const accessoryOptions = feature.accessory_value
       ? data.feature_accessory_options?.[feature.choice_value ?? '']
       : undefined;

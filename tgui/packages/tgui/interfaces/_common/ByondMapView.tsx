@@ -146,12 +146,6 @@ export function ByondMapView(props: ByondMapViewProps) {
         observer.observe(document.body);
       }
     }
-    // The control is a BYOND child of the window, not a DOM node, so it
-    // outlives the browser element unless it is explicitly unparented. React
-    // unmount does not run when the window is destroyed outright rather than
-    // suspended, which is why `tgui-core`'s ByondUi also releases on
-    // `beforeunload` — dropping that leaves the control painted over whatever
-    // interface the pooled window shows next.
     const release = () => {
       if (!controlId) {
         return;
@@ -172,7 +166,6 @@ export function ByondMapView(props: ByondMapViewProps) {
       window.removeEventListener('scroll', schedule, true);
       window.removeEventListener('load', retry);
       window.removeEventListener('beforeunload', release);
-      window.removeEventListener('pagehide', release);
       document.removeEventListener('visibilitychange', retry);
       observer?.disconnect();
       timers.current.forEach(clearTimeout);

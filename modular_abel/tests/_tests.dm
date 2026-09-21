@@ -399,6 +399,12 @@
 			TEST_FAIL("[path] is not a species, faith or patron, so chargen never looks it up")
 			continue
 
+		if(ispath(path, /datum/species))
+			var/datum/species/species = new path()
+			if(!(species.id in GLOB.roundstart_species))
+				TEST_FAIL("[path] is not roundstart-eligible, so the species picker never shows it; the entry is dead")
+				continue
+
 		if(field_at)
 			var/field = copytext(key, field_at + 1)
 			if(!(field in allowed_fields))
@@ -413,6 +419,53 @@
 	load_chargen_sheet()
 	if(!length(GLOB.sheet_chargen))
 		TEST_FAIL("no chargen entries loaded, so every species and faith falls back to English")
+
+/datum/unit_test/modular_chargen_terms/Run()
+	var/datum/asset/json/chat_localization/asset = get_asset_datum(/datum/asset/json/chat_localization)
+	if(!asset)
+		TEST_FAIL("the localization asset is missing, so the term sheet cannot be loaded")
+		return
+
+	var/list/produced = list("Any" = TRUE)
+	for(var/age in list(AGE_CHILD, AGE_ADULT, AGE_MIDDLEAGED, AGE_OLD, AGE_IMMORTAL))
+		produced["[age]"] = TRUE
+	for(var/tag in list("Discriminated", "Exotic", "Taur", "Locked"))
+		produced[tag] = TRUE
+	for(var/species_id in GLOB.roundstart_species)
+		var/species_type = GLOB.species_list[species_id]
+		if(!species_type)
+			continue
+		var/datum/species/species = new species_type()
+		if(species.native_language)
+			produced["[species.native_language]"] = TRUE
+		if(species.skin_tone_wording)
+			produced["[species.skin_tone_wording]"] = TRUE
+
+	var/list/templates = list(
+		"tag:Discriminated", "tag:Exotic", "tag:Taur", "tag:Available",
+		"tag:Language", "tag:Ancestry", "tag:Age", "tag:Generic",
+	)
+	var/list/needs_term = list("tag:Language", "tag:Ancestry", "tag:Age", "tag:Generic")
+
+	var/list/pairs = asset.read_pairs("chargen_terms.txt")
+	if(!length(pairs))
+		TEST_FAIL("chargen_terms.txt produced no entries; the file is missing or every line was skipped")
+		return
+
+	for(var/list/pair as anything in pairs)
+		var/key = pair[1]
+		if(copytext(key, 1, 5) == "tag:")
+			if(!(key in templates))
+				TEST_FAIL("\"[key]\" is not a tooltip template chargen renders; the entry is dead")
+			else if((key in needs_term) && !findtext(pair[2], "%TERM%"))
+				TEST_FAIL("template \"[key]\" interpolates a term but its translation has no %TERM%")
+			continue
+		if(!produced[key])
+			TEST_FAIL("\"[key]\" is not a language, ancestry wording, age or tag the game produces; the entry is dead")
+
+	load_chargen_sheet()
+	if(!length(GLOB.sheet_chargen_terms))
+		TEST_FAIL("no chargen terms loaded, so languages, ages and tags stay English")
 
 /datum/unit_test/modular_description_composites/Run()
 	for(var/obj/item/spellbook/path as anything in subtypesof(/obj/item/spellbook))
