@@ -235,7 +235,7 @@ export const PreferencesMenu = () => {
     catalog,
     data.species_locks,
     data.lang,
-    data.gender,
+    data.gender_key,
   );
 
   const ageOptions = data.age_options ?? [];
@@ -1182,7 +1182,7 @@ export const PreferencesMenu = () => {
           catalog,
           feature.choice_value,
           data.species_id,
-          data.gender,
+          data.gender_key,
         ))
       : undefined;
 

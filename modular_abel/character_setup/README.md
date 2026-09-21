@@ -258,6 +258,30 @@ every op read `took=0ds` and the 43 ms that `act/pref` actually cost was invisib
 in DM needs `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS`; anything coarser reports zero and hides the
 thing you are looking for.
 
+## A display string is not a key
+
+The catalogue keys its per-gender slices with the raw preference value (`MALE` / `FEMALE` /
+`PLURAL`, i.e. `"male"`, `"female"`, `"plural"`), while `ui_data` sent `data["gender"]` as the
+*label* the header renders: `"Masculine"`, `"Feminine"`, `"Plural"`, `"Other"`. The frontend looked
+up `"dwarf|masculine"` in an index that only ever held `"dwarf|male"`, so every lookup missed.
+
+Two failures came out of one mismatch, and only one of them was visible:
+
+- **loud** — `resolveAccessoryOptions()` returned nothing, so the Underwear style pickers were empty
+  for every species;
+- **quiet** — `buildSpeciesOptions()` fell through `gender === 'female' ? … : 'male'` to the male
+  branch for everyone, so a Feminine character was shown the male stat sheet and nothing looked
+  wrong.
+
+`ui_data` now carries `gender_key` (the raw value) alongside the display `gender`, and only the
+header and the gender picker read the display one. The catalogue also gained a `PLURAL` slot, which
+it never had — the accessory filter treats that gender differently from both others, so two slots
+were never enough.
+
+The rule: **a value that is rendered and a value that is looked up are different fields, even when
+they describe the same thing.** If a payload key feeds a `Record` index anywhere, it must be the
+raw enumeration, and the human-readable form must travel under its own name.
+
 ## The settle counter could not reach its own threshold
 
 `ByondMapView` hides its BYOND control whenever the anchor div measures zero, and shows it again

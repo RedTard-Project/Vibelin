@@ -105,7 +105,7 @@ export function buildSpeciesOptions(
     return [];
   }
   const slice = lang === 'ru' ? 'ru' : 'en';
-  const statKey = `${gender}`.toLowerCase() === 'female' ? 'female' : 'male';
+  const statKey = gender === 'female' ? 'female' : 'male';
 
   return catalog.species_order.flatMap((id) => {
     const entry = catalog.species[id];
@@ -157,6 +157,6 @@ export function resolveAccessoryOptions(
   const key =
     typeof index === 'string'
       ? index
-      : index[`${speciesId}|${`${gender}`.toLowerCase()}`];
+      : index[`${speciesId}|${gender}`];
   return key ? catalog.option_lists[key] : undefined;
 }

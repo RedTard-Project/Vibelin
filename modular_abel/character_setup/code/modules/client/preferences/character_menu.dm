@@ -763,6 +763,10 @@ GLOBAL_LIST_INIT(character_setup_species_instances, character_setup_build_specie
 			bg_hex = "#d8d8d8"
 		if("dark")
 			bg_hex = "#0a0a0a"
+	var/list/tile = GLOB.character_setup_backdrop_tiles[character_setup_preview_background]
+	character_setup_apply_backdrop_tile(character_setup_bg, tile)
+	character_setup_apply_backdrop_tile(character_setup_bg_front, tile)
+	character_setup_apply_backdrop_tile(character_setup_bg_side, tile)
 	character_setup_winset_view(user, character_setup_view, bg_hex, character_setup_zoom_main)
 	character_setup_winset_view(user, character_setup_view_front, bg_hex, character_setup_zoom_mini)
 	character_setup_winset_view(user, character_setup_view_side, bg_hex, character_setup_zoom_mini)
@@ -1165,12 +1169,27 @@ GLOBAL_LIST_INIT(character_setup_species_instances, character_setup_build_specie
 		return max(1, round(character_setup_view_scale * 0.55))
 	return character_setup_view_scale
 
+GLOBAL_LIST_INIT(character_setup_backdrop_tiles, list(
+	"grass" = list("Grass", 'icons/turf/natural/grasses.dmi', "grass"),
+	"wood" = list("Wood", 'icons/turf/constructed/wood.dmi', "wooden_floor"),
+	"cobble" = list("Cobble", 'icons/turf/floors.dmi', "cobblealt_edges"),
+))
+
 /proc/character_setup_background_options()
-	return list(
+	. = list(
 		list("name" = "None", "value" = "none"),
 		list("name" = "White", "value" = "white"),
 		list("name" = "Dark", "value" = "dark"),
 	)
+	for(var/key in GLOB.character_setup_backdrop_tiles)
+		var/list/tile = GLOB.character_setup_backdrop_tiles[key]
+		. += list(list("name" = tile[1], "value" = key))
+
+/proc/character_setup_apply_backdrop_tile(atom/movable/screen/background/bg, list/tile)
+	if(!bg)
+		return
+	bg.icon = tile ? tile[2] : null
+	bg.icon_state = tile ? tile[3] : ""
 
 /proc/character_setup_chargen_clean_text(text, limit = 900)
 	if(!text)
@@ -1427,6 +1446,7 @@ GLOBAL_LIST_INIT(character_setup_species_instances, character_setup_build_specie
 	data["species_id"] = pref_species ? pref_species.id : SPEC_ID_HUMEN
 	data["gender"] = gender_name
 	data["gender_short"] = gender_short
+	data["gender_key"] = cspref_gender()
 	data["default_slot"] = default_slot
 
 	data["patron_name"] = patron_name

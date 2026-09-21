@@ -62,7 +62,7 @@
 				if(!per_choice)
 					per_choice = list()
 					accessory_index["[choice_type]"] = per_choice
-				for(var/gender in list(MALE, FEMALE))
+				for(var/gender in list(MALE, FEMALE, PLURAL))
 					var/slot = "[species.id]|[gender]"
 					if(per_choice[slot])
 						continue

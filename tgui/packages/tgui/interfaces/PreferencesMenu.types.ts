@@ -128,6 +128,7 @@ export type PrefsData = {
   taur_tertiary: string;
   gender: string;
   gender_short: string;
+  gender_key: string;
   default_slot: number;
   patron_name: string;
   faith_name: string;

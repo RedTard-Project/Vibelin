@@ -571,7 +571,7 @@
 				if(!choice)
 					continue
 				var/index = accessory_index["[choice_type]"]
-				for(var/gender in list(MALE, FEMALE))
+				for(var/gender in list(MALE, FEMALE, PLURAL))
 					var/key = istext(index) ? index : index?["[species.id]|[gender]"]
 					var/list/resolved = key ? option_lists[key] : null
 					var/list/fresh = character_setup_accessory_options_for(choice, species, gender)
