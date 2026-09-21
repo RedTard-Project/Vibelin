@@ -426,7 +426,7 @@
 		TEST_FAIL("the localization asset is missing, so the term sheet cannot be loaded")
 		return
 
-	var/list/produced = list("Any" = TRUE)
+	var/list/produced = list("Any" = TRUE, "Imperial" = TRUE, "Ancestry" = TRUE)
 	for(var/age in list(AGE_CHILD, AGE_ADULT, AGE_MIDDLEAGED, AGE_OLD, AGE_IMMORTAL))
 		produced["[age]"] = TRUE
 	for(var/tag in list("Discriminated", "Exotic", "Taur", "Locked"))
