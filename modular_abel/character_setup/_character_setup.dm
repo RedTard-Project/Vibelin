@@ -1,3 +1,4 @@
+#include "code\modules\asset_cache\chargen_catalog.dm"
 #include "code\modules\smallclothes\accessories.dm"
 #include "code\modules\smallclothes\customizers.dm"
 #include "code\modules\client\preferences\tgui_theme.dm"

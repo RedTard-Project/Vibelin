@@ -170,42 +170,6 @@
 			else
 				seen[path] = list_name
 
-/datum/unit_test/modular_telemetry/Run()
-	var/list/before = GLOB.tgui_census_interfaces.Copy()
-	var/list/record = tgui_census_record("UnitTestInterface")
-	for(var/field in list("opens", "closes", "full", "partial", "process", "process_ms", "payloads", "payload_ms", "payload_ms_max", "full_payload_ms", "full_payloads", "bytes", "bytes_max", "static_bytes", "static_repeats", "acts", "act_ms", "act_ms_max", "slow"))
-		if(isnull(record[field]))
-			TEST_FAIL("tgui census record has no \"[field]\" counter, so tgui_census_format will print null for it")
-	if(!islist(record["actions"]))
-		TEST_FAIL("tgui census record has no actions list")
-
-	record["payloads"] = 4
-	record["payload_ms"] = 10
-	record["bytes"] = 400
-	record["acts"] = 2
-	record["act_ms"] = 3
-	record["actions"]["unit_test_action"] = 2
-	var/formatted = tgui_census_format("UnitTestInterface", record)
-	if(!findtext(formatted, "UnitTestInterface") || !findtext(formatted, "unit_test_action"))
-		TEST_FAIL("tgui_census_format dropped the interface or its actions: [formatted]")
-
-	tgui_census_flush()
-	if(length(GLOB.tgui_census_interfaces))
-		TEST_FAIL("tgui_census_flush left [length(GLOB.tgui_census_interfaces)] interfaces behind instead of resetting the window")
-	GLOB.tgui_census_interfaces = before
-
-	var/list/cases = list(
-		list("tgui" = 1, "type" = "act/toggle") = "act/toggle",
-		list("tgui" = 1, "type" = "ready") = "ready",
-		list("tgui" = 1) = "tgui:?",
-		list("_src_" = "prefs", "proc" = "set_name") = "legacy:prefs/set_name",
-	)
-	for(var/list/href_list in cases)
-		var/classified = topic_census_classify(href_list, null)
-		if(classified != cases[href_list])
-			TEST_FAIL("topic_census_classify returned \"[classified]\" for [json_encode(href_list)], expected \"[cases[href_list]]\"")
-	if(topic_census_classify(list(), null) != "raw")
-		TEST_FAIL("topic_census_classify does not fall back to \"raw\" for an empty href list")
 
 /datum/unit_test/modular_tgui_themes/Run()
 	if(!length(GLOB.tgui_themes))
@@ -379,6 +343,95 @@
 	if(!length(GLOB.sheet_traits))
 		TEST_FAIL("no traits loaded, so every sheet line falls back to English")
 
+/datum/unit_test/modular_chargen_sheet/Run()
+	var/datum/asset/json/chat_localization/asset = get_asset_datum(/datum/asset/json/chat_localization)
+	if(!asset)
+		TEST_FAIL("the localization asset is missing, so the chargen sheet cannot be loaded")
+		return
+
+	var/list/allowed_fields = list("domain", "boons", "sins", "flaws", "worshippers")
+	for(var/list/pair as anything in asset.read_pairs("chargen.txt"))
+		var/key = pair[1]
+		var/field_at = findtext(key, ":")
+		var/path_text = field_at ? copytext(key, 1, field_at) : key
+		var/path = text2path(path_text)
+
+		if(!ispath(path))
+			TEST_FAIL("\"[path_text]\" is not a type; the entry is dead and chargen keeps its English")
+			continue
+		if(!ispath(path, /datum/species) && !ispath(path, /datum/faith) && !ispath(path, /datum/patron))
+			TEST_FAIL("[path] is not a species, faith or patron, so chargen never looks it up")
+			continue
+
+		if(ispath(path, /datum/species))
+			var/datum/species/species = new path()
+			if(!(species.id in GLOB.roundstart_species))
+				TEST_FAIL("[path] is not roundstart-eligible, so the species picker never shows it; the entry is dead")
+				continue
+
+		if(field_at)
+			var/field = copytext(key, field_at + 1)
+			if(!(field in allowed_fields))
+				TEST_FAIL("\"[key]\" uses field \"[field]\", which chargen does not render")
+			else if(!ispath(path, /datum/patron))
+				TEST_FAIL("\"[key]\" sets a patron field on [path], which is not a patron")
+			continue
+
+		if(!findtext(pair[2], " | "))
+			TEST_FAIL("\"[key]\" has no \" | \" between its name and description")
+
+	load_chargen_sheet()
+	if(!length(GLOB.sheet_chargen))
+		TEST_FAIL("no chargen entries loaded, so every species and faith falls back to English")
+
+/datum/unit_test/modular_chargen_terms/Run()
+	var/datum/asset/json/chat_localization/asset = get_asset_datum(/datum/asset/json/chat_localization)
+	if(!asset)
+		TEST_FAIL("the localization asset is missing, so the term sheet cannot be loaded")
+		return
+
+	var/list/produced = list("Any" = TRUE, "Imperial" = TRUE, "Ancestry" = TRUE)
+	for(var/age in list(AGE_CHILD, AGE_ADULT, AGE_MIDDLEAGED, AGE_OLD, AGE_IMMORTAL))
+		produced["[age]"] = TRUE
+	for(var/tag in list("Discriminated", "Exotic", "Taur", "Locked"))
+		produced[tag] = TRUE
+	for(var/species_id in GLOB.roundstart_species)
+		var/species_type = GLOB.species_list[species_id]
+		if(!species_type)
+			continue
+		var/datum/species/species = new species_type()
+		if(species.native_language)
+			produced["[species.native_language]"] = TRUE
+		if(species.skin_tone_wording)
+			produced["[species.skin_tone_wording]"] = TRUE
+
+	var/list/templates = list(
+		"tag:Discriminated", "tag:Exotic", "tag:Taur", "tag:Available",
+		"tag:Language", "tag:Ancestry", "tag:Age", "tag:Generic",
+		"warn:Discriminated", "warn:Nobles", "warn:Extreme", "warn:Challenge",
+	)
+	var/list/needs_term = list("tag:Language", "tag:Ancestry", "tag:Age", "tag:Generic")
+
+	var/list/pairs = asset.read_pairs("chargen_terms.txt")
+	if(!length(pairs))
+		TEST_FAIL("chargen_terms.txt produced no entries; the file is missing or every line was skipped")
+		return
+
+	for(var/list/pair as anything in pairs)
+		var/key = pair[1]
+		if(copytext(key, 1, 5) == "tag:" || copytext(key, 1, 6) == "warn:")
+			if(!(key in templates))
+				TEST_FAIL("\"[key]\" is not a template chargen renders; the entry is dead")
+			else if((key in needs_term) && !findtext(pair[2], "%TERM%"))
+				TEST_FAIL("template \"[key]\" interpolates a term but its translation has no %TERM%")
+			continue
+		if(!produced[key])
+			TEST_FAIL("\"[key]\" is not a language, ancestry wording, age or tag the game produces; the entry is dead")
+
+	load_chargen_sheet()
+	if(!length(GLOB.sheet_chargen_terms))
+		TEST_FAIL("no chargen terms loaded, so languages, ages and tags stay English")
+
 /datum/unit_test/modular_description_composites/Run()
 	for(var/obj/item/spellbook/path as anything in subtypesof(/obj/item/spellbook))
 		var/form = initial(path.themed_form)
@@ -454,5 +507,83 @@
 	for(var/case_key in valid_cases)
 		if(!seen_cases[case_key])
 			TEST_FAIL("no preference offers case \"[case_key]\", but a template can ask for it")
+
+/// The chargen catalog is generated once at asset init, outside any player context. If a
+/// builder still reaches for a preferences datum, or a species is missing a language slice,
+/// the whole species picker silently comes up empty for everyone.
+/datum/unit_test/modular_chargen_catalog/Run()
+	var/datum/asset/json/chargen_catalog/catalog = get_asset_datum(/datum/asset/json/chargen_catalog)
+	if(!catalog)
+		TEST_FAIL("the chargen catalog asset is not registered")
+		return
+	var/list/data = catalog.generate()
+
+	for(var/key in list("background_options", "tgui_themes", "age_tooltips", "species_order", "species"))
+		if(isnull(data[key]))
+			TEST_FAIL("the chargen catalog has no \"[key]\" block, so the menu reads undefined for it")
+
+	var/list/species_entries = data["species"]
+	var/list/order = data["species_order"]
+
+	if(length(order) != length(GLOB.roundstart_species))
+		TEST_FAIL("catalog lists [length(order)] species but [length(GLOB.roundstart_species)] are roundstart")
+
+	for(var/species_id in GLOB.roundstart_species)
+		if(!(species_id in order))
+			TEST_FAIL("[species_id] is roundstart but missing from species_order, so it never renders")
+		var/list/entry = species_entries[species_id]
+		if(!islist(entry))
+			TEST_FAIL("[species_id] has no catalog entry")
+			continue
+
+		var/list/stats = entry["stats"]
+		if(!islist(stats) || isnull(stats["[MALE]"]) || isnull(stats["[FEMALE]"]))
+			TEST_FAIL("[species_id] is missing a per-gender stat sheet, so one gender shows no modifiers")
+
+		for(var/slice in list("en", "ru"))
+			var/list/text = entry[slice]
+			if(!islist(text))
+				TEST_FAIL("[species_id] has no \"[slice]\" slice, so that language shows a blank card")
+				continue
+			for(var/field in list("name", "description", "language", "ancestry_label", "ages", "locked_tag"))
+				if(!length(text[field]))
+					TEST_FAIL("[species_id] \"[slice]\" has an empty \"[field]\"")
+			if(!islist(text["tags"]) || !islist(text["tag_descriptions"]))
+				TEST_FAIL("[species_id] \"[slice]\" has no tag lists")
+
+	if(length(GLOB.character_setup_species_instances) != length(GLOB.roundstart_species))
+		TEST_FAIL("the cached species instance list holds [length(GLOB.character_setup_species_instances)] of [length(GLOB.roundstart_species)] roundstart species")
+
+	var/list/option_lists = data["option_lists"]
+	var/list/accessory_index = data["accessory_index"]
+	if(!islist(option_lists) || !islist(accessory_index))
+		TEST_FAIL("the catalog has no deduplicated accessory index")
+		return
+
+	for(var/species_id in GLOB.character_setup_species_instances)
+		var/datum/species/species = GLOB.character_setup_species_instances[species_id]
+		for(var/customizer_type in species.customizers)
+			var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
+			if(!customizer)
+				continue
+			for(var/choice_type in customizer.customizer_choices)
+				var/datum/customizer_choice/choice = CUSTOMIZER_CHOICE(choice_type)
+				if(!choice)
+					continue
+				var/index = accessory_index["[choice_type]"]
+				for(var/gender in list(MALE, FEMALE, PLURAL))
+					var/key = istext(index) ? index : index?["[species.id]|[gender]"]
+					var/list/resolved = key ? option_lists[key] : null
+					var/list/fresh = character_setup_accessory_options_for(choice, species, gender)
+					if(length(resolved) != length(fresh))
+						TEST_FAIL("[choice_type] for [species.id]/[gender] resolves to [length(resolved)] options but builds [length(fresh)] — the dedup index collapsed two different lists")
+						continue
+					for(var/i in 1 to length(fresh))
+						var/list/a = resolved[i]
+						var/list/b = fresh[i]
+						if(a["value"] != b["value"])
+							TEST_FAIL("[choice_type] for [species.id]/[gender] resolves option [i] as [a["value"]] but builds [b["value"]]")
+							break
+
 
 #endif

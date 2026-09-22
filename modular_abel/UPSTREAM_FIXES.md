@@ -127,13 +127,106 @@ halves stay as procs on `/mob/living/carbon/human` deliberately — the prebuckl
 be registered with the human as the registrant, or `PROC_REF` resolves against the bodypart and
 the handler never fires.
 
-## `telemetry/_telemetry.dm`
+## `tgui/packages/tgui-panel/modular_chat/`
 
-Temporary instrumentation for the tgui optimisation pass, and the only place where upstream
-files carry modular edits: three `TOPIC-CENSUS TEMP` call sites in
-`code/modules/client/client_procs.dm` (lines 53, 80, 95). Everything else in the module hooks
-tgui by same-type redefinition and chains through `..()`, so no upstream body is copied.
+Chat-embedded components are a two-sided protocol (`tgui/docs/chat-embedded-components.md`
+upstream): DM emits `<span data-component="Name" data-prop="…">`, and the renderer instantiates
+only names listed in `TGUI_CHAT_COMPONENTS`, passing only attributes listed in
+`TGUI_CHAT_ATTRIBUTES_TO_PROPS`.
 
-`GLOB.topic_census_debug`, `GLOB.tgui_census_debug` and `GLOB.tgui_census_payload_bytes` all
-default to `TRUE` and can be switched off live. Remove the module and the three call sites once
-the optimisation pass is finished. See `modular_abel/telemetry/README.md`.
+`span_tooltip_dangerous_html()` (`code/__DEFINES/chat/span.dm:203`, from the Examine Highlights
+port, `5dce59367`) emits `data-component="TooltipHTML"` with the tip as an HTML string in
+`data-html`. That commit touched 13 DM files and no tgui file, so the name was never registered
+and the attribute was never mapped: every item examine both lost its tooltip and posted a
+~1.7 KB `type=log` Topic back to the server. All 13 `OVER-SEC` lines in the 2026-09-20 round log
+are that relay, and 30 of the 36 limiter-counted topics in the busiest second of the round.
+
+**This module touches no upstream tgui file.** Registering the name properly would mean adding it
+to the two `const` maps, which live in `chat/renderer.tsx` itself. A fork module cannot reach them
+without the import cycle `renderer -> localization/translate -> modular_chat -> renderer`, and the
+rspack build **rejects circular dependencies outright** (verified: `ERROR ... Circular dependency
+detected`), so that route does not exist.
+
+What does exist: the renderer writes the message HTML into a node, calls the fork's
+`translateNode()`, and *only then* scans for `[data-component]`. Rewriting the node in that window
+reaches the same end state with no upstream file involved. `rewriteModularChatComponents()` renames
+`TooltipHTML` to the `Tooltip` upstream does register and flattens `data-html` into `data-content`.
+
+| File | Owner | Role |
+| --- | --- | --- |
+| `tgui/packages/tgui-panel/modular_chat/rewrite.ts` | fork | the rewrite, plus `rewrite.test.ts` |
+| `tgui/packages/tgui-panel/localization/translate.ts` | fork | calls it from `translateNode()`, **above** the `isActive()` guard so it runs for EN players too |
+| `tgui/packages/tgui-panel/chat/renderer.tsx` | upstream | **unchanged** |
+
+Two consequences worth knowing before touching either file:
+
+- The call sits in the localization module because that is the only fork-owned function the
+  renderer already calls per message. It is not localization work; if `translateNode()` is ever
+  removed or its `isActive()` guard moved above the call, the tooltips silently go back to
+  flooding the server.
+- `Tooltip` takes `content` as a plain string, so the tip loses its markup: the `<br>` that
+  `carbon/examine.dm` puts between the description and the explanation becomes a visible
+  ` — ` separator. Accepted — the alternative was a themed tooltip that does not render at all.
+
+## `character_setup/` preview controls
+
+`ByondMapView.tsx` is fork-authored (like `PreferencesMenu.tsx`), so it is not an upstream touch
+point — but it replaced `tgui-core`'s `ByondUi` and inherited only part of its contract. `ByondUi`
+clears the control on unmount **and** on `beforeunload`; the replacement kept only the unmount
+path, and React unmount does not run when a tgui window is destroyed outright rather than
+suspended. Combined with `clear_map()` never touching the skin element, three chargen preview
+maps survived `ui_close` still parented to the pooled `tgui-window-1` and painted over the next
+interface opened in it. Both halves are covered now —
+`character_setup_release_control()` DM-side and the restored `beforeunload`/`pagehide` release
+client-side. Full reasoning in `modular_abel/character_setup/README.md`.
+
+**Re-sync obligation:** if `ByondMapView` is ever dropped back to stock `ByondUi`, pass
+`phonehome={false}` with it — DM owns the control lifecycle here, and stock `ByondUi` sends a
+`renderByondUi` Topic on every internal render. The current component sends none.
+
+## `character_setup/` Settings rows
+
+Most of the Settings tab did nothing when clicked. Every row sends the same
+`act('pref', {preference: <key>})`, so the frontend was identical for the ones that worked and
+the ones that did not — the split is entirely upstream's.
+
+`process_link()`'s fallback branch (`_preferences.dm:1172`) looks the key up in
+`GLOB.preference_entries_by_key` and then calls `preference.handle_link()`. Two ways that dies:
+
+- **`/datum/preference/toggle` has no `handle_link()`.** The base implementation
+  (`datums/_base.dm:227`) is `CRASH("handle_link() not implemented on [type]!")`, and only
+  *one* toggle subtype overrides it (`toggle/hotkeys`). So `see_chat_non_mob`, `tgui_fancy`,
+  `tgui_lock`, `windowflashing`, `ambientocclusion`, `auto_fit_viewport`, `widescreenpref` and
+  `buttons_locked` all crashed on click.
+- **Three rows are not preferences at all.** `lobby_music`, `hear_midis` and
+  `allow_midround_antag` are bit flags inside `/datum/preference/bitwise/toggles`, so their
+  names were never savefile keys and the lookup itself crashed — that is the
+  `invalid key lobby_music in menu` runtime in the round logs.
+
+`character_setup_handle_settings_toggle()` intercepts exactly those two sets before
+`process_link()` reaches upstream, using the helpers upstream already provides —
+`toggle_preference()` for the toggles, `preference_toggle_flag()` for the bit flags — then saves
+and refreshes the menu. Rows whose preference *does* implement `handle_link()` (`hotkeys`,
+`pixel_size`, `scaling_method`, and the modular `language`) are deliberately **not** intercepted,
+because their handlers carry side effects the lists here would have to duplicate.
+
+**Remove when** upstream gives `/datum/preference/toggle` a generic `handle_link()`. The
+bit-flag rows stay modular regardless: they are a chargen UI concept, not a preference key.
+
+**Re-sync obligation:** the two lists in `character_menu.dm` name preference types and flag
+defines directly. A renamed toggle or a moved flag makes that row silently dead again rather
+than throwing, so check them when the Settings tab gains or loses a row.
+
+## `character_setup_chargen_clean_text()`
+
+Two visible defects in one helper, both from `STRIP_HTML_FULL` (`code/__DEFINES/text.dm:30`):
+
+- It strips tags by replacing them with **nothing**, so a description written as
+  `"<b>Ау'Ра</b><br>Изогнутые рога…"` rendered as `АуРаИзогнутые рога…` — the name glued to the
+  first word.
+- Its `copytext(text, 1, limit)` counts **bytes**. Cyrillic is two bytes per character in UTF-8,
+  so the 900-byte cut landed mid-character and the blurb ended in a replacement glyph.
+
+The modular helper no longer uses the define: it replaces tags with a space, collapses the
+resulting whitespace runs, and truncates with `copytext_char()`. Same class of bug as the
+`copytext` → `copytext_char` fix recorded under `cyrillic_say_fix.dm`.

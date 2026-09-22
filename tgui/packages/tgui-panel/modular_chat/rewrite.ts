@@ -1,0 +1,39 @@
+const UNKNOWN_COMPONENT = 'TooltipHTML';
+const TOOLTIP_SEPARATOR = ' — ';
+
+function tooltipHtmlToText(html: string): string {
+  return html
+    .split(/<br\s*\/?>/i)
+    .map((part) => {
+      const holder = document.createElement('div');
+      holder.innerHTML = part;
+      return (holder.textContent ?? '').trim();
+    })
+    .filter((part) => part.length > 0)
+    .join(TOOLTIP_SEPARATOR);
+}
+
+export function rewriteModularChatComponents(node: Node): void {
+  const root = node as Partial<Element>;
+  if (typeof root.querySelectorAll !== 'function') {
+    return;
+  }
+
+  const targets = root.querySelectorAll(
+    `[data-component="${UNKNOWN_COMPONENT}"]`,
+  );
+
+  for (let i = 0; i < targets.length; i++) {
+    const target = targets[i];
+    const html = target.getAttribute('data-html');
+    target.removeAttribute('data-html');
+
+    if (!html) {
+      target.removeAttribute('data-component');
+      continue;
+    }
+
+    target.setAttribute('data-component', 'Tooltip');
+    target.setAttribute('data-content', tooltipHtmlToText(html));
+  }
+}

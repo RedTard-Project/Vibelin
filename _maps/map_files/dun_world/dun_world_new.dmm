@@ -66795,11 +66795,11 @@
 	pixel_y = -32
 	},
 /obj/structure/closet/crate/chest/neu,
-/obj/item/paper/scroll,
-/obj/item/paper/scroll,
-/obj/item/paper/scroll,
-/obj/item/paper/scroll,
-/obj/item/paper/scroll,
+/obj/item/reagent_containers/glass/bottle/alchemical,
+/obj/item/reagent_containers/glass/bottle/alchemical,
+/obj/item/reagent_containers/glass/bottle/alchemical,
+/obj/item/reagent_containers/glass/bottle/alchemical,
+/obj/item/reagent_containers/glass/bottle/alchemical,
 /turf/open/floor/concrete,
 /area/rogue/indoors/town/magician)
 "lTF" = (
@@ -72475,6 +72475,7 @@
 /obj/item/clothing/shirt/robe/phys,
 /obj/item/clothing/head/brimmed,
 /obj/item/broom,
+/obj/item/storage/roguebag/trans,
 /turf/open/floor/ruinedwood/chevron,
 /area/rogue/indoors/town)
 "mVD" = (
@@ -82962,6 +82963,14 @@
 	},
 /turf/open/floor/ruinedwood/spiral,
 /area/rogue/indoors/town/church/chapel)
+"oNr" = (
+/obj/effect/decal/cobbleedge/dun_world{
+	color = "#3f3f3f";
+	dir = 8
+	},
+/obj/item/storage/roguebag/trans,
+/turf/open/floor/church/dun_world,
+/area/rogue/indoors/town/magician)
 "oNs" = (
 /obj/structure/mannequin,
 /obj/item/clothing/face/facemask/goldmask,
@@ -83710,7 +83719,7 @@
 /turf/open/floor/hexstone/dun_world,
 /area/rogue/indoors/town/pestra_sanctum)
 "oSF" = (
-/obj/machinery/light/fueled/cauldron,
+/obj/structure/fluff/alch/trans,
 /turf/open/floor/blocks,
 /area/rogue/under/cave/mazedungeon)
 "oSK" = (
@@ -97967,7 +97976,7 @@
 /turf/open/floor/cobble/dun_world,
 /area/rogue/under/town/basement)
 "rvd" = (
-/obj/machinery/light/fueled/cauldron,
+/obj/structure/fluff/alch/trans/uni,
 /turf/open/floor/concrete,
 /area/rogue/indoors/town/magician)
 "rvg" = (
@@ -99566,6 +99575,11 @@
 	},
 /turf/open/floor/twig,
 /area/rogue/indoors/shelter/woods)
+"rKE" = (
+/obj/structure/table/wood/counter/end/dun_world,
+/obj/item/coin,
+/turf/open/floor/concrete,
+/area/rogue/indoors/town/magician)
 "rKG" = (
 /obj/structure/table/wood/counter/end/dun_world,
 /obj/item/reagent_containers/glass/bottle/wine{
@@ -104314,6 +104328,7 @@
 /obj/structure/fluff/railing/border,
 /obj/machinery/light/fueled/wallfire/candle/blue/l/dun_world,
 /obj/structure/closet/crate/chest/old_crate,
+/obj/item/storage/roguebag/trans,
 /turf/open/floor/hexstone/dun_world,
 /area/rogue/indoors/town)
 "sBW" = (
@@ -305212,7 +305227,7 @@ xxN
 xTP
 mtB
 eOE
-qLQ
+rKE
 nTJ
 nTJ
 ukM
@@ -307467,7 +307482,7 @@ jfk
 npz
 jfk
 gRD
-xTP
+oNr
 qNZ
 etL
 dKd

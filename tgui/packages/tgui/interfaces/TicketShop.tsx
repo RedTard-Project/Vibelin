@@ -186,6 +186,28 @@ const TicketCard = ({
   );
 };
 
+const Chip = ({ ticket }: { ticket: TicketEntry }) => (
+  <Box
+    as="span"
+    mr={0.5}
+    mb={0.25}
+    style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      background: `${ticket.ui_color}22`,
+      border: `1px solid ${ticket.ui_color}55`,
+      borderRadius: '12px',
+      padding: '1px 6px',
+      fontSize: '0.8em',
+    }}
+  >
+    <TicketSprite ticket={ticket} size={1} />
+    <Box as="span" ml={0.5}>
+      {ticket.name}
+    </Box>
+  </Box>
+);
+
 const BasketSummary = ({
   offerTickets,
   requestTickets,
@@ -198,28 +220,6 @@ const BasketSummary = ({
   const hasOffer   = offerTickets.length > 0;
   const hasRequest = requestTickets.length > 0;
   if (!hasOffer && !hasRequest) return null;
-
-  const Chip = ({ ticket }: { ticket: TicketEntry }) => (
-    <Box
-      as="span"
-      mr={0.5}
-      mb={0.25}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        background: `${ticket.ui_color}22`,
-        border: `1px solid ${ticket.ui_color}55`,
-        borderRadius: '12px',
-        padding: '1px 6px',
-        fontSize: '0.8em',
-      }}
-    >
-      <TicketSprite ticket={ticket} size={1} />
-      <Box as="span" ml={0.5}>
-        {ticket.name}
-      </Box>
-    </Box>
-  );
 
   return (
     <Box

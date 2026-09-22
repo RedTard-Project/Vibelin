@@ -110,8 +110,71 @@
 /datum/customizer_choice/organ/vagina/character_setup_is_erp()
 	return TRUE
 
+/datum/preferences/proc/character_setup_accessory_option_list(datum/customizer_choice/choice)
+	return character_setup_accessory_options_for(choice, pref_species, cspref_gender())
+
+/proc/character_setup_accessory_options_for(datum/customizer_choice/choice, datum/species/species, gender)
+	. = list()
+	var/list/accessory_types = choice.character_setup_accessory_types_for(species, gender)
+	if(length(accessory_types) < 2)
+		return .
+	var/section = choice.character_setup_section()
+	for(var/accessory_type in accessory_types)
+		var/datum/sprite_accessory/iter_accessory = SPRITE_ACCESSORY(accessory_type)
+		if(!iter_accessory)
+			continue
+		var/list/accessory_option = list(
+			"name" = iter_accessory.name,
+			"value" = "[accessory_type]",
+		)
+		if(section == "underwear")
+			var/list/coverage = list()
+			if(iter_accessory.smallclothes_covers_torso)
+				coverage += "torso"
+			if(iter_accessory.smallclothes_covers_groin)
+				coverage += "groin"
+			if(iter_accessory.smallclothes_covers_legs)
+				coverage += "legs"
+			accessory_option["coverage"] = length(coverage) ? jointext(coverage, ", ") : "decorative"
+		. += list(accessory_option)
+
+/datum/preferences/proc/character_setup_allowed_customizers()
+	. = list()
+	if(!pref_species)
+		return
+	if(length(customizer_entries) < length(pref_species.customizers))
+		validate_customizer_entries()
+	for(var/customizer_type in pref_species.customizers)
+		var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
+		if(!customizer || !customizer.is_allowed(src))
+			continue
+		. += customizer
+
+/datum/preferences/proc/character_setup_build_choice_options()
+	. = list()
+	for(var/datum/customizer/customizer as anything in character_setup_allowed_customizers())
+		if(length(customizer.customizer_choices) <= 1)
+			continue
+		var/list/choice_options = list()
+		for(var/choice_type in customizer.customizer_choices)
+			var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
+			if(!iter_choice)
+				continue
+			choice_options += list(list("name" = iter_choice.name, "value" = "[choice_type]"))
+		.["[customizer.type]"] = choice_options
+
+/datum/preferences/proc/character_setup_build_accessory_options()
+	. = list()
+	for(var/datum/customizer/customizer as anything in character_setup_allowed_customizers())
+		for(var/choice_type in customizer.customizer_choices)
+			var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
+			if(!iter_choice)
+				continue
+			var/list/accessory_options = character_setup_accessory_option_list(iter_choice)
+			if(length(accessory_options))
+				.["[choice_type]"] = accessory_options
+
 /datum/preferences/proc/character_setup_build_features_data()
-	var/_t = world.timeofday
 	var/list/features = list()
 	if(!pref_species)
 		return features
@@ -141,38 +204,12 @@
 		if(feature_section)
 			feature["section"] = feature_section
 
-		if(length(customizer.customizer_choices) > 1)
-			var/list/choice_options = list()
-			for(var/choice_type in customizer.customizer_choices)
-				var/datum/customizer_choice/iter_choice = CUSTOMIZER_CHOICE(choice_type)
-				choice_options += list(list("name" = iter_choice.name, "value" = "[choice_type]"))
-			feature["choice_options"] = choice_options
-
 		var/list/accessory_types = choice.character_setup_accessory_types(src)
 		if(length(accessory_types) && entry.accessory_type)
 			var/datum/sprite_accessory/accessory = SPRITE_ACCESSORY(entry.accessory_type)
 			if(accessory)
 				feature["accessory_name"] = accessory.name
 				feature["accessory_value"] = "[entry.accessory_type]"
-				if(length(accessory_types) > 1)
-					var/list/accessory_options = list()
-					for(var/accessory_type in accessory_types)
-						var/datum/sprite_accessory/iter_accessory = SPRITE_ACCESSORY(accessory_type)
-						var/list/accessory_option = list(
-							"name" = iter_accessory.name,
-							"value" = "[accessory_type]",
-						)
-						if(feature_section == "underwear")
-							var/list/coverage = list()
-							if(iter_accessory.smallclothes_covers_torso)
-								coverage += "torso"
-							if(iter_accessory.smallclothes_covers_groin)
-								coverage += "groin"
-							if(iter_accessory.smallclothes_covers_legs)
-								coverage += "legs"
-							accessory_option["coverage"] = length(coverage) ? jointext(coverage, ", ") : "decorative"
-						accessory_options += list(accessory_option)
-					feature["accessory_options"] = accessory_options
 				if(choice.allows_accessory_color_customization && accessory.color_keys)
 					var/list/colors = list()
 					var/list/color_list = color_string_to_list(entry.accessory_colors)
@@ -192,5 +229,4 @@
 			feature["extras"] = extras
 
 		features += list(feature)
-	character_setup_log_op("build_features_data", _t, "features=[length(features)]")
 	return features

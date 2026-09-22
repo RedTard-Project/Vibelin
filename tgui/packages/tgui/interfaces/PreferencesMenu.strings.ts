@@ -2,6 +2,12 @@ import { useLang } from '../i18n';
 
 const RU: Record<string, string> = {
   'Round Start': 'Начало раунда',
+  'Grass': 'Трава',
+  'Wood': 'Доски',
+  'Cobble': 'Булыжник',
+  'No species match.': 'Нет подходящих рас.',
+  'Loading species…': 'Загрузка рас…',
+  'Species catalog failed to load.': 'Не удалось загрузить каталог рас.',
   'Round Started': 'Раунд начался',
   'Setting Up': 'Подготовка',
   'Starts In': 'Начнётся через',

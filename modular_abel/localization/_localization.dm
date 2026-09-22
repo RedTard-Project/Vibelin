@@ -49,6 +49,7 @@
 #include "code/chat/descriptions.dm"
 #include "code/chat/description_composites.dm"
 #include "code/chat/trait_sheet.dm"
+#include "code/chat/chargen_sheet.dm"
 #include "code/chat/declension_registry.dm"
 #include "code/chat/panel_hooks.dm"
 #include "code/dreams/_dreams.dm"
