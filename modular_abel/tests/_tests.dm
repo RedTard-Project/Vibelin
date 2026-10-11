@@ -554,6 +554,15 @@
 	if(length(GLOB.character_setup_species_instances) != length(GLOB.roundstart_species))
 		TEST_FAIL("the cached species instance list holds [length(GLOB.character_setup_species_instances)] of [length(GLOB.roundstart_species)] roundstart species")
 
+	var/list/runtime_customizers = GLOB.character_setup_smallclothes_customizers + GLOB.character_setup_genital_customizers
+	for(var/customizer_type in runtime_customizers)
+		var/datum/customizer/customizer = CUSTOMIZER(customizer_type)
+		if(!customizer)
+			continue
+		for(var/choice_type in customizer.customizer_choices)
+			if(isnull(data["accessory_index"]?["[choice_type]"]))
+				TEST_FAIL("[choice_type] is registered onto species at runtime but missing from the catalog, so its picker renders empty")
+
 	var/list/option_lists = data["option_lists"]
 	var/list/accessory_index = data["accessory_index"]
 	if(!islist(option_lists) || !islist(accessory_index))

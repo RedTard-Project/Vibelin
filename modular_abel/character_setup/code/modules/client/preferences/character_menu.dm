@@ -14,7 +14,7 @@
 /datum/preferences/var/atom/movable/screen/map_view/character_setup_view_front
 /datum/preferences/var/atom/movable/screen/map_view/character_setup_view_side
 /atom/movable/screen/background/character_setup
-	layer = GAME_PLANE - 1
+	layer = GAME_PLANE - 100
 
 /datum/preferences/var/atom/movable/screen/background/character_setup/character_setup_bg
 /datum/preferences/var/atom/movable/screen/background/character_setup/character_setup_bg_front
