@@ -10,6 +10,7 @@ import { translateNode } from '../localization/translate';
 import { Tooltip } from 'tgui-core/components';
 import { EventEmitter } from 'tgui-core/events';
 import { classes } from 'tgui-core/react';
+import { TooltipHTML } from '../chat_components/TooltipHTML';
 import { store } from '../events/store';
 import { scrollTrackingAtom } from './atom';
 import {
@@ -37,6 +38,7 @@ const SCROLL_TRACKING_TOLERANCE = 24;
 // List of injectable component names to the actual type
 export const TGUI_CHAT_COMPONENTS = {
   Tooltip,
+  TooltipHTML,
 };
 
 // List of injectable attibute names mapped to their proper prop
@@ -44,6 +46,7 @@ export const TGUI_CHAT_COMPONENTS = {
 export const TGUI_CHAT_ATTRIBUTES_TO_PROPS = {
   position: 'position',
   content: 'content',
+  html: 'html',
 };
 
 function createHighlightNode(text, color) {
