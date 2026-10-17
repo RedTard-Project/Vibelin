@@ -551,6 +551,44 @@ Admin channels, OOC and adminPM are worth leaving in English — filter on
 Server-side logs stay English, which keeps admin log-reading unchanged. The chat
 log the player exports from the panel is translated.
 
+## Chargen sheet (`strings/chargen.txt`)
+
+Species, faith and patron strings for the character-setup menu. Server-resolved and absent from
+the browser dictionary for the same reason `traits.txt` is: the keys are **type paths**, not
+English text, so an upstream reword cannot silently orphan a translation.
+
+```
+/тип/путь        = <имя> | <описание>
+/тип/путь:поле   = <текст>
+```
+
+A type path cannot contain `:`, which is what makes the field suffix unambiguous. The fields are
+the ones the patron card renders: `domain`, `boons`, `sins`, `flaws`, `worshippers`.
+
+`chargen_tr_name()`, `chargen_tr_desc()` and `chargen_tr_field()` take the client and fall back
+to the English value whenever the player is on EN or the key is absent, so a **partially filled
+file is a valid state** — untranslated entries simply stay English. That is deliberate: the file
+ships mostly empty and is filled incrementally.
+
+Each resolver is a one-line wrapper over a `_for(ru, …)` core: `chargen_tr_name()` is
+`chargen_tr_name_for(chargen_sheet_active(target), …)`. The split exists because the chargen
+species catalog is generated once per server as a browser asset, with **both** languages in it,
+long before any client is in scope — see *The third tier* in
+`modular_abel/character_setup/README.md`. Anything that resolves for a player keeps using the
+client-taking form; anything that has to answer for a language it was handed uses `_for`.
+
+Faiths and patrons still resolve per player, in `character_setup_faith_options()` and
+`character_setup_patron_options_for_faith()` (`modular_abel/character_setup/`), so their
+translated strings reach `ui_static_data` and `ui_data` without the frontend knowing.
+
+Filling the file is copy-paste rather than transcription: the **Chargen Sheet: Missing Keys**
+verb (`Debug.Telemetry`, `R_DEBUG`) writes every species, faith and patron the sheet does not
+cover into `chargen_sheet.log`, already in this file's line format with the English on the right.
+
+`/datum/unit_test/modular_chargen_sheet` resolves every key through `text2path()`, rejects a key
+that is not a species, faith or patron, rejects a field name the UI does not render or a patron
+field set on a non-patron, and requires the `" | "` separator on every name/description line.
+
 ## Upstream touch points
 
 There is no override mechanism in TypeScript, so two upstream tgui files carry a

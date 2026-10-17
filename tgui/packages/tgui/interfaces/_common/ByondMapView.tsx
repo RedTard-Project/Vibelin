@@ -93,8 +93,10 @@ export function ByondMapView(props: ByondMapViewProps) {
     if (sameRect(placedRect.current, rect) && !paramsChanged) {
       if (settled.current < SETTLE_TICKS) {
         settled.current++;
+        scheduleRef.current();
+        return;
       }
-      if (settled.current >= SETTLE_TICKS && !visible.current) {
+      if (!visible.current) {
         visible.current = true;
         Byond.winset(controlId, { 'is-visible': true });
       }
@@ -146,9 +148,18 @@ export function ByondMapView(props: ByondMapViewProps) {
         observer.observe(document.body);
       }
     }
+    const release = () => {
+      if (!controlId) {
+        return;
+      }
+      visible.current = false;
+      Byond.winset(controlId, { 'is-visible': false, parent: '' });
+    };
+
     window.addEventListener('resize', schedule);
     window.addEventListener('scroll', schedule, true);
     window.addEventListener('load', retry);
+    window.addEventListener('beforeunload', release);
     document.addEventListener('visibilitychange', retry);
 
     return () => {
@@ -156,6 +167,7 @@ export function ByondMapView(props: ByondMapViewProps) {
       window.removeEventListener('resize', schedule);
       window.removeEventListener('scroll', schedule, true);
       window.removeEventListener('load', retry);
+      window.removeEventListener('beforeunload', release);
       document.removeEventListener('visibilitychange', retry);
       observer?.disconnect();
       timers.current.forEach(clearTimeout);

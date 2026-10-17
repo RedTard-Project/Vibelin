@@ -1968,18 +1968,10 @@ export const EroticRolePlayPanel: React.FC = () => {
   const partnerArousal = clamp01(data.partner_arousal ?? 0);
   const [activeTab, setActiveTab] = useState<string>(data.active_tab || 'actions');
   useEffect(() => {
-    if (data.active_tab && data.active_tab !== activeTab) setActiveTab(data.active_tab);
+    if (data.active_tab) setActiveTab(data.active_tab);
   }, [data.active_tab]);
   const kinkEntries = data.tabs?.erp?.entries ?? [];
   const [kinkLocal, setKinkLocal] = useState<Record<string, number>>({});
-  useEffect(() => {
-    const next: Record<string, number> = {};
-    for (const k of kinkEntries) next[k.type] = k.pref ?? 0;
-    setKinkLocal((prev) => {
-      if (Object.keys(prev).length) return prev;
-      return next;
-    });
-  }, [kinkEntries]);
   const statusEntries = data.tabs?.status?.entries ?? [];
   const actionsPayload = data.tabs?.actions;
   const editorTemplates = data.tabs?.editor?.templates ?? [];

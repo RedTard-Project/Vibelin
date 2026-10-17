@@ -17,10 +17,22 @@ recipe. What follows is what upstream's suite cannot see.
 | `modular_stash_naming` | Three copies of one pick produce three distinct stash entries rather than overwriting each other. |
 | `modular_morphing_elixir` | Every kit maps onto a type the result inherits from, the result is concrete and not the target itself, keys are ordered specific-first so none is unreachable, and the swap changes no armour value. This is what keeps reskins cosmetic. |
 | `modular_test_exclusions` | The modular additions to upstream's unit-test exclusion lists are non-empty and have no duplicates — a refactor emptied one of them once and nothing noticed. |
-| `modular_telemetry` | Every counter `tgui_census_format()` prints exists in the record, a flush resets the window, and `topic_census_classify()` still classifies tgui/act/legacy/empty hrefs. |
+| `modular_chargen_catalog` | The chargen constant asset generates at `SSassets` init with no player in scope: every roundstart species is in it, with both language slices and both per-gender stat sheets. A builder that still reaches for a preferences datum fails here rather than emptying the species picker live. Also checks the deduplicated accessory index: resolving it for every species, gender and choice must return the same options, in the same order, as building the list fresh. |
 | `modular_abyssor_gating` | No `/datum/map_config` turns `abyssor_cult` on in code; it is a per-map json switch. |
 
 ## Gotchas when adding a test here
+
+- **Never `new()` an asset datum — use `get_asset_datum()`.** `/datum/asset/New()` writes
+  `GLOB.asset_datums[type] = src` and calls `register()`, so constructing a second one silently
+  *replaces the live singleton* with your copy and regenerates the asset. `qdel()`ing it afterwards
+  then hard-deletes, because the GLOB entry still holds the reference, and the rest of the round
+  gets a deleted datum back from `get_asset_datum()`. `generate()` is pure, so call it on the
+  registered instance and destroy nothing.
+- **A hard-delete failure reported by `create_and_destroy` may not be its own.** That test only
+  instantiates `/atom/movable` and `/turf` — it never touches datums — but it accounts hard
+  deletes across the **whole run**. A datum type named in its failure was created and qdel'd by
+  some other test; `total del count` tells you how many qdels there were in total, which is the
+  fastest way to tell whose they are.
 
 - **The `TEST_ASSERT` macros are gone.** `code/modules/unit_tests/_unit_tests.dm` `#undef`s
   `TEST_ASSERT`, `TEST_ASSERT_EQUAL` and `TEST_ASSERT_NOTEQUAL` at the end of the file, and this

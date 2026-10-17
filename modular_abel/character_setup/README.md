@@ -2,7 +2,7 @@
 
 Replaces the upstream character-setup browser window with a modular one
 (`code/modules/client/preferences/character_menu.dm` in this folder), plus the smallclothes
-system, the topic census instrumentation and the modular preference hooks.
+system and the modular preference hooks.
 
 ## Topic routing
 
@@ -18,12 +18,6 @@ invalid key, so falling through is safe.
 The smallclothes module loads through the upstream `_load_appearence(savefile)` hook and saves
 in a `save_character()` override. Three other modules do the same (`erp`, `races/taur`,
 `loadout_panel`), so one character save currently opens the savefile several times over.
-
-## Topic census
-
-The topic census moved out of this module into `modular_abel/telemetry/`, together with the new
-tgui census. Its three call sites in `code/modules/client/client_procs.dm` are unchanged — the
-procs it calls are global, so only the file location moved.
 
 ## Interface themes
 
@@ -76,9 +70,8 @@ player's choice.
 The theme also reaches **every** tgui window now, not just this one. Upstream
 `/datum/tgui/get_payload` hardcodes `"theme" = "grim"` (`code/modules/tgui/tgui.dm:262`);
 `tgui_theme.dm` overrides `get_payload` and rewrites `config.window.theme` from the player's
-preference after `..()` runs. That is a second same-type redefinition of the same proc — the
-telemetry module also chains one — which BYOND resolves by running them in include order,
-outermost last.
+preference after `..()` runs. That is a same-type redefinition of the same proc, which BYOND
+resolves by running every definition in include order, outermost last.
 
 Rebuild the bundle after touching any `.scss`: `bun run tgui:build` from `tgui/`.
 
@@ -163,3 +156,354 @@ still `82%` wide at a `0.82/1` aspect ratio, so halving the column halves the do
 axes as asked.
 
 Rebuild the bundle after touching any of this: `bun run tgui:build` from `tgui/`.
+
+## The preview controls outlive the menu (black rectangles over other interfaces)
+
+Reported as "TGUI artifacts": three black rectangles painted over an unrelated interface — in
+the field report, a `SpellBook` window. They are the chargen preview maps.
+
+A `map_view` is two things with two owners. DM owns the **content** — the
+`/atom/movable/screen/map_view` object registered on the client by `register_map_obj()`. The
+frontend owns the **control** — the BYOND skin element `ByondMapView` creates with
+`winset(id, {parent: <window>, type: 'map', …})`. `clear_map()`
+(`code/_onclick/hud/map_popups.dm`) only unregisters screen objects; it never touches the skin
+element.
+
+So `character_setup_teardown_view()` used to destroy the content and leave three controls
+parented to the window, `is-visible=true`, at their last geometry. The round log shows that
+state immediately before a teardown:
+
+```
+[CTRL] post_display MAP id=character_setup_main_…_map  winget=parent=tgui-window-1;…;pos=301,156;size=321x391;is-visible=true
+[CTRL] post_display MAP id=character_setup_front_…_map winget=parent=tgui-window-1;…;pos=7,797;size=119x119;is-visible=true
+[CTRL] post_display MAP id=character_setup_side_…_map  winget=parent=tgui-window-1;…;pos=133,797;size=119x119;is-visible=true
+[LIFECYCLE] ui_close user=…
+[VIEW] teardown map=character_setup_main_…_map user=…
+```
+
+tgui windows are pooled, so `tgui-window-1` goes to the next interface with those three
+controls still attached — and a BYOND child control composites *over* the WebView, so whatever
+is drawn underneath is simply not visible. One tall rectangle plus two small squares side by
+side near the bottom left, which is what the report shows.
+
+Two things were missing, and both are now in place:
+
+- **`character_setup_release_control()`** winsets `is-visible=false;parent=` for each view
+  before `hide_from()`. DM decides when the preview dies and knows the control ids, so DM
+  releases them; this runs whatever the client does.
+- **`ByondMapView` releases on `beforeunload`/`pagehide`.** `tgui-core`'s `ByondUi` clears the
+  control on unmount *and* on `beforeunload`; the local replacement kept only the unmount path.
+  React unmount does not run when the window is destroyed outright (`browse(null)`) rather than
+  suspended, which is exactly the case the unmount path cannot cover.
+
+Neither half is redundant: the DM half covers a client that never processes the teardown, the
+frontend half covers a menu closed without DM's `ui_close` having run first.
+
+## Payload split and op timing
+
+`ui_data()` was 53 KB per partial payload with `static=0`, resent on every update — 423 payloads
+and 23.3 MB in one round for two clients, measured with the tgui census that instrumented the
+optimisation pass and has since been removed. The heavy blocks
+were already memoised in `character_setup_ui_heavy_cache`, so they were not being *rebuilt*; they
+were being re-serialised and re-sent. Caching the build is the wrong axis: what costs is the wire,
+and the framework mechanism for that is `ui_static_data()` plus an explicit `update_static_data()`
+push.
+
+Moved to `ui_static_data()`, all keyed by the existing `character_setup_static_sig`
+(`species-gender`) that `update_menu_data()` already pushes on:
+
+- `age_options` and `age_tooltips` — the tooltip text is the expensive half, and it is derived
+  from `pref_species.possible_ages`.
+- `ancestry_options` — `pref_species.get_skin_list()`.
+- `tgui_themes` — a constant list that was being rebuilt and resent on every update.
+
+`age_index`, `display_age` and `age_max` stay in `ui_data()` because they track the current
+selection; `age_count` replaces the length of the list that no longer travels with them.
+
+**No frontend change was needed.** `backendStateAtom` (`tgui/packages/tgui/events/store.ts`)
+composes `data` as `{...gameDataAtom, ...gameStaticDataAtom}`, so a key reads the same from
+`useBackend().data` whichever side sends it. The corollary is that a key must live in exactly one
+of the two — static wins the merge, so a key left in both is silently dead weight in `ui_data`.
+
+**`features`** was the largest single block and could not move wholesale, because it interleaves
+catalog and selection: `choice_options`/`accessory_options` are fixed for a species, while
+`choice_value`, `accessory_value`, `enabled` and `colors` change on every pick. It is now split:
+
+- `character_setup_build_feature_options()` (`features_tgui.dm`) builds both catalogs and they ride
+  in `ui_static_data()` as `feature_choice_options` and `feature_accessory_options`.
+- `character_setup_build_features_data()` keeps only what a pick changes.
+
+The two catalogs are keyed differently and it matters. Choices are keyed by **customizer type**;
+accessories by **customizer-choice type**, because `character_setup_accessory_types()` is asked of
+the *selected* choice — a customizer offering Hair and Bald has a different accessory list per
+variant, so keying by customizer would serve the wrong list the moment the variant changed. The
+catalogs are therefore built for every choice, not just the selected one.
+
+`PreferencesMenu.tsx` reads `data.feature_accessory_options?.[feature.choice_value]` and gates it on
+`feature.accessory_value` being present. That gate is not cosmetic: the backend only fills
+`accessory_value` when the entry actually has an accessory, and the style grid only used to appear
+in that case — without the gate it would start appearing for features that never showed one.
+
+`character_setup_static_sig` (`character_setup_build_static_sig()`, the one place it is built)
+carried `erp_enabled` for a while, on the reasoning that the option catalogs run through
+`customizer.is_allowed(src)` and `choice.character_setup_accessory_types(src)`, which both take the
+preferences datum and could therefore filter on the ERP flag. Nothing ever did — no override in
+either chain mentions it — so that was a full static rebuild bought for nothing. See
+*Making an apply O(1)* below for what the signature tracks now and why.
+
+The instrumentation this module carried while that work was done — a per-op disk logger behind
+`GLOB.character_setup_debug`, 57 call sites deep — has been removed along with the tgui census.
+One lesson from it is worth keeping: it timed with `world.timeofday`, which is deciseconds, so
+every op read `took=0ds` and the 43 ms that `act/pref` actually cost was invisible. Sub-tick work
+in DM needs `TICK_USAGE_REAL`/`TICK_USAGE_TO_MS`; anything coarser reports zero and hides the
+thing you are looking for.
+
+## A display string is not a key
+
+The catalogue keys its per-gender slices with the raw preference value (`MALE` / `FEMALE` /
+`PLURAL`, i.e. `"male"`, `"female"`, `"plural"`), while `ui_data` sent `data["gender"]` as the
+*label* the header renders: `"Masculine"`, `"Feminine"`, `"Plural"`, `"Other"`. The frontend looked
+up `"dwarf|masculine"` in an index that only ever held `"dwarf|male"`, so every lookup missed.
+
+Two failures came out of one mismatch, and only one of them was visible:
+
+- **loud** — `resolveAccessoryOptions()` returned nothing, so the Underwear style pickers were empty
+  for every species;
+- **quiet** — `buildSpeciesOptions()` fell through `gender === 'female' ? … : 'male'` to the male
+  branch for everyone, so a Feminine character was shown the male stat sheet and nothing looked
+  wrong.
+
+`ui_data` now carries `gender_key` (the raw value) alongside the display `gender`, and only the
+header and the gender picker read the display one. The catalogue also gained a `PLURAL` slot, which
+it never had — the accessory filter treats that gender differently from both others, so two slots
+were never enough.
+
+The rule: **a value that is rendered and a value that is looked up are different fields, even when
+they describe the same thing.** If a payload key feeds a `Record` index anywhere, it must be the
+raw enumeration, and the human-readable form must travel under its own name.
+
+## The settle counter could not reach its own threshold
+
+`ByondMapView` hides its BYOND control whenever the anchor div measures zero, and shows it again
+only after the rect has been **stable for `SETTLE_TICKS` (2) consecutive `place()` calls**. The
+reposition branch scheduled exactly **one** follow-up frame, so the counter reached 1 and stopped:
+nothing scheduled the second call, and the control stayed hidden until some unrelated event — a
+window resize, a scroll, a `visibilitychange` — happened to call `place()` again.
+
+On mount this never showed, because the effect's `retry()` fires seven timers
+(`RETRY_DELAYS = [0, 50, 150, 400, 900, 1800, 3200]`) and the counter always got its second tick.
+It only bit *mid-life*, when a re-render briefly collapsed the anchor to zero size.
+
+That is what a backdrop change does. The live log shows it directly — a geometry report with
+`front_w: 0, side_w: 0` immediately after `preview_background`, then a second report with the real
+113x113 a moment later. The first one hid the control; the second repositioned it while still
+invisible; the counter stalled at 1.
+
+It also explains the two things that looked like separate bugs:
+
+- **"the character disappears until I reopen the window"** — nothing was ever going to call
+  `place()` again on its own.
+- **"pressing Zoom fixes it"** — changing the scale changes `menuScale`/`previewScale`, which are in
+  the component's `deps`, so the effect re-runs and `retry()` pumps `place()` seven more times.
+
+The fix is that the settle branch now schedules its own next frame while it is still counting, so
+the sequence completes without needing an outside event.
+
+The general rule: **a state machine driven by a frame scheduler has to keep scheduling until it
+reaches a terminal state.** Any branch that returns while still mid-sequence is a place the machine
+can die, and it will die exactly where it is hardest to notice — not on mount, where retries paper
+over it, but on the one interaction that disturbs layout.
+
+## Zoom and backdrop are one winset, not two
+
+The preview maps get exactly two properties from DM after they are placed: `zoom`, from the
+frontend's geometry report, and `background-color`, from the backdrop picker. They were applied on
+separate paths, and only one of those paths was complete.
+
+`character_setup_apply_reported_zoom()` set the zoom and *then* called
+`character_setup_apply_map_background()` — the author already knew the order matters. The backdrop
+href called `character_setup_apply_map_background()` on its own, so a backdrop change re-winset the
+map with no zoom alongside it.
+
+That is unrecoverable from DM, because the zoom was never stored: it arrived in the href, went
+straight into `winset`, and was discarded. Nothing could put it back until the frontend sent
+another geometry report — which happens on a resize, a scale change, or a remount. Hence the
+symptom: after touching the backdrop the character preview stays blank *until the window is
+reopened*.
+
+`character_setup_zoom_main` / `character_setup_zoom_mini` now hold the last reported values, and
+`character_setup_winset_view()` is the single place that talks to a preview map, emitting
+`zoom` and `background-color` in one `winset`. Both callers go through it, so the two paths cannot
+diverge again.
+
+The rule this leaves behind: **a preview map has no recoverable state in DM.** Anything winset onto
+it must be re-winset by whoever touches it next, so every property that matters belongs in one call
+from one proc — not spread across the handlers that happen to change each one.
+
+## The third tier: a constant catalog
+
+The static split above fixed the wrong half first. `ui_static_data()` is per player and is resent
+whenever `character_setup_static_sig` changes — and that signature is
+`species-gender-erp`. So every time a player clicked a different species, the server rebuilt and
+resent the full list of 33 species with their descriptions, tags and stat sheets: a block that
+cannot change when the species changes.
+
+/tg/ does not have this problem because its chargen has three tiers, not two
+(`code/modules/client/preferences.dm` + `preferences/assets.dm`):
+
+| tier | scope | how often |
+|---|---|---|
+| `compile_constant_data()` → `/datum/asset/json/preferences` | whole server | generated once, then browser-cached |
+| `ui_static_data()` | one player | on open, and on an explicit `update_static_data()` |
+| `ui_data()` | one player | every update |
+
+This fork inherited `compile_constant_data()` on the preference base types and **never called it** —
+the producer arrived at port time, the consumer (`/datum/asset/json/preferences` and the
+`preference_middleware` system) did not. Five overrides sat dead.
+
+`modular_abel/character_setup/code/modules/asset_cache/chargen_catalog.dm` is that missing tier,
+built for this fork's shape rather than copied. The difference that matters: /tg/'s constant data
+really is constant, because /tg/ has no per-player language. Ours has two, so the catalog carries
+an axis /tg/'s does not.
+
+What is genuinely invariant, and what is not:
+
+| block | varies by | where it lives now |
+|---|---|---|
+| background options, tgui themes, age tooltips | nothing | catalog |
+| species name, description, language, ancestry label, ages, tags, warning | **language** | catalog, under `en` / `ru` |
+| species stat modifiers | **gender** | catalog, under `stats.male` / `stats.female` |
+| species `available` / `lock_reason` | the player's unlocks | `ui_static_data()` |
+| ancestry options, age options, feature catalogs | the selected species | `ui_static_data()` |
+
+So the catalog holds every species once, with two language slices and two stat sheets, and
+`ui_static_data()` keeps a map of 33 `{available, lock_reason}` pairs. Changing species now resends
+that map and the species-dependent catalogs, and nothing else.
+
+Making that possible needed the translation layer to answer for a language rather than for a
+client. `chargen_tr_*()` funnelled everything through `chargen_sheet_active(target)`, so each
+resolver in `modular_abel/localization/code/chat/chargen_sheet.dm` grew a `_for(ru, …)` core and
+the client-taking proc became a one-line wrapper. Nothing at the call sites changed.
+
+The same lift applies on the DM side: the builders that never touched `src` became global procs,
+and the four that only needed `parent` for its language take `ru` instead. What stayed a
+`/datum/preferences/proc/` is exactly what is genuinely per player —
+`character_setup_species_lock_reason()` and `character_setup_species_availability()`.
+
+Two things to know before touching this:
+
+- **`generate()` runs at `SSassets` init, with no player in scope.** `/datum/asset/New()` calls
+  `register()` immediately and `SSassets.Initialize()` constructs every non-abstract asset, so a
+  builder that reaches for a preferences datum fails at roundstart rather than at first open.
+  `modular_chargen_catalog` in `modular_abel/tests/_tests.dm` generates the catalog and asserts
+  every roundstart species has both language slices and both stat sheets, which is what that
+  failure would look like.
+- **The frontend must wait for the asset mapping.** `resolveAsset()` returns the bare filename
+  until the `asset/mappings` message lands, so fetching on mount would 404 and leave the species
+  list permanently empty. `PreferencesMenu.catalog.ts` polls `loadedMappings` for the real url
+  first, then fetches with retries, and the picker distinguishes loading from failure from
+  no-match rather than showing one silent empty box for all three.
+
+### Making an apply O(1): move the bytes, not everything
+
+Browsing the species list never reaches the server — `previewSpeciesId` is local React state, and
+since the species catalog is an asset the whole list is client-side. The only round trip is
+*applying* a species, and that is what had to stop scaling.
+
+Three measurements decided the shape rather than a preference for symmetry:
+
+- **872 sprite accessories exist, but only three choices filter them.** The smallclothes choices
+  (`top`, `bottom`, `legs`, 61 accessories between them) override
+  `character_setup_accessory_types`; the other ~130 choices use the base, which returns its whole
+  list unfiltered. So most of the catalog is invariant and duplicating it per species would be
+  pure waste.
+- **`smallclothes_coverage_allowed()` is a pure function of the accessory** — it reads
+  `smallclothes_covers_torso` / `_groin` and nothing about the character. The accessory list is a
+  catalog, not character state, so it can be precomputed at all.
+- **The filters need exactly species and gender.** `character_setup_accessory_types()` reached for
+  them through the preferences datum; splitting out a `character_setup_accessory_types_for(species,
+  gender)` core (the same shape as the localization `_for` split) removes the last player
+  dependency, and the prefs-taking proc is a one-line wrapper.
+
+So the asset carries the resolved lists **deduplicated by content**: every distinct list is stored
+once under a signature, and `accessory_index[choice]` maps `"<species>|<gender>"` to a signature —
+collapsing to a bare signature when every combination agrees, which is the case for those ~130
+invariant choices. No predicate logic is replicated on the client, so there is nothing for the two
+sides to disagree about; the client does a lookup.
+
+**What deliberately stayed in `ui_static_data`, and why.** The *choices* block — which customizers
+a species offers — runs through upstream's `/datum/customizer/proc/is_allowed()`, which is
+dual-typed (it takes a human *or* a preferences datum, branching on `istype`) and reads `age` in
+`.../bodypart_feature/accessory.dm` and age, gender and species in `.../hair.dm`. Precomputing it
+would mean either standing up a fake preferences datum to satisfy that signature, or
+reimplementing two upstream predicates in the asset and owning the drift. For roughly forty small
+entries that is a bad trade. It stays a per-player build.
+
+Three cheaper cuts finished the job, because a static push sends the *whole* of
+`ui_static_data()` and anything riding along pays on every apply:
+
+- **The choices builder was building the accessory lists too, and `ui_static_data()` threw them
+  away.** `character_setup_build_feature_options()` returned both halves; it is now
+  `character_setup_build_choice_options()` and `character_setup_build_accessory_options()` over a
+  shared `character_setup_allowed_customizers()`, so the per-apply path does no accessory work at
+  all. This was the largest remaining cost and it was pure waste.
+- **Availability became locks.** Sending `{available, lock_reason}` for all 33 species meant one
+  entry per species on every push. `character_setup_species_locks()` sends only the species the
+  player *cannot* pick — typically two — and the frontend treats anything absent as available.
+- **The 33 species datums are cached.** The availability check is a proc call, so it needs an
+  instance; `GLOB.character_setup_species_instances` builds one of each once instead of
+  allocating 33 per push.
+
+What is left on the wire for an apply is the choices block, ancestry and ages — a couple of
+kilobytes that does not grow with the accessory catalog, the species count, or the length of any
+description.
+
+**A bug this surfaced.** `character_setup_static_sig` was `species-gender-erp`. Nothing filters on
+the ERP flag — no `is_allowed` or `character_setup_accessory_types` override mentions it, so
+toggling ERP forced a full static rebuild for nothing. Age, which two upstream `is_allowed`
+overrides *do* read, was absent, so changing age never refreshed the customizer list and facial
+hair stayed offered to a Youngling. The signature is now `species-gender-age`.
+
+**The one visual edge case.** A savefile can hold a species that is no longer roundstart, and the
+asset only covers roundstart species, which would have left that character's accessory dropdowns
+empty. `ui_static_data()` still ships `feature_accessory_options` in exactly that case and the
+frontend prefers it when present, so the fallback costs nothing for everyone else.
+
+`modular_chargen_catalog` asserts the equivalence that matters here: for every species, gender and
+choice, resolving through the deduplicated index returns the same options, in the same order, as
+building the list fresh. A dedup signature that collided would show up as a wrong dropdown for one
+species, and this is what catches it.
+
+### The thumbnail map is gone
+
+`ui_static_data()` used to ship `thumbs`: one entry per accessory, mapping its type path to its
+spritesheet CSS class. The class is `sanitize_css_class_name(path)`
+(`code/modules/asset_cache/asset_list.dm`), i.e. the path with everything non-alphanumeric
+stripped — **a pure function of the key it was stored under**. 435 entries, ~80 KB per full
+update, carrying no information the frontend did not already hold in `option.value`.
+
+`spriteClassFor()` in `PreferencesMenu.components.tsx` applies the same rule client-side. The one
+thing the map really encoded was *which grids show thumbnails at all*, and that is a property of
+the grid, not of the data: accessory grids do, choice grids do not. `OptionGrid` now takes an
+explicit `spriteThumbs` prop, passed only at the accessory call site. If the DM rule ever changes,
+change it in both places — the mirror is noted in the helper's comment.
+
+The dead `option.thumb` / `data:`-URL branch went with it: no DM code has ever set that field.
+
+### The preview bbox is cached
+
+`character_setup_measure_art()` flattens the whole dummy through
+`character_setup_get_flat_icon()` for one reason — to read its content bounding box, so the map
+zoom and offsets can be computed. The 2026-09-20 round ran it **345 times against 297 renders**
+(a second, perpendicular measurement runs whenever the render is not `main_only`).
+
+It is now memoised per direction behind `character_setup_measure_signature()`, which lists
+everything that can change the doll's silhouette: species, gender, the preview job, the clothes
+and underwear toggles, the hovered accessory, and every customizer entry's choice, accessory and
+disabled flag. **Accessory colours are deliberately excluded** — `accessory_colors` are opaque
+hex, so a colour change cannot add or remove a pixel, and including them would throw the cache
+away on every click of the colour picker.
+
+The invariant to preserve: the signature must be a *superset* of what feeds the flatten. Adding a
+preview-only toggle that changes the doll's outline without extending the signature will produce
+a subtly mis-sized preview with no error anywhere.

@@ -50,8 +50,6 @@ GLOBAL_LIST_EMPTY(respawncounts)
 		return
 #endif
 
-	log_topic_census(src, href, href_list, hsrc) // TOPIC-CENSUS TEMP — remove after debug
-
 	// asset_cache
 	var/asset_cache_job
 	if(href_list["asset_cache_confirm_arrival"])
@@ -77,7 +75,6 @@ GLOBAL_LIST_EMPTY(respawncounts)
 					msg += " Administrators have been informed."
 					message_admins("[ADMIN_LOOKUPFLW(usr)] [ADMIN_KICK(usr)] Has hit the per-minute topic limit of [mtl] topic calls in a given game minute")
 				log_game("[key_name(src)] Has hit the per-minute topic limit of [mtl] topic calls in a given game minute with [hsrc ? "[hsrc] " : ""][href].")
-				log_topic_census_drop(src, "minute", topiclimiter[MINUTE_COUNT], mtl, href) // TOPIC-CENSUS TEMP — remove after debug
 				to_chat(src, span_danger("[msg]"))
 				return
 
@@ -92,7 +89,6 @@ GLOBAL_LIST_EMPTY(respawncounts)
 			topiclimiter[SECOND_COUNT] += 1
 			if (topiclimiter[SECOND_COUNT] > stl)
 				log_game("[key_name(src)] Has hit the per-second topic limit of [stl] topic calls in a given game second with [hsrc ? "[hsrc] " : ""][href].")
-				log_topic_census_drop(src, "second", topiclimiter[SECOND_COUNT], stl, href) // TOPIC-CENSUS TEMP — remove after debug
 				to_chat(src, span_danger("Your previous action was ignored because you've done too many in a second"))
 				return
 

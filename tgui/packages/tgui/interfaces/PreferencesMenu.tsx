@@ -12,536 +12,37 @@ import {
   Tooltip,
 } from 'tgui-core/components';
 import { useBackend } from '../backend';
-import type { Lang } from '../i18n';
 import { Window } from '../layouts';
 import { ByondMapView } from './_common/ByondMapView';
+import {
+  buildSpeciesOptions,
+  resolveAccessoryOptions,
+  useChargenCatalog,
+} from './PreferencesMenu.catalog';
+import {
+  ActionButton,
+  asBool,
+  BACKDROP_KEY,
+  charSections,
+  clampMenuScale,
+  clampPreviewScale,
+  DECLENSION_CASES,
+  display,
+  FACE_KEY,
+  FieldBlock,
+  formatRoundCountdown,
+  InfoRow,
+  isFaceFeature,
+  OptionGrid,
+  Panel,
+  PrefRow,
+  swatchColor,
+  systemSections,
+  TAUR_KEY,
+  UNDERWEAR_KEY,
+} from './PreferencesMenu.components';
 import { usePrefsTp } from './PreferencesMenu.strings';
-
-type Booleanish = boolean | number;
-
-type LoadoutSlot = {
-  slot: number;
-  name: string;
-};
-
-type SpeciesStat = {
-  name: string;
-  label: string;
-  value: number;
-};
-
-type SpeciesEntry = {
-  id: string;
-  name: string;
-  description: string;
-  available: Booleanish;
-  lock_reason: string;
-  language: string;
-  ancestry_label: string;
-  ages: string;
-  tags: string[];
-  tag_descriptions?: Record<string, string>;
-  stats: SpeciesStat[];
-};
-
-type PatronEntry = {
-  id: string;
-  name: string;
-  domain: string;
-  description: string;
-  flaws: string;
-  worshippers: string;
-  sins: string;
-  boons: string;
-  available: Booleanish;
-  selected: Booleanish;
-};
-
-type FaithEntry = {
-  id: string;
-  name: string;
-  description: string;
-  available: Booleanish;
-  selected: Booleanish;
-  patrons: PatronEntry[];
-};
-
-type AncestryOption = {
-  name: string;
-  value: string;
-  color: string;
-  selected: Booleanish;
-};
-
-type OocMessage = {
-  sender: string;
-  message: string;
-  time: string;
-};
-
-type FeatureOption = {
-  name: string;
-  value: string;
-  thumb?: string;
-  coverage?: string;
-};
-
-type FeatureColor = {
-  name: string;
-  value: string;
-  index: string;
-};
-
-type FeatureExtra = {
-  task: string;
-  label: string;
-  kind: 'color' | 'text';
-  value: string;
-};
-
-type FeatureEntry = {
-  key: string;
-  name: string;
-  enabled: Booleanish;
-  can_disable: Booleanish;
-  choice_name: string;
-  choice_value?: string;
-  choice_options?: FeatureOption[];
-  accessory_name?: string;
-  accessory_value?: string;
-  accessory_options?: FeatureOption[];
-  colors?: FeatureColor[];
-  extras?: FeatureExtra[];
-  erp?: Booleanish;
-  section?: string;
-};
-
-type PrefsData = {
-  lang?: Lang;
-  real_name: string;
-  declensions?: Record<string, string>;
-  initial_tab: string;
-  tgui_theme: string;
-  tgui_themes: { value: string; label: string }[];
-  tgui_font_size: number | null;
-  tgui_line_height: number | null;
-  tgui_text_bounds: {
-    font_min: number;
-    font_max: number;
-    font_default: number;
-    line_min: number;
-    line_max: number;
-    line_step: number;
-    line_default: number;
-  };
-  open_sequence: number;
-  preferences_fullscreen: Booleanish;
-  preferences_scale: number;
-  preview_scale: number;
-  species_id: string;
-  species_name: string;
-  species_options: SpeciesEntry[];
-  is_taur: Booleanish;
-  taur_body: string;
-  taur_color: string;
-  taur_markings: string;
-  taur_tertiary: string;
-  gender: string;
-  gender_short: string;
-  default_slot: number;
-  patron_name: string;
-  faith_name: string;
-  selected_patron_id: string;
-  selected_faith_id: string;
-  faith_options: FaithEntry[];
-  high_job: string;
-  age: string;
-  age_index: number;
-  age_min: number;
-  age_max: number;
-  age_options: string[];
-  age_tooltips: Record<string, string>;
-  pronouns: string;
-  domhand: string;
-  ancestry_label: string;
-  ancestry_value: string;
-  ancestry_options: AncestryOption[];
-  erp_enabled: Booleanish;
-  headshot: string | null;
-  features: FeatureEntry[];
-  preview_underwear: Booleanish;
-  preview_clothes: Booleanish;
-  preview_dir: number;
-  background: string;
-  background_options: FeatureOption[];
-  thumbs?: Record<string, string>;
-  preview_map: string | null;
-  preview_map_front: string | null;
-  preview_map_side: string | null;
-  preview_bbox_w: number;
-  preview_bbox_h: number;
-  culture_name: string;
-  voice_type: string;
-  voice_color: string;
-  selected_accent: string;
-  family: string;
-  gender_pref: string;
-  spouse: string;
-  loadouts: LoadoutSlot[];
-  triumphs: number;
-  special_role: string;
-  round_start_status: string;
-  round_start_seconds: number;
-  round_ready_players: number;
-  round_total_players: number;
-  round_player_ready: Booleanish;
-  round_action_label: string;
-  round_action_icon: string;
-  round_action_color: string | null;
-  round_action_disabled: Booleanish;
-  round_action_tooltip: string;
-  ooc_messages: OocMessage[];
-  player_quality: string;
-  player_quality_color: string | null;
-  game_prefs: {
-    hotkeys: Booleanish;
-    buttons_locked: Booleanish;
-    see_chat_non_mob: Booleanish;
-    tgui_fancy: Booleanish;
-    tgui_lock: Booleanish;
-    windowflashing: Booleanish;
-    lobby_music: Booleanish;
-    hear_midis: Booleanish;
-    ambientocclusion: Booleanish;
-    auto_fit_viewport: Booleanish;
-    widescreenpref: Booleanish;
-    allow_midround_antag: Booleanish;
-    pixel_size: string;
-    scaling_method: string;
-    language: string;
-  };
-};
-
-const charSections = [
-  { id: 'identity', label: 'Identity', icon: 'id-card' },
-  { id: 'appearance', label: 'Appearance', icon: 'palette' },
-  { id: 'gameplay', label: 'Gameplay', icon: 'gamepad' },
-  { id: 'profile', label: 'Character Profile', icon: 'image' },
-];
-
-const systemSections = [
-  { id: 'erp', label: 'Intimacy', icon: 'heart' },
-  { id: 'settings', label: 'Settings', icon: 'cog' },
-];
-
-const UNDERWEAR_KEY = '__underwear__';
-const FACE_KEY = '__face__';
-const TAUR_KEY = '__taur__';
-const BACKDROP_KEY = '__backdrop__';
-
-const FACE_PATTERNS = ['face_detail', 'eyes', 'facial_hair'];
-const isFaceFeature = (key: string) =>
-  FACE_PATTERNS.some((pattern) => key.includes(pattern));
-
-const asBool = (value: Booleanish | undefined) => value === true || value === 1;
-
-const display = (value: unknown, fallback = 'None') => {
-  const text = String(value ?? '').trim();
-  return text || fallback;
-};
-
-const swatchColor = (value: string) => {
-  const text = String(value || '').trim();
-  if (!text) {
-    return '#888888';
-  }
-  return text.startsWith('#') ? text : `#${text}`;
-};
-
-const clampPreviewScale = (value: unknown) => {
-  const scale = Math.round(Number(value));
-  if (!Number.isFinite(scale)) {
-    return 1;
-  }
-  return Math.max(1, Math.min(3, scale));
-};
-
-const clampMenuScale = (value: unknown) => {
-  const scale = Number(value);
-  if (!Number.isFinite(scale)) {
-    return 1;
-  }
-  return Math.max(0.8, Math.min(1.25, Math.round(scale * 20) / 20));
-};
-
-const formatRoundCountdown = (seconds: number) => {
-  if (!Number.isFinite(seconds) || seconds < 0) {
-    return 'DELAYED';
-  }
-  const minutes = Math.floor(seconds / 60);
-  const remainder = seconds % 60;
-  if (minutes <= 0) {
-    return `${remainder}s`;
-  }
-  return `${minutes}:${String(remainder).padStart(2, '0')}`;
-};
-
-type PanelProps = {
-  title: string;
-  icon?: string;
-  buttons?: React.ReactNode;
-  children?: React.ReactNode;
-};
-
-const Panel = (props: PanelProps) => {
-  const { title, icon, buttons, children } = props;
-  const tp = usePrefsTp();
-  return (
-    <Section
-      mb={1}
-      title={
-        <Stack align="center">
-          {icon ? (
-            <Stack.Item>
-              <Icon name={icon} />
-            </Stack.Item>
-          ) : null}
-          <Stack.Item>{tp(title)}</Stack.Item>
-        </Stack>
-      }
-      buttons={buttons}
-    >
-      {children}
-    </Section>
-  );
-};
-
-type PrefRowProps = {
-  icon: string;
-  label: string;
-  value?: unknown;
-  onClick?: () => void;
-  disabled?: boolean;
-  selected?: boolean;
-  swatch?: string;
-  tooltip?: string;
-};
-
-/**
- * The cases the chat panel can decline a character's name into. Leaving one
- * blank is fine: chat falls back to the nominative for that case.
- */
-const DECLENSION_CASES = [
-  { key: 'declension_genitive', case: 'gen', label: 'Родительный', tooltip: 'Кого? Чего? — Ивана Петрова' },
-  { key: 'declension_dative', case: 'dat', label: 'Дательный', tooltip: 'Кому? Чему? — Ивану Петрову' },
-  { key: 'declension_accusative', case: 'acc', label: 'Винительный', tooltip: 'Кого? Что? — Ивана Петрова' },
-  { key: 'declension_instrumental', case: 'ins', label: 'Творительный', tooltip: 'Кем? Чем? — Иваном Петровым' },
-  { key: 'declension_prepositional', case: 'pre', label: 'Предложный', tooltip: 'О ком? О чём? — Иване Петрове' },
-] as const;
-
-const PrefRow = (props: PrefRowProps) => {
-  const { icon, label, value, onClick, disabled, selected, swatch, tooltip } =
-    props;
-  const tp = usePrefsTp();
-  return (
-    <Button
-      fluid
-      mb={0.5}
-      disabled={disabled}
-      selected={selected}
-      tooltip={tp(tooltip || label)}
-      onClick={onClick}
-    >
-      <Stack align="center">
-        <Stack.Item>
-          <Icon name={icon} />
-        </Stack.Item>
-        <Stack.Item grow>
-          <Box textAlign="left">{tp(label)}</Box>
-        </Stack.Item>
-        {swatch ? (
-          <Stack.Item>
-            <Box
-              width="12px"
-              height="12px"
-              style={{ border: '1px solid rgba(0,0,0,0.6)' }}
-              backgroundColor={swatchColor(swatch)}
-            />
-          </Stack.Item>
-        ) : null}
-        <Stack.Item>
-          <Box bold>{display(tp(value))}</Box>
-        </Stack.Item>
-      </Stack>
-    </Button>
-  );
-};
-
-const InfoRow = (props: {
-  icon: string;
-  label: string;
-  value?: unknown;
-  valueColor?: string;
-}) => {
-  const { icon, label, value, valueColor } = props;
-  const tp = usePrefsTp();
-  return (
-    <Box mb={0.5} p={0.5}>
-      <Stack align="center">
-        <Stack.Item>
-          <Icon name={icon} />
-        </Stack.Item>
-        <Stack.Item grow>
-          <Box textAlign="left">{tp(label)}</Box>
-        </Stack.Item>
-        <Stack.Item>
-          <Box bold color={valueColor}>
-            {display(tp(value))}
-          </Box>
-        </Stack.Item>
-      </Stack>
-    </Box>
-  );
-};
-
-const ActionButton = (props: {
-  icon: string;
-  label: string;
-  onClick?: () => void;
-  color?: string;
-  disabled?: boolean;
-  selected?: boolean;
-}) => {
-  const { icon, label, onClick, color, disabled, selected } = props;
-  const tp = usePrefsTp();
-  return (
-    <Button
-      fluid
-      mb={0.5}
-      textAlign="center"
-      icon={icon}
-      color={color || undefined}
-      disabled={disabled}
-      selected={selected}
-      tooltip={tp(label)}
-      onClick={onClick}
-    >
-      {tp(label)}
-    </Button>
-  );
-};
-
-const OptionGrid = (props: {
-  options: FeatureOption[];
-  selected?: string;
-  onSelect: (value: string) => void;
-  onHover?: (value: string | null) => void;
-  thumbs?: Record<string, string>;
-  labelSize?: string;
-}) => {
-  const { options, selected, onSelect, onHover, thumbs, labelSize } = props;
-  const thumbOf = (option: FeatureOption) =>
-    option.thumb || thumbs?.[option.value];
-  const hasThumbs = options.some((option) => thumbOf(option));
-  const optionLabelSize = labelSize || (hasThumbs ? '10px' : '11px');
-  return (
-    <Box style={{ display: 'flex', flexWrap: 'wrap' }}>
-      {options.map((option) => {
-        const thumb = thumbOf(option);
-        return (
-          <Button
-            key={option.value}
-            mr={0.5}
-            mb={0.5}
-            tooltip={
-              option.coverage
-                ? `${option.name} - covers ${option.coverage}`
-                : option.name
-            }
-            selected={String(selected) === String(option.value)}
-            onClick={() => onSelect(option.value)}
-            onMouseOver={() => onHover?.(option.value)}
-            onMouseLeave={() => onHover?.(null)}
-            style={
-              hasThumbs
-                ? { width: '66px', height: '80px', padding: '2px' }
-                : undefined
-            }
-          >
-            {hasThumbs ? (
-              <Box
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: '50px',
-                }}
-              >
-                {thumb ? (
-                  thumb.startsWith('data:') ? (
-                    <img
-                      src={thumb}
-                      alt=""
-                      style={{
-                        width: '50px',
-                        height: '50px',
-                        objectFit: 'contain',
-                        imageRendering: 'pixelated',
-                      }}
-                    />
-                  ) : (
-                    <Box
-                      className={`character_setup_chargen48x48 ${thumb}`}
-                      style={{
-                        width: '48px',
-                        height: '48px',
-                        imageRendering: 'pixelated',
-                      }}
-                    />
-                  )
-                ) : (
-                  <Icon name="ban" color="label" />
-                )}
-              </Box>
-            ) : null}
-            <Box
-              style={{
-                fontSize: optionLabelSize,
-                lineHeight: '1.15',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                textAlign: 'center',
-              }}
-            >
-              {option.name}
-            </Box>
-          </Button>
-        );
-      })}
-    </Box>
-  );
-};
-
-const FieldBlock = (props: {
-  label: string;
-  children: React.ReactNode;
-  labelSize?: string;
-}) => {
-  const tp = usePrefsTp();
-  return (
-    <Box mb={1}>
-      <Box
-        color="label"
-        mb={0.5}
-        style={{ fontSize: props.labelSize || '12px', lineHeight: '1.2' }}
-      >
-        {tp(props.label)}
-      </Box>
-      {props.children}
-    </Box>
-  );
-};
+import type { FeatureEntry, PrefsData } from './PreferencesMenu.types';
 
 export const PreferencesMenu = () => {
   const { act, data } = useBackend<PrefsData>();
@@ -653,7 +154,13 @@ export const PreferencesMenu = () => {
       window.removeEventListener('resize', measure);
       observer?.disconnect();
     };
-  }, [data.preview_map, menuScale, previewScale, data.preferences_fullscreen, data.tgui_theme]);
+  }, [
+    data.preview_map,
+    menuScale,
+    previewScale,
+    data.preferences_fullscreen,
+    data.tgui_theme,
+  ]);
 
   const previewBboxW = Math.max(16, Number(data.preview_bbox_w) || 0);
   const previewBboxH = Math.max(16, Number(data.preview_bbox_h) || 0);
@@ -662,7 +169,10 @@ export const PreferencesMenu = () => {
       ? Math.max(
           1,
           Math.floor(
-            Math.min((boxW * 0.95) / previewBboxW, (boxH * 0.85) / previewBboxH),
+            Math.min(
+              (boxW * 0.95) / previewBboxW,
+              (boxH * 0.85) / previewBboxH,
+            ),
           ),
         )
       : 0;
@@ -693,7 +203,15 @@ export const PreferencesMenu = () => {
     };
     const t = setTimeout(report, 250);
     return () => clearTimeout(t);
-  }, [data.preview_map, menuScale, previewScale, data.preferences_fullscreen, previewZoom, previewMiniZoom, data.tgui_theme]);
+  }, [
+    data.preview_map,
+    menuScale,
+    previewScale,
+    data.preferences_fullscreen,
+    previewZoom,
+    previewMiniZoom,
+    data.tgui_theme,
+  ]);
 
   const [localRoundSeconds, setLocalRoundSeconds] = useState<number>(-1);
 
@@ -711,6 +229,14 @@ export const PreferencesMenu = () => {
     );
     return () => clearTimeout(timer);
   }, [localRoundSeconds]);
+
+  const { catalog, failed: catalogFailed } = useChargenCatalog();
+  const speciesOptions = buildSpeciesOptions(
+    catalog,
+    data.species_locks,
+    data.lang,
+    data.gender_key,
+  );
 
   const ageOptions = data.age_options ?? [];
   const erpEnabled = asBool(data.erp_enabled);
@@ -814,7 +340,7 @@ export const PreferencesMenu = () => {
 
   // ---- Detail panels ----
 
-  const SelectionModeButtons = () => (
+  const renderSelectionModeButtons = () => (
     <Box>
       <Button
         compact
@@ -844,7 +370,6 @@ export const PreferencesMenu = () => {
   );
 
   const renderSpeciesPicker = () => {
-    const speciesOptions = data.species_options ?? [];
     const currentSpecies =
       speciesOptions.find((species) => species.id === data.species_id) ||
       speciesOptions.find((species) => species.name === data.species_name);
@@ -987,7 +512,11 @@ export const PreferencesMenu = () => {
                 })
               ) : (
                 <Box color="label" py={2} textAlign="center">
-                  No species match.
+                  {catalogFailed
+                    ? tp('Species catalog failed to load.')
+                    : catalog
+                      ? tp('No species match.')
+                      : tp('Loading species…')}
                 </Box>
               )}
             </Box>
@@ -1019,10 +548,10 @@ export const PreferencesMenu = () => {
                   <Stack.Item grow>
                     <Box color="label">
                       {inspectedSpecies.id === data.species_id
-                        ? 'Selected species'
+                        ? tp('Selected species')
                         : asBool(inspectedSpecies.available)
-                          ? 'Ready to apply'
-                          : display(inspectedSpecies.lock_reason, 'Locked')}
+                          ? tp('Ready to apply')
+                          : tp(display(inspectedSpecies.lock_reason, 'Locked'))}
                     </Box>
                   </Stack.Item>
                   <Stack.Item>
@@ -1059,7 +588,9 @@ export const PreferencesMenu = () => {
                 </Stack>
                 <Box
                   mb={1}
-                  color={asBool(inspectedSpecies.available) ? undefined : 'label'}
+                  color={
+                    asBool(inspectedSpecies.available) ? undefined : 'label'
+                  }
                   style={{
                     minHeight: '118px',
                     maxHeight: '132px',
@@ -1069,6 +600,21 @@ export const PreferencesMenu = () => {
                 >
                   {display(inspectedSpecies.description, 'No description.')}
                 </Box>
+
+                {inspectedSpecies.warning ? (
+                  <Box
+                    mb={1}
+                    bold
+                    color="bad"
+                    style={{
+                      whiteSpace: 'normal',
+                      overflowWrap: 'anywhere',
+                      lineHeight: '15px',
+                    }}
+                  >
+                    {inspectedSpecies.warning}
+                  </Box>
+                ) : null}
 
                 <Stack mb={1}>
                   <Stack.Item grow>
@@ -1094,7 +640,9 @@ export const PreferencesMenu = () => {
 
                 {inspectedSpecies.stats?.length ? (
                   <FieldBlock label="Stat modifiers">
-                    <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    <Box
+                      style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}
+                    >
                       {inspectedSpecies.stats.map((stat) => (
                         <Button
                           key={stat.label}
@@ -1115,13 +663,17 @@ export const PreferencesMenu = () => {
                 )}
 
                 <FieldBlock label="Tags">
-                  <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                  <Box
+                    style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}
+                  >
                     {(inspectedSpecies.tags || []).map((tag) => (
                       <Button
                         key={tag}
                         compact
                         color="transparent"
-                        tooltip={inspectedSpecies.tag_descriptions?.[tag] || tag}
+                        tooltip={
+                          inspectedSpecies.tag_descriptions?.[tag] || tag
+                        }
                         style={{
                           maxWidth: '100%',
                           whiteSpace: 'normal',
@@ -1190,7 +742,9 @@ export const PreferencesMenu = () => {
                     <Stack align="center">
                       <Stack.Item>
                         <Icon
-                          name={asBool(faith.selected) ? 'check-circle' : 'asterisk'}
+                          name={
+                            asBool(faith.selected) ? 'check-circle' : 'asterisk'
+                          }
                           color={asBool(faith.selected) ? 'good' : undefined}
                         />
                       </Stack.Item>
@@ -1266,6 +820,7 @@ export const PreferencesMenu = () => {
                     style={{
                       maxHeight: '300px',
                       overflowY: 'auto',
+                      overflowX: 'hidden',
                       border: '1px solid rgba(255,255,255,0.18)',
                       backgroundColor: 'rgba(0,0,0,0.22)',
                     }}
@@ -1288,15 +843,36 @@ export const PreferencesMenu = () => {
                         <Stack align="center">
                           <Stack.Item>
                             <Icon
-                              name={asBool(patron.selected) ? 'check-circle' : 'star'}
-                              color={asBool(patron.selected) ? 'good' : undefined}
+                              name={
+                                asBool(patron.selected)
+                                  ? 'check-circle'
+                                  : 'star'
+                              }
+                              color={
+                                asBool(patron.selected) ? 'good' : undefined
+                              }
                             />
                           </Stack.Item>
-                          <Stack.Item grow>
-                            <Box textAlign="left" bold>
+                          <Stack.Item grow style={{ minWidth: 0 }}>
+                            <Box
+                              textAlign="left"
+                              bold
+                              style={{
+                                whiteSpace: 'normal',
+                                overflowWrap: 'anywhere',
+                              }}
+                            >
                               {patron.name}
                             </Box>
-                            <Box textAlign="left" color="label">
+                            <Box
+                              textAlign="left"
+                              color="label"
+                              style={{
+                                whiteSpace: 'normal',
+                                overflowWrap: 'anywhere',
+                                lineHeight: '13px',
+                              }}
+                            >
                               {display(patron.domain)}
                             </Box>
                             <Box
@@ -1305,6 +881,7 @@ export const PreferencesMenu = () => {
                                 fontSize: '11px',
                                 lineHeight: '13px',
                                 whiteSpace: 'normal',
+                                overflowWrap: 'anywhere',
                                 display: '-webkit-box',
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
@@ -1322,8 +899,16 @@ export const PreferencesMenu = () => {
 
                 {selectedPatron ? (
                   <>
-                    <InfoRow icon="star" label="Patron" value={selectedPatron.name} />
-                    <InfoRow icon="sun" label="Domain" value={selectedPatron.domain} />
+                    <InfoRow
+                      icon="star"
+                      label="Patron"
+                      value={selectedPatron.name}
+                    />
+                    <InfoRow
+                      icon="sun"
+                      label="Domain"
+                      value={selectedPatron.domain}
+                    />
                     <FieldBlock label="About">
                       <Box style={{ whiteSpace: 'pre-line' }}>
                         {display(selectedPatron.description, 'No description.')}
@@ -1358,7 +943,9 @@ export const PreferencesMenu = () => {
         <Section
           title={
             <Stack align="center">
-              <Stack.Item>{display(data.ancestry_label, 'Ancestry')}</Stack.Item>
+              <Stack.Item>
+                {display(data.ancestry_label, 'Ancestry')}
+              </Stack.Item>
               <Stack.Item>
                 <Box color="good">{display(data.ancestry_value)}</Box>
               </Stack.Item>
@@ -1420,12 +1007,27 @@ export const PreferencesMenu = () => {
       <Stack>
         <Stack.Item grow basis={0}>
           <Panel title="Identity" icon="id-card">
-            <PrefRow icon="signature" label="Name" value={data.real_name} onClick={() => doPref('name', 'input')} />
-            <PrefRow icon="venus-mars" label="Body Type" value={data.gender} onClick={() => doPref('gender')} />
-            <PrefRow icon="comment" label="Pronouns" value={data.pronouns} onClick={() => doPref('pronouns', 'input')} />
+            <PrefRow
+              icon="signature"
+              label="Name"
+              value={data.real_name}
+              onClick={() => doPref('name', 'input')}
+            />
+            <PrefRow
+              icon="venus-mars"
+              label="Body Type"
+              value={data.gender}
+              onClick={() => doPref('gender')}
+            />
+            <PrefRow
+              icon="comment"
+              label="Pronouns"
+              value={data.pronouns}
+              onClick={() => doPref('pronouns', 'input')}
+            />
             <FieldBlock label="Age">
               <Tooltip
-                content={data.age_tooltips?.[data.age] ?? ''}
+                content={catalog?.age_tooltips?.[data.age] ?? ''}
                 position="bottom"
               >
                 <Box>
@@ -1442,15 +1044,30 @@ export const PreferencesMenu = () => {
                 </Box>
               </Tooltip>
             </FieldBlock>
-            <SelectionModeButtons />
+            {renderSelectionModeButtons()}
           </Panel>
         </Stack.Item>
 
         <Stack.Item grow basis={0}>
           <Panel title="Standing" icon="sun">
-            <PrefRow icon="hand-paper" label="Dominant Hand" value={data.domhand} onClick={() => doPref('domhand')} />
-            <PrefRow icon="theater-masks" label="Quirks" value="Select" onClick={() => doPref('select_quirks')} />
-            <InfoRow icon="award" label="Player Quality" value={data.player_quality} valueColor={data.player_quality_color || undefined} />
+            <PrefRow
+              icon="hand-paper"
+              label="Dominant Hand"
+              value={data.domhand}
+              onClick={() => doPref('domhand')}
+            />
+            <PrefRow
+              icon="theater-masks"
+              label="Quirks"
+              value="Select"
+              onClick={() => doPref('select_quirks')}
+            />
+            <InfoRow
+              icon="award"
+              label="Player Quality"
+              value={data.player_quality}
+              valueColor={data.player_quality_color || undefined}
+            />
           </Panel>
         </Stack.Item>
 
@@ -1484,7 +1101,9 @@ export const PreferencesMenu = () => {
           mr={0.5}
           tooltip={color.name}
           onClick={() =>
-            customizerAct(feature.key, 'acc_color', { color_index: color.index })
+            customizerAct(feature.key, 'acc_color', {
+              color_index: color.index,
+            })
           }
         >
           <Box
@@ -1556,6 +1175,16 @@ export const PreferencesMenu = () => {
 
   const renderFeatureBody = (feature: FeatureEntry, skipColors?: boolean) => {
     const extraControls = renderFeatureExtras(feature);
+    const choiceOptions = data.feature_choice_options?.[feature.key];
+    const accessoryOptions = feature.accessory_value
+      ? (data.feature_accessory_options?.[feature.choice_value ?? ''] ??
+        resolveAccessoryOptions(
+          catalog,
+          feature.choice_value,
+          data.species_id,
+          data.gender_key,
+        ))
+      : undefined;
 
     return (
       <>
@@ -1563,10 +1192,10 @@ export const PreferencesMenu = () => {
           <FieldBlock label="Colors">{renderColorSwatches(feature)}</FieldBlock>
         ) : null}
 
-        {feature.choice_options ? (
+        {choiceOptions ? (
           <FieldBlock label="Type">
             <OptionGrid
-              options={feature.choice_options}
+              options={choiceOptions}
               selected={feature.choice_value}
               onSelect={(value) =>
                 doPref('character_setup_set_choice', undefined, {
@@ -1578,16 +1207,18 @@ export const PreferencesMenu = () => {
           </FieldBlock>
         ) : null}
 
-        {feature.accessory_options ? (
+        {accessoryOptions ? (
           <Box mb={1}>
             <Stack align="center" mb={0.5}>
               <Stack.Item>
                 <Box color="label">{tp('Style')}</Box>
               </Stack.Item>
-              {extraControls ? <Stack.Item grow>{extraControls}</Stack.Item> : null}
+              {extraControls ? (
+                <Stack.Item grow>{extraControls}</Stack.Item>
+              ) : null}
             </Stack>
             <OptionGrid
-              options={feature.accessory_options}
+              options={accessoryOptions}
               selected={feature.accessory_value}
               onSelect={(value) =>
                 customizerAct(feature.key, 'select_acc', { acc_type: value })
@@ -1600,7 +1231,7 @@ export const PreferencesMenu = () => {
                   feature.key,
                 )
               }
-              thumbs={data.thumbs}
+              spriteThumbs
             />
           </Box>
         ) : feature.accessory_name ? (
@@ -1609,7 +1240,9 @@ export const PreferencesMenu = () => {
               <Stack.Item>
                 <Box color="label">{tp('Style')}</Box>
               </Stack.Item>
-              {extraControls ? <Stack.Item grow>{extraControls}</Stack.Item> : null}
+              {extraControls ? (
+                <Stack.Item grow>{extraControls}</Stack.Item>
+              ) : null}
             </Stack>
             <Box>{feature.accessory_name}</Box>
           </Box>
@@ -1654,17 +1287,46 @@ export const PreferencesMenu = () => {
 
   const renderTaurEditor = () => (
     <>
-      <PrefRow icon="paw" label="Body" value={data.taur_body} onClick={() => doPref('character_setup_taur_body')} />
-      <PrefRow icon="palette" label="Color" swatch={data.taur_color} value={data.taur_color} onClick={() => doPref('character_setup_taur_color', undefined, { which: 'base' })} />
-      <PrefRow icon="palette" label="Markings" swatch={data.taur_markings} value={data.taur_markings} onClick={() => doPref('character_setup_taur_color', undefined, { which: 'markings' })} />
-      <PrefRow icon="palette" label="Tertiary" swatch={data.taur_tertiary} value={data.taur_tertiary} onClick={() => doPref('character_setup_taur_color', undefined, { which: 'tertiary' })} />
+      <PrefRow
+        icon="paw"
+        label="Body"
+        value={data.taur_body}
+        onClick={() => doPref('character_setup_taur_body')}
+      />
+      <PrefRow
+        icon="palette"
+        label="Color"
+        swatch={data.taur_color}
+        value={data.taur_color}
+        onClick={() =>
+          doPref('character_setup_taur_color', undefined, { which: 'base' })
+        }
+      />
+      <PrefRow
+        icon="palette"
+        label="Markings"
+        swatch={data.taur_markings}
+        value={data.taur_markings}
+        onClick={() =>
+          doPref('character_setup_taur_color', undefined, { which: 'markings' })
+        }
+      />
+      <PrefRow
+        icon="palette"
+        label="Tertiary"
+        swatch={data.taur_tertiary}
+        value={data.taur_tertiary}
+        onClick={() =>
+          doPref('character_setup_taur_color', undefined, { which: 'tertiary' })
+        }
+      />
     </>
   );
 
   const renderBackdropEditor = () => (
     <FieldBlock label="Backdrop tile" labelSize="18px">
       <OptionGrid
-        options={data.background_options ?? []}
+        options={catalog?.background_options ?? []}
         selected={data.background}
         labelSize="15px"
         onSelect={(value) =>
@@ -1791,30 +1453,91 @@ export const PreferencesMenu = () => {
 
   const renderVoice = () => (
     <Panel title="Voice" icon="volume-up">
-      <PrefRow icon="microphone" label="Voice Type" value={data.voice_type} onClick={() => doPref('voicetype', 'input')} />
-      <PrefRow icon="comment-dots" label="Accent" value={data.selected_accent} onClick={() => doPref('selected_accent', 'input')} />
-      <PrefRow icon="tint" label="Voice Color" swatch={data.voice_color} value={data.voice_color} onClick={() => doPref('voice', 'input')} />
+      <PrefRow
+        icon="microphone"
+        label="Voice Type"
+        value={data.voice_type}
+        onClick={() => doPref('voicetype', 'input')}
+      />
+      <PrefRow
+        icon="comment-dots"
+        label="Accent"
+        value={data.selected_accent}
+        onClick={() => doPref('selected_accent', 'input')}
+      />
+      <PrefRow
+        icon="tint"
+        label="Voice Color"
+        swatch={data.voice_color}
+        value={data.voice_color}
+        onClick={() => doPref('voice', 'input')}
+      />
     </Panel>
   );
 
   const renderBackground = () => (
     <>
       <Panel title="Flavour" icon="scroll">
-        <PrefRow icon="align-left" label="Flavour Text" value="Edit" onClick={() => doPref('flavortext', 'input')} />
-        <PrefRow icon="tags" label="Descriptors" value="Edit" onClick={() => doPref('descriptors', 'menu')} />
-        <PrefRow icon="map" label="Culture" value={data.culture_name} onClick={() => doPref('culture', 'input')} />
-        <PrefRow icon="utensils" label="Food Preferences" value="Edit" onClick={() => doPref('culinary', 'menu')} />
+        <PrefRow
+          icon="align-left"
+          label="Flavour Text"
+          value="Edit"
+          onClick={() => doPref('flavortext', 'input')}
+        />
+        <PrefRow
+          icon="tags"
+          label="Descriptors"
+          value="Edit"
+          onClick={() => doPref('descriptors', 'menu')}
+        />
+        <PrefRow
+          icon="map"
+          label="Culture"
+          value={data.culture_name}
+          onClick={() => doPref('culture', 'input')}
+        />
+        <PrefRow
+          icon="utensils"
+          label="Food Preferences"
+          value="Edit"
+          onClick={() => doPref('culinary', 'menu')}
+        />
       </Panel>
 
       <Panel title="Relations" icon="users">
-        <PrefRow icon="home" label="Family" value={data.family} onClick={() => doPref('family')} />
-        <PrefRow icon="heart" label="Spouse Pref" value={data.spouse} onClick={() => doPref('setspouse')} />
-        <PrefRow icon="venus-mars" label="Gender Pref" value={data.gender_pref} onClick={() => doPref('gender_choice')} />
+        <PrefRow
+          icon="home"
+          label="Family"
+          value={data.family}
+          onClick={() => doPref('family')}
+        />
+        <PrefRow
+          icon="heart"
+          label="Spouse Pref"
+          value={data.spouse}
+          onClick={() => doPref('setspouse')}
+        />
+        <PrefRow
+          icon="venus-mars"
+          label="Gender Pref"
+          value={data.gender_pref}
+          onClick={() => doPref('gender_choice')}
+        />
       </Panel>
 
       <Panel title="OOC" icon="sticky-note">
-        <PrefRow icon="sticky-note" label="OOC Notes" value="Edit" onClick={() => doPref('ooc_notes', 'input')} />
-        <PrefRow icon="paperclip" label="OOC Extra" value="Edit" onClick={() => doPref('ooc_extra', 'input')} />
+        <PrefRow
+          icon="sticky-note"
+          label="OOC Notes"
+          value="Edit"
+          onClick={() => doPref('ooc_notes', 'input')}
+        />
+        <PrefRow
+          icon="paperclip"
+          label="OOC Extra"
+          value="Edit"
+          onClick={() => doPref('ooc_extra', 'input')}
+        />
       </Panel>
     </>
   );
@@ -1822,10 +1545,24 @@ export const PreferencesMenu = () => {
   const renderGameplay = () => (
     <>
       <Panel title="Class & Roles" icon="shield-alt">
-        <PrefRow icon="briefcase" label="Class / Jobs" value={data.high_job} onClick={() => doPref('job', 'menu')} />
-        <PrefRow icon="list-ol" label="Ready Order" value="Edit" onClick={() => doPref('multi', 'menu')} />
+        <PrefRow
+          icon="briefcase"
+          label="Class / Jobs"
+          value={data.high_job}
+          onClick={() => doPref('job', 'menu')}
+        />
+        <PrefRow
+          icon="list-ol"
+          label="Ready Order"
+          value="Edit"
+          onClick={() => doPref('multi', 'menu')}
+        />
         <InfoRow icon="star" label="Special Role" value={data.special_role} />
-        <ActionButton icon="user-secret" label="Special Roles" onClick={() => doPref('antag', 'menu')} />
+        <ActionButton
+          icon="user-secret"
+          label="Special Roles"
+          onClick={() => doPref('antag', 'menu')}
+        />
       </Panel>
 
       <Panel title="Loadout" icon="shopping-bag">
@@ -1844,8 +1581,16 @@ export const PreferencesMenu = () => {
 
       <Panel title="Triumphs" icon="trophy">
         <InfoRow icon="coins" label="Balance" value={data.triumphs} />
-        <ActionButton icon="shopping-bag" label="Triumph Shop" onClick={() => doPref('triumph_buy_menu')} />
-        <ActionButton icon="shirt" label="Лодаут" onClick={() => doPref('donor_loadout')} />
+        <ActionButton
+          icon="shopping-bag"
+          label="Triumph Shop"
+          onClick={() => doPref('triumph_buy_menu')}
+        />
+        <ActionButton
+          icon="shirt"
+          label="Лодаут"
+          onClick={() => doPref('donor_loadout')}
+        />
       </Panel>
     </>
   );
@@ -1866,7 +1611,11 @@ export const PreferencesMenu = () => {
           </Box>
         )}
       </Box>
-      <ActionButton icon="link" label="Set Headshot URL" onClick={() => doPref('headshot', 'input')} />
+      <ActionButton
+        icon="link"
+        label="Set Headshot URL"
+        onClick={() => doPref('headshot', 'input')}
+      />
     </Panel>
   );
 
@@ -1968,7 +1717,10 @@ export const PreferencesMenu = () => {
           {messages.length ? (
             messages.map((entry, index) => (
               <Box key={`${entry.time}-${entry.sender}-${index}`} mb={0.75}>
-                <Box color="label" style={{ fontSize: '10px', lineHeight: '12px' }}>
+                <Box
+                  color="label"
+                  style={{ fontSize: '10px', lineHeight: '12px' }}
+                >
                   {display(entry.time, '--:--')} {display(entry.sender, 'OOC')}
                 </Box>
                 <Box
@@ -2058,9 +1810,7 @@ export const PreferencesMenu = () => {
             tooltip={tp('Back to the theme default')}
             onClick={props.reset}
           >
-            {props.value === null
-              ? tp('Theme')
-              : `${props.value}${props.unit}`}
+            {props.value === null ? tp('Theme') : `${props.value}${props.unit}`}
           </Button>
         </Stack.Item>
         <Stack.Item>
@@ -2082,22 +1832,59 @@ export const PreferencesMenu = () => {
     return (
       <>
         <Panel title="Interface" icon="desktop">
-          <PrefRow icon="language" label="Язык / Language" value={game.language} onClick={() => toggle('language')} />
-          <PrefRow icon="keyboard" label="Hotkeys" value={asBool(game.hotkeys) ? 'ON' : 'OFF'} selected={asBool(game.hotkeys)} onClick={() => toggle('hotkeys')} />
-          <PrefRow icon="mouse-pointer" label="Action Buttons" value={asBool(game.buttons_locked) ? 'Locked' : 'Unlocked'} selected={asBool(game.buttons_locked)} onClick={() => toggle('action_buttons')} />
-          <PrefRow icon="window-restore" label="Fancy tgui" value={asBool(game.tgui_fancy) ? 'ON' : 'OFF'} selected={asBool(game.tgui_fancy)} onClick={() => toggle('tgui_fancy')} />
-          <PrefRow icon="lock" label="Lock tgui Layout" value={asBool(game.tgui_lock) ? 'ON' : 'OFF'} selected={asBool(game.tgui_lock)} onClick={() => toggle('tgui_lock')} />
-          <PrefRow icon="bolt" label="Window Flashing" value={asBool(game.windowflashing) ? 'ON' : 'OFF'} selected={asBool(game.windowflashing)} onClick={() => toggle('winflash')} />
+          <PrefRow
+            icon="language"
+            label="Язык / Language"
+            value={game.language}
+            onClick={() => toggle('language')}
+          />
+          <PrefRow
+            icon="keyboard"
+            label="Hotkeys"
+            value={asBool(game.hotkeys) ? 'ON' : 'OFF'}
+            selected={asBool(game.hotkeys)}
+            onClick={() => toggle('hotkeys')}
+          />
+          <PrefRow
+            icon="mouse-pointer"
+            label="Action Buttons"
+            value={asBool(game.buttons_locked) ? 'Locked' : 'Unlocked'}
+            selected={asBool(game.buttons_locked)}
+            onClick={() => toggle('action_buttons')}
+          />
+          <PrefRow
+            icon="window-restore"
+            label="Fancy tgui"
+            value={asBool(game.tgui_fancy) ? 'ON' : 'OFF'}
+            selected={asBool(game.tgui_fancy)}
+            onClick={() => toggle('tgui_fancy')}
+          />
+          <PrefRow
+            icon="lock"
+            label="Lock tgui Layout"
+            value={asBool(game.tgui_lock) ? 'ON' : 'OFF'}
+            selected={asBool(game.tgui_lock)}
+            onClick={() => toggle('tgui_lock')}
+          />
+          <PrefRow
+            icon="bolt"
+            label="Window Flashing"
+            value={asBool(game.windowflashing) ? 'ON' : 'OFF'}
+            selected={asBool(game.windowflashing)}
+            onClick={() => toggle('winflash')}
+          />
         </Panel>
 
         <Panel title="Interface Theme" icon="palette">
           <Box style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {(data.tgui_themes ?? []).map((t) => (
+            {(catalog?.tgui_themes ?? []).map((t) => (
               <Button
                 key={t.value}
                 selected={data.tgui_theme === t.value}
                 onClick={() =>
-                  doPref('character_setup_tgui_theme', undefined, { theme: t.value })
+                  doPref('character_setup_tgui_theme', undefined, {
+                    theme: t.value,
+                  })
                 }
               >
                 {t.label}
@@ -2133,25 +1920,96 @@ export const PreferencesMenu = () => {
         </Panel>
 
         <Panel title="Display" icon="eye">
-          <PrefRow icon="comments" label="See Non-mob Chat" value={asBool(game.see_chat_non_mob) ? 'ON' : 'OFF'} selected={asBool(game.see_chat_non_mob)} onClick={() => toggle('see_chat_non_mob')} />
-          <PrefRow icon="sun" label="Ambient Occlusion" value={asBool(game.ambientocclusion) ? 'ON' : 'OFF'} selected={asBool(game.ambientocclusion)} onClick={() => toggle('ambientocclusion')} />
-          <PrefRow icon="expand" label="Auto-fit Viewport" value={asBool(game.auto_fit_viewport) ? 'ON' : 'OFF'} selected={asBool(game.auto_fit_viewport)} onClick={() => toggle('auto_fit_viewport')} />
-          <PrefRow icon="tv" label="Widescreen" value={asBool(game.widescreenpref) ? 'ON' : 'OFF'} selected={asBool(game.widescreenpref)} onClick={() => toggle('widescreenpref')} />
-          <PrefRow icon="search-plus" label="Pixel Size" value={game.pixel_size} onClick={() => toggle('pixel_size')} />
-          <PrefRow icon="image" label="Scaling Method" value={game.scaling_method} onClick={() => toggle('scaling_method')} />
+          <PrefRow
+            icon="comments"
+            label="See Non-mob Chat"
+            value={asBool(game.see_chat_non_mob) ? 'ON' : 'OFF'}
+            selected={asBool(game.see_chat_non_mob)}
+            onClick={() => toggle('see_chat_non_mob')}
+          />
+          <PrefRow
+            icon="sun"
+            label="Ambient Occlusion"
+            value={asBool(game.ambientocclusion) ? 'ON' : 'OFF'}
+            selected={asBool(game.ambientocclusion)}
+            onClick={() => toggle('ambientocclusion')}
+          />
+          <PrefRow
+            icon="expand"
+            label="Auto-fit Viewport"
+            value={asBool(game.auto_fit_viewport) ? 'ON' : 'OFF'}
+            selected={asBool(game.auto_fit_viewport)}
+            onClick={() => toggle('auto_fit_viewport')}
+          />
+          <PrefRow
+            icon="tv"
+            label="Widescreen"
+            value={asBool(game.widescreenpref) ? 'ON' : 'OFF'}
+            selected={asBool(game.widescreenpref)}
+            onClick={() => toggle('widescreenpref')}
+          />
+          <PrefRow
+            icon="search-plus"
+            label="Pixel Size"
+            value={game.pixel_size}
+            onClick={() => toggle('pixel_size')}
+          />
+          <PrefRow
+            icon="image"
+            label="Scaling Method"
+            value={game.scaling_method}
+            onClick={() => toggle('scaling_method')}
+          />
         </Panel>
 
         <Panel title="Audio & Round" icon="volume-up">
-          <PrefRow icon="music" label="Lobby Music" value={asBool(game.lobby_music) ? 'ON' : 'OFF'} selected={asBool(game.lobby_music)} onClick={() => toggle('lobby_music')} />
-          <PrefRow icon="music" label="Admin MIDIs" value={asBool(game.hear_midis) ? 'ON' : 'OFF'} selected={asBool(game.hear_midis)} onClick={() => toggle('hear_midis')} />
-          <PrefRow icon="user-secret" label="Midround Antag" value={asBool(game.allow_midround_antag) ? 'ON' : 'OFF'} selected={asBool(game.allow_midround_antag)} onClick={() => toggle('allow_midround_antag')} />
+          <PrefRow
+            icon="music"
+            label="Lobby Music"
+            value={asBool(game.lobby_music) ? 'ON' : 'OFF'}
+            selected={asBool(game.lobby_music)}
+            onClick={() => toggle('lobby_music')}
+          />
+          <PrefRow
+            icon="music"
+            label="Admin MIDIs"
+            value={asBool(game.hear_midis) ? 'ON' : 'OFF'}
+            selected={asBool(game.hear_midis)}
+            onClick={() => toggle('hear_midis')}
+          />
+          <PrefRow
+            icon="user-secret"
+            label="Midround Antag"
+            value={asBool(game.allow_midround_antag) ? 'ON' : 'OFF'}
+            selected={asBool(game.allow_midround_antag)}
+            onClick={() => toggle('allow_midround_antag')}
+          />
         </Panel>
 
         <Panel title="Intimacy & Tools" icon="sliders-h">
-          <PrefRow icon="heart" label="Intimacy Opt-in (ERP)" value={erpEnabled ? 'ON' : 'OFF'} selected={erpEnabled} onClick={() => doPref('character_setup_erp_toggle')} />
-          <ActionButton icon="toggle-on" label="Toggle Bitfields" onClick={() => doPref('toggles')} />
-          <ActionButton icon="keyboard" label="Keybinds" onClick={() => doPref('keybinds', 'menu')} />
-          <ActionButton icon="save" label="Save Preferences" color="blue" onClick={() => doPref('save')} />
+          <PrefRow
+            icon="heart"
+            label="Intimacy Opt-in (ERP)"
+            value={erpEnabled ? 'ON' : 'OFF'}
+            selected={erpEnabled}
+            onClick={() => doPref('character_setup_erp_toggle')}
+          />
+          <ActionButton
+            icon="toggle-on"
+            label="Toggle Bitfields"
+            onClick={() => doPref('toggles')}
+          />
+          <ActionButton
+            icon="keyboard"
+            label="Keybinds"
+            onClick={() => doPref('keybinds', 'menu')}
+          />
+          <ActionButton
+            icon="save"
+            label="Save Preferences"
+            color="blue"
+            onClick={() => doPref('save')}
+          />
         </Panel>
       </>
     );
@@ -2197,7 +2055,11 @@ export const PreferencesMenu = () => {
     value?: unknown;
     onClick: () => void;
   }) => (
-    <Button color="transparent" onClick={props.onClick} tooltip={tp(props.label)}>
+    <Button
+      color="transparent"
+      onClick={props.onClick}
+      tooltip={tp(props.label)}
+    >
       <Stack align="center">
         <Stack.Item>
           <Icon name={props.icon} />
@@ -2212,7 +2074,7 @@ export const PreferencesMenu = () => {
     </Button>
   );
 
-  const RoundStartReport = () => (
+  const renderRoundStartReport = () => (
     <Section title={tp('Round Start')} mb={1}>
       <Box bold fontSize="22px" color={roundStatusColor}>
         {roundCountdown}
@@ -2248,7 +2110,7 @@ export const PreferencesMenu = () => {
     </Section>
   );
 
-  const WindowControls = () => (
+  const renderWindowControls = () => (
     <Stack align="center">
       <Stack.Item>
         <Button
@@ -2294,7 +2156,7 @@ export const PreferencesMenu = () => {
       width={windowWidth}
       height={windowHeight}
       theme={data.tgui_theme || 'vibelin'}
-      buttons={<WindowControls />}
+      buttons={renderWindowControls()}
     >
       <Window.Content>
         <Box height="100%" style={scaledContentStyle}>
@@ -2309,7 +2171,10 @@ export const PreferencesMenu = () => {
                     <Box color="label">{headerMeta}</Box>
                   </Stack.Item>
                   <Stack.Item>
-                    <Button icon="exchange-alt" onClick={() => doPref('changeslot')}>
+                    <Button
+                      icon="exchange-alt"
+                      onClick={() => doPref('changeslot')}
+                    >
                       {tp('Change Character')}
                     </Button>
                   </Stack.Item>
@@ -2321,14 +2186,17 @@ export const PreferencesMenu = () => {
               <Stack fill>
                 <Stack.Item basis="210px">
                   <Stack vertical fill>
-                    <Stack.Item>
-                      <RoundStartReport />
-                    </Stack.Item>
+                    <Stack.Item>{renderRoundStartReport()}</Stack.Item>
                     <Stack.Item grow>
                       <Section fill scrollable>
                         <Tabs vertical>
                           {charSections.map(NavTab)}
-                          <Box my={1} mx={1} height="1px" backgroundColor="rgba(255,255,255,0.15)" />
+                          <Box
+                            my={1}
+                            mx={1}
+                            height="1px"
+                            backgroundColor="rgba(255,255,255,0.15)"
+                          />
                           {systemSections.map(NavTab)}
                         </Tabs>
                         {renderOocChatPanel()}
@@ -2351,7 +2219,10 @@ export const PreferencesMenu = () => {
                                 <ByondMapView
                                   key={data.preview_map_front}
                                   style={{ width: '100%', height: '100%' }}
-                                  deps={[menuScale, data.preferences_fullscreen]}
+                                  deps={[
+                                    menuScale,
+                                    data.preferences_fullscreen,
+                                  ]}
                                   params={{
                                     id: data.preview_map_front,
                                     type: 'map',
@@ -2385,7 +2256,10 @@ export const PreferencesMenu = () => {
                                 <ByondMapView
                                   key={data.preview_map_side}
                                   style={{ width: '100%', height: '100%' }}
-                                  deps={[menuScale, data.preferences_fullscreen]}
+                                  deps={[
+                                    menuScale,
+                                    data.preferences_fullscreen,
+                                  ]}
                                   params={{
                                     id: data.preview_map_side,
                                     type: 'map',
@@ -2424,174 +2298,237 @@ export const PreferencesMenu = () => {
                             width: '100%',
                           }}
                         >
-                        <div
-                          ref={dollBoxRef}
-                          style={{
-                            position: 'relative',
-                            width: '82%',
-                            aspectRatio: '0.82 / 1',
-                            maxHeight: '100%',
-                            backgroundColor: backdropColor || '#0d0d0d',
-                          }}
-                        >
-                        {data.preview_map && previewZoom > 0 ? (
-                          <ByondMapView
-                            key={data.preview_map}
-                            style={{ width: '100%', height: '100%' }}
-                            deps={[menuScale, previewScale, data.preferences_fullscreen]}
-                            params={{
-                              id: data.preview_map,
-                              type: 'map',
-                              zoom: previewZoom,
-                              'zoom-mode': 'distort',
-                              'background-color': backdropColor || '#0d0d0d',
-                            }}
-                          />
-                        ) : (
-                          <Box
+                          <div
+                            ref={dollBoxRef}
                             style={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              height: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
+                              position: 'relative',
+                              width: '82%',
+                              aspectRatio: '0.82 / 1',
+                              maxHeight: '100%',
+                              backgroundColor: backdropColor || '#0d0d0d',
                             }}
                           >
-                            <Icon name="user" size={6} color="label" />
-                          </Box>
-                        )}
-                        </div>
+                            {data.preview_map && previewZoom > 0 ? (
+                              <ByondMapView
+                                key={data.preview_map}
+                                style={{ width: '100%', height: '100%' }}
+                                deps={[
+                                  menuScale,
+                                  previewScale,
+                                  data.preferences_fullscreen,
+                                ]}
+                                params={{
+                                  id: data.preview_map,
+                                  type: 'map',
+                                  zoom: previewZoom,
+                                  'zoom-mode': 'distort',
+                                  'background-color':
+                                    backdropColor || '#0d0d0d',
+                                }}
+                              />
+                            ) : (
+                              <Box
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: '100%',
+                                  height: '100%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <Icon name="user" size={6} color="label" />
+                              </Box>
+                            )}
+                          </div>
                         </Box>
                       </Stack.Item>
-                    <Stack.Item>
-                      <Stack mb={0.5}>
-                        <Stack.Item grow>
-                          <Button
-                            fluid
-                            textAlign="center"
-                            icon="arrow-left"
-                            tooltip={tp('Rotate left')}
-                            onClick={() => doPref('character_setup_preview_rotate', undefined, { rotate: 'left' })}
-                          />
-                        </Stack.Item>
-                        <Stack.Item>
-                          <Box color="label" style={{ lineHeight: '24px' }}>
-                            {tp('Rotate')}
-                          </Box>
-                        </Stack.Item>
-                        <Stack.Item grow>
-                          <Button
-                            fluid
-                            textAlign="center"
-                            icon="arrow-right"
-                            tooltip={tp('Rotate right')}
-                            onClick={() => doPref('character_setup_preview_rotate', undefined, { rotate: 'right' })}
-                          />
-                        </Stack.Item>
-                      </Stack>
-                      <Button
-                        fluid
-                        mb={0.5}
-                        icon={asBool(data.preview_underwear) ? 'check-square' : 'square'}
-                        selected={asBool(data.preview_underwear)}
-                        onClick={() => doPref('character_setup_preview_layer', undefined, { layer: 'underwear' })}
-                      >
-                        {tp('Underwear Layer')}
-                      </Button>
-                      <Button
-                        fluid
-                        mb={0.5}
-                        icon={asBool(data.preview_clothes) ? 'check-square' : 'square'}
-                        selected={asBool(data.preview_clothes)}
-                        onClick={() => doPref('character_setup_preview_layer', undefined, { layer: 'clothes' })}
-                      >
-                        {tp('Work Clothes Layer')}
-                      </Button>
-                      <Button
-                        fluid
-                        icon="dice"
-                        onClick={() => doPref('randomiseappearanceprefs')}
-                      >
-                        {tp('Randomise Appearance')}
-                      </Button>
-                      <Stack mt={0.5}>
-                        <Stack.Item>
-                          <Button
-                            icon="arrow-left"
-                            disabled={previewScale <= 1}
-                            tooltip={tp('Zoom out')}
-                            onClick={() => setPreviewScale(previewScale - 1)}
-                          />
-                        </Stack.Item>
-                        <Stack.Item grow>
-                          <Box
-                            color="label"
-                            textAlign="center"
-                            style={{ lineHeight: '24px' }}
-                          >
-                            {tp('Zoom')} {previewScale}x
-                          </Box>
-                        </Stack.Item>
-                        <Stack.Item>
-                          <Button
-                            icon="arrow-right"
-                            disabled={previewScale >= 3}
-                            tooltip={tp('Zoom in')}
-                            onClick={() => setPreviewScale(previewScale + 1)}
-                          />
-                        </Stack.Item>
-                      </Stack>
-                    </Stack.Item>
-                  </Stack>
-                </Section>
-              </Stack.Item>
+                      <Stack.Item>
+                        <Stack mb={0.5}>
+                          <Stack.Item grow>
+                            <Button
+                              fluid
+                              textAlign="center"
+                              icon="arrow-left"
+                              tooltip={tp('Rotate left')}
+                              onClick={() =>
+                                doPref(
+                                  'character_setup_preview_rotate',
+                                  undefined,
+                                  { rotate: 'left' },
+                                )
+                              }
+                            />
+                          </Stack.Item>
+                          <Stack.Item>
+                            <Box color="label" style={{ lineHeight: '24px' }}>
+                              {tp('Rotate')}
+                            </Box>
+                          </Stack.Item>
+                          <Stack.Item grow>
+                            <Button
+                              fluid
+                              textAlign="center"
+                              icon="arrow-right"
+                              tooltip={tp('Rotate right')}
+                              onClick={() =>
+                                doPref(
+                                  'character_setup_preview_rotate',
+                                  undefined,
+                                  { rotate: 'right' },
+                                )
+                              }
+                            />
+                          </Stack.Item>
+                        </Stack>
+                        <Button
+                          fluid
+                          mb={0.5}
+                          icon={
+                            asBool(data.preview_underwear)
+                              ? 'check-square'
+                              : 'square'
+                          }
+                          selected={asBool(data.preview_underwear)}
+                          onClick={() =>
+                            doPref('character_setup_preview_layer', undefined, {
+                              layer: 'underwear',
+                            })
+                          }
+                        >
+                          {tp('Underwear Layer')}
+                        </Button>
+                        <Button
+                          fluid
+                          mb={0.5}
+                          icon={
+                            asBool(data.preview_clothes)
+                              ? 'check-square'
+                              : 'square'
+                          }
+                          selected={asBool(data.preview_clothes)}
+                          onClick={() =>
+                            doPref('character_setup_preview_layer', undefined, {
+                              layer: 'clothes',
+                            })
+                          }
+                        >
+                          {tp('Work Clothes Layer')}
+                        </Button>
+                        <Button
+                          fluid
+                          icon="dice"
+                          onClick={() => doPref('randomiseappearanceprefs')}
+                        >
+                          {tp('Randomise Appearance')}
+                        </Button>
+                        <Stack mt={0.5}>
+                          <Stack.Item>
+                            <Button
+                              icon="arrow-left"
+                              disabled={previewScale <= 1}
+                              tooltip={tp('Zoom out')}
+                              onClick={() => setPreviewScale(previewScale - 1)}
+                            />
+                          </Stack.Item>
+                          <Stack.Item grow>
+                            <Box
+                              color="label"
+                              textAlign="center"
+                              style={{ lineHeight: '24px' }}
+                            >
+                              {tp('Zoom')} {previewScale}x
+                            </Box>
+                          </Stack.Item>
+                          <Stack.Item>
+                            <Button
+                              icon="arrow-right"
+                              disabled={previewScale >= 3}
+                              tooltip={tp('Zoom in')}
+                              onClick={() => setPreviewScale(previewScale + 1)}
+                            />
+                          </Stack.Item>
+                        </Stack>
+                      </Stack.Item>
+                    </Stack>
+                  </Section>
+                </Stack.Item>
 
-              <Stack.Item grow basis={0}>
-                <Section fill scrollable>{renderActiveSection()}</Section>
-              </Stack.Item>
-            </Stack>
-          </Stack.Item>
-
-          <Stack.Item>
-            <Section>
-              <Stack align="center">
-                <Stack.Item grow>
-                  <Stack>
-                    <Stack.Item>
-                      <FooterSummary icon="shield-alt" label="Class" value={data.high_job} onClick={() => setActiveSection('gameplay')} />
-                    </Stack.Item>
-                    <Stack.Item>
-                      <FooterSummary icon="trophy" label="Triumphs" value={data.triumphs} onClick={() => setActiveSection('gameplay')} />
-                    </Stack.Item>
-                  </Stack>
-                </Stack.Item>
-                <Stack.Item>
-                  <Button icon="dice" tooltip={tp('Randomise Appearance')} onClick={() => doPref('randomiseappearanceprefs')}>
-                    {tp('Randomise')}
-                  </Button>
-                </Stack.Item>
-                <Stack.Item>
-                  <Button icon="undo" tooltip={tp('Undo from save')} onClick={() => doPref('load')}>
-                    {tp('Undo')}
-                  </Button>
-                </Stack.Item>
-                <Stack.Item>
-                  <Button icon="save" color="blue" tooltip={tp('Save')} onClick={() => doPref('save')}>
-                    {tp('Save')}
-                  </Button>
-                </Stack.Item>
-                <Stack.Item>
-                  <Button icon="check" color="green" tooltip={tp('Done')} onClick={() => doPref('finished')}>
-                    {tp('Done')}
-                  </Button>
+                <Stack.Item grow basis={0}>
+                  <Section fill scrollable>
+                    {renderActiveSection()}
+                  </Section>
                 </Stack.Item>
               </Stack>
-            </Section>
-          </Stack.Item>
-        </Stack>
+            </Stack.Item>
+
+            <Stack.Item>
+              <Section>
+                <Stack align="center">
+                  <Stack.Item grow>
+                    <Stack>
+                      <Stack.Item>
+                        <FooterSummary
+                          icon="shield-alt"
+                          label="Class"
+                          value={data.high_job}
+                          onClick={() => setActiveSection('gameplay')}
+                        />
+                      </Stack.Item>
+                      <Stack.Item>
+                        <FooterSummary
+                          icon="trophy"
+                          label="Triumphs"
+                          value={data.triumphs}
+                          onClick={() => setActiveSection('gameplay')}
+                        />
+                      </Stack.Item>
+                    </Stack>
+                  </Stack.Item>
+                  <Stack.Item>
+                    <Button
+                      icon="dice"
+                      tooltip={tp('Randomise Appearance')}
+                      onClick={() => doPref('randomiseappearanceprefs')}
+                    >
+                      {tp('Randomise')}
+                    </Button>
+                  </Stack.Item>
+                  <Stack.Item>
+                    <Button
+                      icon="undo"
+                      tooltip={tp('Undo from save')}
+                      onClick={() => doPref('load')}
+                    >
+                      {tp('Undo')}
+                    </Button>
+                  </Stack.Item>
+                  <Stack.Item>
+                    <Button
+                      icon="save"
+                      color="blue"
+                      tooltip={tp('Save')}
+                      onClick={() => doPref('save')}
+                    >
+                      {tp('Save')}
+                    </Button>
+                  </Stack.Item>
+                  <Stack.Item>
+                    <Button
+                      icon="check"
+                      color="green"
+                      tooltip={tp('Done')}
+                      onClick={() => doPref('finished')}
+                    >
+                      {tp('Done')}
+                    </Button>
+                  </Stack.Item>
+                </Stack>
+              </Section>
+            </Stack.Item>
+          </Stack>
         </Box>
       </Window.Content>
     </Window>
