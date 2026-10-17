@@ -1,0 +1,14 @@
+author: "trueroguan"
+delete-after: True
+changes:
+  - bugfix: "Settings tab buttons work again - most of them silently did nothing when clicked"
+  - bugfix: "The character preview no longer leaves black rectangles on top of other windows"
+  - bugfix: "Item examine tooltips actually appear instead of quietly failing"
+  - bugfix: "Species descriptions no longer run words together or cut off mid-word"
+  - bugfix: "Picking a job whose gear comes from its class no longer previews your character naked"
+  - bugfix: "Intimacy panel sliders no longer stick to the values they had when the panel opened"
+  - qol: "Character setup is noticeably lighter and more responsive"
+  - qol: "Species, faiths and patrons are translated for players using the Russian interface"
+  - qol: "The \"discriminated species\" warning is now a red badge instead of being buried at the end of the description"
+  - code_imp: "Reworked character setup payloads - option catalogs are sent once instead of on every update"
+  - refactor: "Split the character setup interface into separate type and component files"
