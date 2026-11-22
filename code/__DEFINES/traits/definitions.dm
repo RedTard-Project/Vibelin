@@ -39,7 +39,8 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_SINKING "sinking"
 
 // ************* mob traits
-
+///This trait lets us tell what an ingredient does when cooked with
+#define TRAIT_INGREDIENT_INSIGHT "Ingredient Insight"
 /// Prevents voluntary movement.
 #define TRAIT_IMMOBILIZED "immobilized"
 /// Buckling yourself to objects with this trait won't immobilize you
@@ -442,6 +443,7 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_POISONBITE "Poison Bite"
 #define TRAIT_BLOODDRINKER "Blood Drinker" // Can drink blood without vomiting
 #define TRAIT_SILVER_IMMUNE "Silver Immune"
+#define TRAIT_TRUESILVER_IMMUNE "Truesilver Immune"
 #define TRAIT_FORAGER "Expert Forager"
 #define TRAIT_TINY "Tiny"
 #define TRAIT_BIGGUY "Big Guy"
@@ -476,6 +478,7 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define TRAIT_KNOWCOURTAGENTS "knowagents"
 #define TRAIT_VAMPMANSION "vampiremansion"
 #define TRAIT_VAMP_DREAMS "vamp_dreams"
+#define TRAIT_VAMP_OFFERED "offered_vampirism"
 #define TRAIT_INHUMENCAMP "inhumencamp"
 #define TRAIT_GALLOWBAND "gallowband"
 #define TRAIT_INTRAINING "intraining" //allows certain roles to bypass the average skill limitation of training dummies

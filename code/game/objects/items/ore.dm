@@ -49,7 +49,7 @@
 /obj/item/ore/silver/Initialize(mapload)
 	. = ..()
 	icon_state = "oresilv[rand(1,3)]"
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/ore/iron
 	name = "raw iron"
@@ -128,7 +128,7 @@
 /obj/item/ore/bloodstone/Initialize(mapload)
 	. = ..()
 	icon_state = "orecorrupt[rand(1,3)]"
-	enchant(/datum/enchantment/bloodcurse)
+	enchant(/datum/enchantment/on_hit/bloodcurse)
 
 /obj/item/ore/coal/charcoal
 	name = "charcoal"
@@ -162,6 +162,10 @@
 	armor_type = /datum/armor/cursedrosa
 	attacked_sound = list('sound/combat/hits/armor/chain_slashed (1).ogg', 'sound/combat/hits/armor/chain_slashed (2).ogg', 'sound/combat/hits/armor/chain_slashed (3).ogg')
 	examine_highlight_type = /datum/examine_highlight/blackbriar
+
+/obj/item/ore/cursedrosa/Initialize(mapload)
+	. = ..()
+	AddElement(/datum/element/food_topping, "cursedrosa", null, 3, topping_name = "black briar rosa")
 
 /obj/item/ore/cursedrosa/equipped(mob/living/carbon/human/user, slot)
 	. = ..()
@@ -305,16 +309,20 @@
 
 /obj/item/ingot/silver/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
-/obj/item/ingot/silver/truesilver
+/obj/item/ingot/truesilver
 	name = "truesilver bar"
 	desc = "A bar of glistening truesilver. Blessed material of The Moon Prince and the ultimate bane of nite creachers."
 	icon_state = "ingotlunar"
-	smeltresult = /obj/item/ingot/silver/truesilver
+	smeltresult = /obj/item/ingot/truesilver
 	melting_material = /datum/material/truesilver
 	sellprice = 60
 	item_weight = 6.65 KILOGRAMS
+
+/obj/item/ingot/truesilver/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/on_hit/truesilver)
 
 /obj/item/ingot/steel
 	name = "steel bar"
@@ -364,7 +372,7 @@
 
 /obj/item/ingot/bloodsteel/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/bloodcurse)
+	enchant(/datum/enchantment/on_hit/bloodcurse)
 
 /obj/item/ingot/steel_slag
 	name = "steel slag"
@@ -446,7 +454,7 @@
 
 /obj/item/ingot/avantyne
 	name = "avantyne wafer"
-	desc = "This ingot, though borne of unholy circumstance, rumbles with otherworldly potential. Chiseled onto the darksteel is a forbidden iteration of the psycross; a foreboding sign for those who bow to lesser gods."
+	desc = "This ingot, though borne of unholy circumstance, rumbles with otherworldly potential. Chiseled onto the avantyne is a forbidden iteration of the psycross; a foreboding sign for those who bow to lesser gods."
 	icon_state = "ingotavantyne"
 	sellprice = 0 // Super evil Zizo material, nobody wants this
 	smeltresult = /obj/item/ingot/avantyne
@@ -524,7 +532,7 @@
 
 /obj/item/ingot/component/threadavantyne
 	name = "avantyne thread"
-	desc = "These strands, though borne of unholy circumstance, shimmer with otherworldly potential. Each wire of darksteel seem to twitch with vigor, whenever brought close to another alloy; like a parasite drawn to a host."
+	desc = "These strands, though borne of unholy circumstance, shimmer with otherworldly potential. Each wire of avantyne seem to twitch with vigor, whenever brought close to another alloy; like a parasite drawn to a host."
 	icon_state = "component_avantynethread"
 	sellprice = 0 // Super evil Zizo material, nobody wants this
 

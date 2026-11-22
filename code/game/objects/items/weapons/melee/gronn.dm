@@ -73,7 +73,7 @@
 
 /obj/item/weapon/handclaw/steel/silver/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/weapon/handclaw/steel/blacksteel
 	name = "blacksteel mantis claws"
@@ -93,7 +93,7 @@
 
 /obj/item/weapon/handclaw/steel/bloodsteel/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/bloodcurse)
+	enchant(/datum/enchantment/on_hit/bloodcurse)
 
 /obj/item/weapon/handclaw/steel/bloodsteel/relic
 	name = "\proper regret"
@@ -182,6 +182,7 @@
 	force_wielded = DAMAGE_HEAVYCLUB_WIELD - 3 //-3 compared to grand mace(steel goden). Better intents.
 	wdefense = GOOD_PARRY
 	wlength = WLENGTH_LONG
+	sharpness = IS_BLUNT
 	possible_item_intents = list(/datum/intent/mace/strike)
 	gripped_intents = list(/datum/intent/mace/strike, /datum/intent/mace/smash, /datum/intent/effect/daze, /datum/intent/effect/hobble)
 	minstr = 12

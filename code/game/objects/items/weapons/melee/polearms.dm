@@ -55,6 +55,7 @@
 	sellprice = 5
 	item_weight = 1 KILOGRAMS
 	weapon_special = /datum/special_intent/quarterstaff_sweep
+	associated_skill = /datum/attribute/skill/combat/polearms/staves
 
 /obj/item/weapon/polearm/woodstaff/getonmobprop(tag)
 	. = ..()
@@ -122,7 +123,7 @@
 
 /obj/item/weapon/polearm/woodstaff/quarterstaff/silver/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/weapon/polearm/woodstaff/quarterstaff/gold
 	name = "golden quarterstaff"
@@ -166,7 +167,7 @@
 
 /obj/item/weapon/polearm/woodstaff/quarterstaff/bloodsteel/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/bloodcurse)
+	enchant(/datum/enchantment/on_hit/bloodcurse)
 
 /obj/item/weapon/polearm/woodstaff/quarterstaff/bloodsteel/relic
 	name = "\proper remorse"
@@ -270,7 +271,7 @@
 
 /obj/item/weapon/polearm/spear/silver/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/weapon/polearm/spear/bloodsteel
 	name = "bloodsteel spear"
@@ -287,7 +288,7 @@
 
 /obj/item/weapon/polearm/spear/bloodsteel/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/bloodcurse)
+	enchant(/datum/enchantment/on_hit/bloodcurse)
 
 /obj/item/weapon/polearm/spear/abyssor
 	name = "depthseeker"
@@ -320,7 +321,7 @@
 
 /obj/item/weapon/polearm/spear/psydon/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/weapon/polearm/spear/psydon/noblessing
 	item_weight = 2.5 KILOGRAMS
@@ -516,7 +517,7 @@
 
 /obj/item/weapon/polearm/spear/javelin/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/weapon/polearm/spear/bone
 	name = "bone javelin"
@@ -609,20 +610,28 @@
 	wbalance = EASY_TO_DODGE
 	max_blade_int = 300
 	melting_material = /datum/material/silver
-	melt_amount = 150
 	sellprice = 120
 	max_integrity = INTEGRITY_HALBERD * INTEGRITY_MOD_SILVER
 
 /obj/item/weapon/polearm/halberd/silver/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
-/obj/item/weapon/polearm/halberd/silver/truesilver
+/obj/item/weapon/polearm/halberd/truesilver
 	name = "truesilver halberd"
 	desc = "A halberd forged from truesilver, a favored weapon of the Lunar Order."
 	icon_state = "lunar_halberd"
+	force = DAMAGE_SPEAR
+	force_wielded = DAMAGE_HALBERD_WIELD
+	wbalance = EASY_TO_DODGE
+	max_blade_int = 300
 	melting_material = /datum/material/truesilver
+	sellprice = 140
 	max_integrity = INTEGRITY_HALBERD * INTEGRITY_MOD_TRUESILVER
+
+/obj/item/weapon/polearm/halberd/truesilver/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/on_hit/truesilver)
 
 /obj/item/weapon/polearm/halberd/bloodsteel
 	name = "bloodsteel halberd"
@@ -639,7 +648,7 @@
 
 /obj/item/weapon/polearm/halberd/bloodsteel/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/bloodcurse)
+	enchant(/datum/enchantment/on_hit/bloodcurse)
 
 /obj/item/weapon/polearm/halberd/bloodsteel/relic
 	name = "\proper vanguard"

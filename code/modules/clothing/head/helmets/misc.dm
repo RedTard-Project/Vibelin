@@ -512,7 +512,7 @@
 
 /obj/item/clothing/head/helmet/visored/knight/owl/lunar/Initialize()
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/clothing/head/helmet/visored/knight/aalloy
 	name = "decrepit bascinet"
@@ -705,8 +705,8 @@
 //................. Zizo Barbute .............. //
 
 /obj/item/clothing/head/helmet/visored/zizo
-	name = "darksteel barbute"
-	desc = "A darksteel barbute. This one has an adjustable visor. Called forth from the edge of what should be known. In Her name."
+	name = "avantyne barbute"
+	desc = "An avantyne barbute. This one has an adjustable visor. Called forth from the edge of what should be known. In Her name."
 	icon_state = "zizobarbute"
 	icon = 'icons/roguetown/clothing/special/evilarmor.dmi'
 	mob_overlay_icon = 'icons/roguetown/clothing/special/onmob/evilarmor.dmi'
@@ -714,7 +714,7 @@
 	melting_material = /datum/material/avantyne
 	melt_amount = 100
 	item_weight = 3.7 KILOGRAMS
-	max_integrity = INTEGRITY_OLD_STRONGEST * INTEGRITY_MOD_DARKSTEEL
+	max_integrity = INTEGRITY_OLD_STRONGEST * INTEGRITY_MOD_AVANTYNE
 
 //................. Silver Bascinet .............. //
 
@@ -733,7 +733,7 @@
 
 /obj/item/clothing/head/helmet/visored/silver/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 /obj/item/clothing/head/helmet/visored/silver/armet
 	name = "silver armet"
@@ -742,7 +742,7 @@
 
 /obj/item/clothing/head/helmet/visored/silver/armet/Initialize(mapload)
 	. = ..()
-	enchant(/datum/enchantment/silver)
+	enchant(/datum/enchantment/on_hit/silver)
 
 //............... Feldshers Cage ............... //
 /obj/item/clothing/head/helmet/feld
